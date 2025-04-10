@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Mi App de Gestión</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <style>
+        /* Estilos muy básicos (similares a proveedores.html) */
+        body { font-family: sans-serif; display: flex; margin: 0;}
+        .sidebar { width: 200px; background-color: #f4f4f4; padding: 15px; height: 100vh; box-sizing: border-box; overflow-y: auto;}
+        .sidebar h2 { margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li a { text-decoration: none; color: #333; display: block; padding: 8px 0; }
+        .sidebar ul li a.active { font-weight: bold; }
+        .content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .content header { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .actions button { margin-right: 5px; padding: 3px 6px; cursor: pointer; }
+        .add-button { padding: 10px 15px; font-size: 1.1em; cursor: pointer; margin-bottom: 20px; background-color: #007bff; color: white; border: none; border-radius: 4px;}
+        .data-form { border: 1px solid #ccc; padding: 20px; margin-top: 20px; background-color: #f9f9f9; border-radius: 5px; }
+        .data-form h3 { margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold;}
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;}
+        .form-actions button { padding: 8px 12px; cursor: pointer; margin-right: 10px;}
+        .hidden { display: none; }
+        .error { color: red; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+         <h2>Gestiona Fácil</h2>
+         <p><small id="business-name-sidebar">Nombre Negocio</small></p>
+        <ul>
+            <li><a href="dashboard.html">Inicio / Dashboard</a></li>
+            <li><a href="nueva_venta.html">Nueva Venta (POS)</a></li>
+            <li><a href="restaurante.html">Restaurante</a></li>
+            <li><a href="caja.html">Caja</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="inventario.html">Inventario</a></li>
+            <li><a href="proveedores.html">Proveedores</a></li>
+            <li><a href="clientes.html" class="active">Clientes</a></li>
+            <li><a href="gastos.html">Gastos / Pagos</a></li>
+            <li><a href="reportes.html">Reportes</a></li>
+            <li><a href="configuracion.html">Configuración</a></li>
+            <li><a href="login.html" id="logout-button">Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Clientes</h1>
+            <p>Administra la información básica de tus clientes.</p>
+        </header>
+
+        <button id="show-add-form-button" class="add-button">+ Agregar Nuevo Cliente</button>
+
+        <!-- Formulario para Agregar/Editar Cliente (Inicialmente oculto) -->
+        <section id="client-form-section" class="data-form hidden">
+            <h3 id="form-title">Agregar Nuevo Cliente</h3>
+            <form id="client-form">
+                <input type="hidden" id="client-id">
+
+                <div class="form-group">
+                    <label for="client-name">Nombre del Cliente:</label>
+                    <input type="text" id="client-name" required>
+                </div>
+                 <div class="form-group">
+                    <label for="client-phone">Teléfono (Opcional):</label>
+                    <input type="tel" id="client-phone">
+                </div>
+                 <div class="form-group">
+                    <label for="client-email">Correo Electrónico (Opcional):</label>
+                    <input type="email" id="client-email">
+                </div>
+                 <div class="form-group">
+                    <label for="client-address">Dirección (Opcional):</label>
+                    <textarea id="client-address" rows="2"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="client-notes">Notas Adicionales (Opcional):</label>
+                    <textarea id="client-notes" rows="3"></textarea>
+                </div>
+                <p id="client-form-error" class="error hidden"></p>
+                <div class="form-actions">
+                    <button type="submit" id="save-client-button">Guardar Cliente</button>
+                    <button type="button" id="cancel-edit-button">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <h2>Listado de Clientes</h2>
+        <input type="search" id="client-search-table" placeholder="Buscar cliente..." style="margin-bottom: 10px; padding: 8px; width: 300px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="client-table-body">
+                <!-- Las filas de clientes se cargarán aquí con JavaScript -->
+                <!-- Ejemplo de fila:
+                <tr>
+                    <td>María García</td>
+                    <td>555-9876</td>
+                    <td>maria.g@email.com</td>
+                    <td class="actions">
+                        <button class="edit-btn" data-id="c1">Editar</button>
+                        <button class="delete-btn" data-id="c1">Eliminar</button>
+                    </td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+         <p id="no-clients-message" class="hidden">No tienes clientes registrados todavía.</p>
+
+    </main>
+
+    <!-- <script src="js/app.js"></script> -->
+    <!-- <script src="js/clientes.js"></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+            document.getElementById('business-name-sidebar').textContent = businessName;
+
+            // Elementos UI Clientes
+            const showClientFormButton = document.getElementById('show-add-form-button');
+            const clientFormSection = document.getElementById('client-form-section');
+            const clientForm = document.getElementById('client-form');
+            const clientFormTitle = document.getElementById('form-title');
+            const cancelClientEditButton = document.getElementById('cancel-edit-button');
+            const clientTableBody = document.getElementById('client-table-body');
+            const noClientsMessage = document.getElementById('no-clients-message');
+            const clientSearchTable = document.getElementById('client-search-table');
+            const clientIdField = document.getElementById('client-id');
+            const clientFormError = document.getElementById('client-form-error');
+
+            let allClients = [];
+
+            // --- Carga Inicial ---
+            loadClients();
+
+            // --- Event Listeners ---
+            showClientFormButton.addEventListener('click', () => {
+                resetClientForm();
+                clientFormTitle.textContent = 'Agregar Nuevo Cliente';
+                clientFormSection.classList.remove('hidden');
+                showClientFormButton.classList.add('hidden');
+            });
+
+            cancelClientEditButton.addEventListener('click', () => {
+                clientFormSection.classList.add('hidden');
+                showClientFormButton.classList.remove('hidden');
+                resetClientForm();
+            });
+
+            clientForm.addEventListener('submit', handleClientFormSubmit);
+
+             clientTableBody.addEventListener('click', (event) => {
+                if (event.target.classList.contains('edit-btn')) {
+                    const clientId = event.target.dataset.id;
+                    editClient(clientId);
+                } else if (event.target.classList.contains('delete-btn')) {
+                    const clientId = event.target.dataset.id;
+                    deleteClient(clientId);
+                }
+            });
+
+             clientSearchTable.addEventListener('input', renderClientTable);
+
+
+            // --- Funciones Clientes ---
+            function loadClients() {
+                try {
+                    allClients = JSON.parse(localStorage.getItem('clientes') || '[]');
+                    renderClientTable();
+                } catch (error) {
+                    console.error("Error cargando clientes:", error);
+                    allClients = [];
+                }
+            }
+
+             function renderClientTable() {
+                clientTableBody.innerHTML = '';
+                const searchTerm = clientSearchTable.value.toLowerCase();
+
+                const filteredClients = allClients.filter(client =>
+                    client.nombre.toLowerCase().includes(searchTerm) ||
+                    (client.telefono && client.telefono.includes(searchTerm)) ||
+                    (client.email && client.email.toLowerCase().includes(searchTerm))
+                );
+
+                 if (filteredClients.length === 0) {
+                    noClientsMessage.classList.remove('hidden');
+                } else {
+                    noClientsMessage.classList.add('hidden');
+                    filteredClients.forEach(client => {
+                        const row = clientTableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${client.nombre || 'N/A'}</td>
+                            <td>${client.telefono || '-'}</td>
+                            <td>${client.email || '-'}</td>
+                            <td class="actions">
+                                <button class="edit-btn" data-id="${client.id}">Editar</button>
+                                <button class="delete-btn" data-id="${client.id}">Eliminar</button>
+                            </td>
+                        `;
+                    });
+                }
+            }
+
+            function handleClientFormSubmit(event) {
+                event.preventDefault();
+                clientFormError.classList.add('hidden');
+
+                const clientData = {
+                    id: clientIdField.value ? clientIdField.value : `c${Date.now()}`, // ID simple: c + timestamp
+                    nombre: document.getElementById('client-name').value.trim(),
+                    telefono: document.getElementById('client-phone').value.trim() || null,
+                    email: document.getElementById('client-email').value.trim() || null,
+                    direccion: document.getElementById('client-address').value.trim() || null,
+                    notas: document.getElementById('client-notes').value.trim() || null,
+                };
+
+                if (!clientData.nombre) {
+                    clientFormError.textContent = 'El Nombre del Cliente es obligatorio.';
+                    clientFormError.classList.remove('hidden');
+                    return;
+                }
+
+                saveClient(clientData);
+                resetClientForm();
+                clientFormSection.classList.add('hidden');
+                showClientFormButton.classList.remove('hidden');
+                loadClients(); // Recargar y renderizar tabla
+            }
+
+            function saveClient(clientData) {
+                 try {
+                    const index = allClients.findIndex(c => c.id === clientData.id);
+                    if (index > -1) {
+                        allClients[index] = clientData; // Actualizar
+                    } else {
+                        allClients.push(clientData); // Agregar nuevo
+                    }
+                    localStorage.setItem('clientes', JSON.stringify(allClients));
+                    console.log("Cliente guardado:", clientData);
+                } catch (error) {
+                    console.error("Error guardando cliente:", error);
+                    alert("Hubo un error al guardar el cliente.");
+                }
+            }
+
+             function editClient(clientId) {
+                const client = allClients.find(c => c.id == clientId);
+                if (client) {
+                    resetClientForm();
+                    clientIdField.value = client.id;
+                    document.getElementById('client-name').value = client.nombre || '';
+                    document.getElementById('client-phone').value = client.telefono || '';
+                    document.getElementById('client-email').value = client.email || '';
+                    document.getElementById('client-address').value = client.direccion || '';
+                    document.getElementById('client-notes').value = client.notas || '';
+
+                    clientFormTitle.textContent = 'Editar Cliente';
+                    clientFormSection.classList.remove('hidden');
+                    showClientFormButton.classList.add('hidden');
+                }
+            }
+
+             function deleteClient(clientId) {
+                 // Verificar si el cliente está vinculado a algo (ej: ventas a crédito futuras)
+                 // Por ahora, eliminación simple
+                 const client = allClients.find(c => c.id == clientId);
+                 if (client && confirm(`¿Estás seguro de que quieres eliminar al cliente "${client.nombre}"?`)) {
+                    try {
+                        allClients = allClients.filter(c => c.id != clientId);
+                        localStorage.setItem('clientes', JSON.stringify(allClients));
+                        console.log("Cliente eliminado:", clientId);
+                        renderClientTable();
+                    } catch (error) {
+                         console.error("Error eliminando cliente:", error);
+                         alert("Hubo un error al eliminar el cliente.");
+                    }
+                 }
+            }
+
+             function resetClientForm() {
+                clientForm.reset();
+                clientIdField.value = '';
+                clientFormError.classList.add('hidden');
+            }
+
+
+             // Lógica botón Salir
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

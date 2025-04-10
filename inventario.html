@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+             /* Adjusted for better contrast on light bg */
+             --warning-bg-color: #fff8e1; /* Lighter yellow */
+             --warning-border-color: #ffecb3;
+             --warning-text-color: #c77c02; /* Darker orange/brown */
+             /* Adjusted for better contrast on light bg */
+             --danger-bg-color: #fdecea; /* Lighter red */
+             --danger-border-color: #f5c6cb;
+             --danger-text-color-row: #a02a33; /* Darker red */
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --warning-hover-color: #f8d347;
+             /* Adjusted for dark bg */
+             --warning-bg-color: rgba(253, 193, 7, 0.1);
+             --warning-border-color: rgba(253, 193, 7, 0.2);
+             --warning-text-color: #fdc107;
+             /* Adjusted for dark bg */
+             --danger-bg-color: rgba(231, 76, 60, 0.1);
+             --danger-border-color: rgba(231, 76, 60, 0.2);
+             --danger-text-color-row: #f1948a;
+            --info-color: #3498db;
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             .filters input[type="search"] { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%23adb5bd" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); }
+              th { background-color: rgba(255,255,255,0.05) !important; }
+              tbody tr:not(.low-stock):not(.no-stock):hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+              #no-inventory-message { background-color: rgba(255,255,255,0.03); }
+             #product-search-results { border-color: var(--border-color); background: var(--input-bg-color); }
+             #product-search-results button { border-bottom-color: var(--border-color); color: var(--text-color); }
+             #product-search-results button:hover { background-color: rgba(52, 152, 219, 0.1); }
+             #selected-product-info { background-color: rgba(255,255,255,0.03); }
+             .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+             .status-ok { background-color: rgba(32, 201, 151, 0.1); } /* Adjusted dark badge colors */
+             .status-low { background-color: var(--warning-bg-color); }
+             .status-out { background-color: rgba(231, 76, 60, 0.1); }
+             .status-na { background-color: rgba(173, 181, 189, 0.1); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); box-shadow: var(--box-shadow); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; }
+
+        /* Filters Section */
+        .filters { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+        .filters label { font-weight: 500; color: var(--text-muted-color); font-size: 0.9em; }
+        .filters select, .filters input[type="search"] { padding: 9px 12px; /* Slightly smaller padding */ border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 0.95em; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; height: 40px; }
+        .filters select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%236c757d" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; background-size: 12px 12px; padding-right: 35px; }
+        .filters input[type="search"] { padding-left: 35px; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%236c757d" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); background-repeat: no-repeat; background-position: left 12px center; background-size: 14px 14px; margin-left: auto; min-width: 250px; }
+        .filters select:focus, .filters input[type="search"]:focus { outline: none; border-color: var(--input-focus-border-color); box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+
+        /* Table Styles */
+        .table-container { /* Use card styles */ overflow: hidden; padding: 0; margin-bottom: 25px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0; min-width: 800px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9em; white-space: nowrap; transition: background-color 0.15s ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+        th { background-color: rgba(0,0,0,0.02); font-weight: 600; font-size: 0.85em; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.7px; position: sticky; top: 0; z-index: 1; }
+        tbody tr:not(.low-stock):not(.no-stock):hover { background-color: rgba(0, 123, 255, 0.03); }
+         tbody tr:last-child td { border-bottom: none; }
+         td:nth-child(3), td:nth-child(4) { text-align: center; } /* Center stock numbers */
+         th:nth-child(3), th:nth-child(4) { text-align: center; }
+
+        /* Stock Status Row Styles */
+         .low-stock td { background-color: var(--warning-bg-color) !important; color: var(--warning-text-color) !important; font-weight: 500; border-bottom-color: var(--warning-border-color) !important; }
+         .no-stock td { background-color: var(--danger-bg-color) !important; color: var(--danger-text-color-row) !important; font-weight: 500; border-bottom-color: var(--danger-border-color) !important; }
+         .low-stock .status-badge, .no-stock .status-badge { font-weight: bold; }
+         /* Ensure hover doesn't override status background */
+         tbody tr.low-stock:hover td, tbody tr.no-stock:hover td { background-color: inherit !important; }
+
+
+        .actions button { margin: 0; padding: 5px 8px; background: none; border: 1px solid transparent; border-radius: var(--border-radius-md); font-size: 0.9em; transition: all 0.15s ease; line-height: 1; }
+        .actions .adjust-btn { color: var(--primary-color); cursor: pointer; }
+        .actions .adjust-btn:hover { background-color: rgba(0, 123, 255, 0.1); }
+        .actions button i { pointer-events: none; }
+
+         .status-badge { padding: 3px 8px; border-radius: var(--border-radius-md); font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid transparent; }
+         .status-ok { background-color: rgba(40, 167, 69, 0.1); color: var(--success-color); border-color: rgba(40, 167, 69, 0.2); }
+         .status-low { background-color: var(--warning-bg-color); color: var(--warning-text-color); border-color: var(--warning-border-color); }
+         .status-out { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-color); border-color: rgba(220, 53, 69, 0.2); }
+         .status-na { background-color: rgba(108, 117, 125, 0.1); color: var(--text-muted-color); border-color: rgba(108, 117, 125, 0.2); }
+
+        /* Adjustment Form Styles */
+        .adjustment-form { /* Use card styles */ padding: 25px 30px; margin-top: 20px; margin-bottom: 30px; }
+        .adjustment-form h3 { margin-top: 0; margin-bottom: 25px; font-weight: 600; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 25px; }
+        .form-group { margin-bottom: 0; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+        .form-group .input-group { position: relative; }
+         .form-group .input-group i.fa-fw { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); transition: color var(--transition-speed) ease; font-size: 0.95em; pointer-events: none; width: 1.2em; text-align: center; }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea { width: 100%; padding: 11px 15px; box-sizing: border-box; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 1rem; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+         .form-group .input-group input { padding-left: 45px; }
+        .form-group select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%236c757d" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>'); background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; padding-right: 40px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--input-focus-border-color); outline: none; box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         .form-group .input-group input:focus ~ i.fa-fw { color: var(--primary-color); }
+         .form-group small { font-size: 0.85em; color: var(--text-muted-color); margin-top: 5px; display: block; line-height: 1.4; }
+         .form-group textarea { padding: 11px 15px; min-height: 60px; resize: vertical; }
+         .form-group.full-width { grid-column: 1 / -1; }
+
+        /* Product search results */
+         #product-search-wrapper { position: relative; } /* Needed for absolute positioning */
+        #product-search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 10; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); background: var(--card-bg-color); /* Match form bg */ margin-top: 1px; border-radius: 0 0 var(--border-radius-md) var(--border-radius-md); box-shadow: var(--box-shadow); }
+        #product-search-results button { display: block; width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; border-bottom: 1px solid var(--border-color); cursor: pointer; font-size: 0.95em; color: var(--text-color); transition: background-color 0.15s ease; }
+        #product-search-results button:last-child { border-bottom: none; }
+        #product-search-results button:hover { background-color: rgba(0, 123, 255, 0.05); }
+         #product-search-results button small { color: var(--text-muted-color); font-size: 0.9em; margin-left: 5px; }
+
+         #selected-product-info { margin-top: 10px; padding: 10px 15px; background-color: rgba(0,0,0,0.02); border-radius: var(--border-radius-md); font-size: 0.95em; border: 1px dashed var(--border-color); }
+          #selected-product-info strong { color: var(--primary-color); }
+
+        /* Action buttons using general class */
+        .form-actions { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px; grid-column: 1 / -1; }
+        .form-actions .save-button { background-color: var(--success-color); color: white; }
+        .form-actions .save-button:hover:not(:disabled) { background-color: var(--success-hover-color); }
+        .form-actions .cancel-button { background-color: var(--secondary-color); color: white; }
+        .form-actions .cancel-button:hover:not(:disabled) { background-color: var(--secondary-hover-color); }
+
+        /* Error & Messages */
+        .message { font-size: 0.9em; margin-top: 10px; padding: 10px 15px; border-radius: var(--border-radius-md); border: 1px solid transparent; text-align: left; display: flex; align-items: center; gap: 8px; }
+        .message.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.15); grid-column: 1 / -1; }
+         .message.error i { font-size: 1.1em; }
+         #no-inventory-message { text-align: center; padding: 20px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); margin-top: 10px; }
+        .hidden { display: none !important; }
+
+         /* Theme Toggle Button (Consistent) */
+         .theme-toggle { position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030; }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments (Consistent) */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+              .adjustment-form .form-grid { grid-template-columns: 1fr 1fr; }
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .filters { flex-direction: column; align-items: stretch; gap: 10px; }
+             .filters input[type="search"] { margin-left: 0; min-width: 0; width: 100%; }
+             /* .table-container is card styled */
+             .adjustment-form { padding: 20px; }
+             .adjustment-form .form-grid { grid-template-columns: 1fr; }
+             .adjustment-form .full-width { grid-column: auto; }
+             .form-actions { flex-direction: column; gap: 8px; }
+             .form-actions button { width: 100%; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html" class="active"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Inventario</h1>
+            <p>Consulta el stock de tus productos y realiza ajustes manuales.</p>
+        </header>
+
+        <div class="filters">
+            <label for="inventory-filter">Mostrar:</label>
+            <select id="inventory-filter">
+                <option value="all">Todos los Productos</option>
+                <option value="managed">Solo Gestionados</option>
+                <option value="low">Bajos de Stock</option>
+                <option value="out">Sin Stock</option>
+            </select>
+            <input type="search" id="inventory-search" placeholder="Buscar por nombre o SKU...">
+        </div>
+
+        <div class="table-container card">
+             <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col">Stock Actual</th>
+                            <th scope="col">Stock Mínimo</th>
+                            <th scope="col">Unidad</th>
+                            <th scope="col">Proveedor</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col" style="width: 80px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body">
+                        <!-- Rows loaded by JS -->
+                    </tbody>
+                </table>
+             </div>
+        </div>
+         <p id="no-inventory-message" class="hidden">No hay productos que coincidan con los filtros.</p>
+
+         <button id="download-inventory-csv" class="action-button" style="background-color: var(--info-color); color: white; margin-bottom: 25px;">
+             <i class="fas fa-download"></i> <span class="button-text">Descargar Inventario (CSV)</span>
+         </button>
+
+
+        <!-- Formulario para Ajuste Manual -->
+        <section id="adjustment-form-section" class="adjustment-form card">
+            <h3>Ajuste Manual de Stock</h3>
+            <form id="adjustment-form" novalidate>
+                <input type="hidden" id="adjustment-product-id">
+
+                 <div class="form-grid">
+                    <div class="form-group full-width" id="product-search-wrapper"> <!-- Wrapper for positioning -->
+                         <label for="product-search-adjust">Buscar Producto a Ajustar:</label>
+                         <div class="input-group">
+                             <input type="text" id="product-search-adjust" placeholder="Escribe nombre o SKU (solo gestionados)..." autocomplete="off">
+                              <i class="fas fa-search fa-fw"></i>
+                         </div>
+                         <div id="product-search-results"></div> <!-- Results appear here -->
+                         <div id="selected-product-info" class="hidden">
+                            <strong>Producto:</strong> <span id="selected-product-name">Ninguno</span> |
+                            <strong>Stock Actual:</strong> <span id="selected-product-current-stock">N/A</span> <span id="selected-product-unit"></span>
+                         </div>
+                    </div>
+
+                     <div class="form-group">
+                         <label for="adjustment-type">Tipo de Ajuste:</label>
+                         <select id="adjustment-type" required>
+                             <option value="Compra/Entrada">Compra / Entrada (+)</option>
+                             <option value="Merma/Pérdida">Merma / Pérdida (-)</option>
+                             <option value="Uso Interno">Uso Interno (-)</option>
+                             <option value="Devolución Proveedor">Devolución a Proveedor (-)</option>
+                             <option value="Devolución Cliente">Devolución de Cliente (+)</option>
+                             <option value="Conteo Físico">Conteo Físico (=)</option>
+                             <option value="Ajuste Positivo">Ajuste Positivo (+)</option>
+                             <option value="Ajuste Negativo">Ajuste Negativo (-)</option>
+                         </select>
+                     </div>
+
+                     <div class="form-group">
+                         <label for="adjustment-quantity" id="quantity-label">Cantidad:</label>
+                         <div class="input-group">
+                            <input type="number" id="adjustment-quantity" step="any" required>
+                             <i class="fas fa-calculator fa-fw"></i>
+                         </div>
+                         <small id="quantity-help-text">Introduce la cantidad a sumar/restar o la cantidad final contada.</small>
+                     </div>
+
+                      <div class="form-group full-width">
+                        <label for="adjustment-notes">Notas (Obligatorio si es Merma, Pérdida, Uso o Ajuste):</label>
+                        <textarea id="adjustment-notes" rows="2"></textarea>
+                    </div>
+                 </div> <!-- End form-grid -->
+
+                 <p id="adjustment-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                 <div class="form-actions">
+                     <button type="submit" id="save-adjustment-button" class="action-button save-button" disabled>
+                         <i class="fas fa-check"></i> <span class="button-text">Guardar Ajuste</span>
+                     </button>
+                     <button type="button" id="cancel-adjustment-button" class="action-button cancel-button">
+                          <i class="fas fa-times"></i> <span class="button-text">Limpiar / Cancelar</span>
+                     </button>
+                 </div>
+            </form>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button'); const body = document.body; const themeIcon = themeToggleButton.querySelector('i'); const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon'; function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); } function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); } function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; } const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Elements & Config ---
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            const inventoryFilter = document.getElementById('inventory-filter');
+            const inventorySearch = document.getElementById('inventory-search');
+            const inventoryTableBody = document.getElementById('inventory-table-body');
+            const noInventoryMessage = document.getElementById('no-inventory-message');
+            const adjustmentFormSection = document.getElementById('adjustment-form-section');
+            const adjustmentForm = document.getElementById('adjustment-form');
+            const productSearchAdjustInput = document.getElementById('product-search-adjust');
+            const productSearchResultsDiv = document.getElementById('product-search-results');
+            const selectedProductInfoDiv = document.getElementById('selected-product-info');
+            const selectedProductName = document.getElementById('selected-product-name');
+            const selectedProductStock = document.getElementById('selected-product-current-stock');
+            const selectedProductUnit = document.getElementById('selected-product-unit');
+            const adjustmentProductId = document.getElementById('adjustment-product-id');
+            const adjustmentType = document.getElementById('adjustment-type');
+            const adjustmentQuantityInput = document.getElementById('adjustment-quantity');
+            const quantityLabel = document.getElementById('quantity-label');
+            const quantityHelpText = document.getElementById('quantity-help-text');
+            const adjustmentNotesInput = document.getElementById('adjustment-notes');
+            const saveAdjustmentButton = document.getElementById('save-adjustment-button');
+            const cancelAdjustmentButton = document.getElementById('cancel-adjustment-button');
+            const adjustmentError = document.getElementById('adjustment-error');
+            const adjustmentErrorSpan = adjustmentError.querySelector('span');
+            const downloadInventoryButton = document.getElementById('download-inventory-csv');
+
+            let allProducts = [];
+            let allProviders = [];
+
+            // --- Utility Functions ---
+            const showError = (message) => { adjustmentErrorSpan.textContent = message; adjustmentError.classList.remove('hidden'); };
+            const hideError = () => adjustmentError.classList.add('hidden');
+            const setLoading = (button, text = "Guardando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`; };
+            const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+            const escapeCsvValue = (value) => { if (value == null) return ''; const stringValue = String(value); if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) { return `"${stringValue.replace(/"/g, '""')}"`; } return stringValue; };
+
+
+            // --- Load Initial Data ---
+            function loadInitialConfig() {
+                try {
+                    const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    document.getElementById('business-name-sidebar').textContent = businessName;
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                    document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch(e) { console.error("Error loading config:", e); }
+            }
+
+            function loadProductsAndProviders() {
+                try {
+                    allProducts = JSON.parse(localStorage.getItem('productos') || '[]');
+                    allProviders = JSON.parse(localStorage.getItem('proveedores') || '[]');
+                    renderInventoryTable(); // Initial render
+                } catch (error) {
+                    console.error("Error cargando datos:", error);
+                    allProducts = []; allProviders = [];
+                    renderInventoryTable();
+                    noInventoryMessage.textContent = 'Error al cargar productos.';
+                    noInventoryMessage.classList.remove('hidden');
+                }
+            }
+
+            function getProviderName(providerId) {
+                const provider = allProviders.find(p => p.id === providerId); // Use strict equality
+                return provider ? provider.nombre : '-';
+            }
+
+            // --- Table Rendering & Filtering ---
+            function renderInventoryTable() {
+                inventoryTableBody.innerHTML = '';
+                const filterValue = inventoryFilter.value;
+                const searchTerm = inventorySearch.value.trim().toLowerCase();
+
+                const filteredProducts = allProducts.filter(product => {
+                    const matchesSearch = !searchTerm ||
+                                          (product.name || '').toLowerCase().includes(searchTerm) ||
+                                          (product.sku || '').toLowerCase().includes(searchTerm);
+                    if (!matchesSearch) return false;
+
+                    const managesStock = product.manageStock;
+                    const stock = managesStock ? (product.stock ?? 0) : 0;
+                    const minStock = managesStock ? (product.minStock ?? 0) : 0;
+
+                    switch (filterValue) {
+                        case 'managed': return managesStock;
+                        case 'low': return managesStock && stock > 0 && stock <= minStock;
+                        case 'out': return managesStock && stock <= 0;
+                        case 'all': default: return true;
+                    }
+                });
+
+                noInventoryMessage.classList.toggle('hidden', filteredProducts.length > 0 || allProducts.length === 0); // Show if filtered list empty but products exist
+                noInventoryMessage.textContent = (allProducts.length === 0) ? 'No hay productos registrados.' : 'No hay productos que coincidan con los filtros.';
+                downloadInventoryButton.disabled = allProducts.length === 0;
+
+                if (filteredProducts.length > 0) {
+                     filteredProducts.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+                     filteredProducts.forEach(product => {
+                        const row = inventoryTableBody.insertRow();
+                        let statusText = 'No Gestionado'; let statusClass = 'status-na'; let rowClass = '';
+                        let stockDisplay = '-'; let minStockDisplay = '-';
+
+                        if (product.manageStock) {
+                             const stock = product.stock ?? 0;
+                             const minStock = product.minStock ?? 0;
+                             stockDisplay = stock; minStockDisplay = minStock;
+                             if (stock <= 0) { statusText = 'Sin Stock'; statusClass = 'status-out'; rowClass = 'no-stock'; }
+                             else if (stock <= minStock) { statusText = 'Bajo Stock'; statusClass = 'status-low'; rowClass = 'low-stock'; }
+                             else { statusText = 'OK'; statusClass = 'status-ok'; }
+                        }
+                        if(rowClass) row.classList.add(rowClass);
+
+                        row.insertCell().textContent = product.name || 'N/A';
+                        row.insertCell().textContent = product.sku || '-';
+                        row.insertCell().textContent = stockDisplay;
+                        row.insertCell().textContent = minStockDisplay;
+                        row.insertCell().textContent = product.unit || 'unidad';
+                        row.insertCell().textContent = getProviderName(product.providerId);
+                        row.insertCell().innerHTML = `<span class="status-badge ${statusClass}"><i class="fas ${ statusClass === 'status-ok' ? 'fa-check-circle' : statusClass === 'status-low' ? 'fa-exclamation-triangle' : statusClass === 'status-out' ? 'fa-times-circle' : 'fa-minus-circle' }"></i> ${statusText}</span>`;
+                        const actionsCell = row.insertCell();
+                        actionsCell.className = 'actions';
+                        actionsCell.innerHTML = product.manageStock ? `<button class="adjust-btn" data-id="${product.id}" title="Ajustar Stock"><i class="fas fa-edit"></i></button>` : '';
+                    });
+                }
+            }
+
+            // --- Adjustment Form Logic ---
+            function searchProductForAdjustment() {
+                 const query = productSearchAdjustInput.value.trim().toLowerCase();
+                 productSearchResultsDiv.innerHTML = '';
+                 if (query.length < 2) { productSearchResultsDiv.classList.add('hidden'); return; }
+
+                 const results = allProducts.filter(p =>
+                    p.manageStock && ( (p.name || '').toLowerCase().includes(query) || (p.sku || '').toLowerCase().includes(query) )
+                 ).slice(0, 10);
+
+                 if (results.length > 0) {
+                    results.forEach(p => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.dataset.productId = p.id;
+                        btn.innerHTML = `${p.name} ${p.sku ? '('+p.sku+')' : ''} <small>- Stock: ${p.stock ?? 0} ${p.unit || 'unidad'}</small>`;
+                        btn.addEventListener('click', () => selectProductForAdjustment(p.id));
+                        productSearchResultsDiv.appendChild(btn);
+                    });
+                    productSearchResultsDiv.classList.remove('hidden');
+                 } else {
+                     productSearchResultsDiv.innerHTML = '<button disabled style="cursor:default; color: var(--text-muted-color);">No se encontraron productos gestionados.</button>';
+                     productSearchResultsDiv.classList.remove('hidden');
+                 }
+            }
+
+            function selectProductForAdjustment(productId) {
+                 const product = allProducts.find(p => p.id === productId); // Strict equality
+                 if (product) {
+                     adjustmentProductId.value = product.id;
+                     selectedProductName.textContent = product.name || 'N/A';
+                     selectedProductStock.textContent = product.stock ?? '0';
+                     selectedProductUnit.textContent = product.unit || 'unidad';
+                     selectedProductInfoDiv.classList.remove('hidden');
+                     productSearchAdjustInput.value = product.name; // Pre-fill search bar
+                     productSearchResultsDiv.innerHTML = ''; // Clear results
+                     productSearchResultsDiv.classList.add('hidden');
+                     saveAdjustmentButton.disabled = false;
+                     adjustmentQuantityInput.step = (product.unit === 'unidad' || product.unit === 'paquete' || product.unit === 'caja') ? "1" : "any";
+                     adjustmentQuantityInput.value = '';
+                     adjustmentQuantityInput.focus();
+                     updateQuantityLabels();
+                 } else { resetAdjustmentForm(); }
+             }
+
+            function updateQuantityLabels() {
+                 const isCount = adjustmentType.value === 'Conteo Físico';
+                 quantityLabel.textContent = isCount ? 'Cantidad Contada Final:' : 'Cantidad a Ajustar:';
+                 quantityHelpText.textContent = isCount
+                    ? 'Introduce la cantidad total que contaste físicamente.'
+                    : 'Número positivo para añadir (ej: 5), negativo para restar (ej: -2).';
+                 // Require notes for certain types
+                 const requiresNotes = ['Merma/Pérdida', 'Uso Interno', 'Ajuste Positivo', 'Ajuste Negativo'].includes(adjustmentType.value);
+                 adjustmentNotesInput.required = requiresNotes;
+                 adjustmentNotesInput.closest('.form-group').querySelector('label').textContent = requiresNotes
+                     ? 'Notas (Obligatorio para este tipo):'
+                     : 'Notas (Opcional):';
+            }
+
+            function prepareAdjustmentForm(productId) {
+                 selectProductForAdjustment(productId);
+                 adjustmentFormSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function resetAdjustmentForm() {
+                 adjustmentForm.reset(); // Reset native form elements
+                 adjustmentProductId.value = '';
+                 selectedProductName.textContent = 'Ninguno';
+                 selectedProductStock.textContent = 'N/A';
+                 selectedProductUnit.textContent = '';
+                 selectedProductInfoDiv.classList.add('hidden');
+                 saveAdjustmentButton.disabled = true;
+                 productSearchResultsDiv.innerHTML = '';
+                 productSearchResultsDiv.classList.add('hidden');
+                 adjustmentQuantityInput.step = "any";
+                 hideError();
+                 updateQuantityLabels(); // Reset labels and note requirement
+             }
+
+            function saveAdjustment(event) {
+                event.preventDefault();
+                hideError();
+                const button = saveAdjustmentButton;
+                const originalHTML = button.innerHTML;
+                setLoading(button);
+
+                setTimeout(() => { // Simulate async
+                    try {
+                        const productId = adjustmentProductId.value;
+                        const productIndex = allProducts.findIndex(p => p.id === productId);
+                        if (productIndex === -1) throw new Error("Producto no seleccionado o inválido.");
+                        const product = allProducts[productIndex];
+
+                        const type = adjustmentType.value;
+                        const quantityStr = adjustmentQuantityInput.value;
+                        const notes = adjustmentNotesInput.value.trim();
+                        let quantity;
+
+                        if (quantityStr === null || quantityStr.trim() === '') throw new Error("La cantidad es obligatoria.");
+                        quantity = parseFloat(quantityStr);
+                        if (isNaN(quantity)) throw new Error("La cantidad debe ser un número válido.");
+
+                        const requiresNotes = ['Merma/Pérdida', 'Uso Interno', 'Ajuste Positivo', 'Ajuste Negativo'].includes(type);
+                        if (requiresNotes && !notes) throw new Error("Las notas son obligatorias para este tipo de ajuste.");
+
+                        const requireInteger = (product.unit === 'unidad' || product.unit === 'paquete' || product.unit === 'caja') && type !== 'Conteo Físico';
+                        if (requireInteger && !Number.isInteger(quantity)) throw new Error(`La cantidad para '${product.unit}' debe ser un número entero para este tipo de ajuste.`);
+
+                        const currentStock = product.stock ?? 0;
+                        let newStock, adjustmentAmount;
+
+                        if (type === 'Conteo Físico') {
+                            if (quantity < 0) throw new Error("La cantidad contada no puede ser negativa.");
+                            newStock = quantity;
+                            adjustmentAmount = newStock - currentStock;
+                        } else {
+                            adjustmentAmount = quantity;
+                            newStock = currentStock + adjustmentAmount;
+                        }
+                        if (newStock < 0) throw new Error(`El ajuste resultaría en stock negativo (${newStock}). Stock actual: ${currentStock}.`);
+
+                        // Rounding based on unit
+                        if (!['unidad', 'paquete', 'caja'].includes(product.unit)) newStock = parseFloat(newStock.toFixed(3));
+                        else newStock = Math.round(newStock);
+
+                        // --- Save Product ---
+                        allProducts[productIndex].stock = newStock;
+                        localStorage.setItem('productos', JSON.stringify(allProducts));
+
+                        // --- Save History ---
+                        saveAdjustmentRecord({
+                            productId: productId, productName: product.name, type: type,
+                            quantityAdjusted: adjustmentAmount, quantityBefore: currentStock,
+                            quantityAfter: newStock, notes: notes, timestamp: new Date().toISOString()
+                        });
+
+                        console.log(`Stock de ${product.name} ajustado de ${currentStock} a ${newStock}`);
+                        alert(`Ajuste guardado. Nuevo stock para "${product.name}": ${newStock}`);
+                        renderInventoryTable();
+                        resetAdjustmentForm();
+
+                    } catch (error) {
+                        console.error("Error guardando ajuste:", error);
+                        showError(error.message || "Error desconocido al guardar.");
+                         // Optionally revert in-memory change if save failed - depends on desired behaviour
+                         // if(productIndex !== -1) allProducts[productIndex].stock = currentStock;
+                    } finally {
+                         clearLoading(button, originalHTML);
+                    }
+                }, 150);
+            }
+
+            function saveAdjustmentRecord(record) {
+                 try {
+                     let history = JSON.parse(localStorage.getItem('inventoryAdjustments') || '[]');
+                     history.unshift(record);
+                     localStorage.setItem('inventoryAdjustments', JSON.stringify(history));
+                 } catch(e) { console.error("Error guardando historial de ajustes", e); }
+             }
+
+             // --- Download CSV ---
+              function downloadInventoryCSV() {
+                  if (allProducts.length === 0) { alert("No hay productos para descargar."); return; }
+                  // Use the currently filtered and displayed products for download? Or all? Let's do all for now.
+                  console.log("Preparando descarga CSV de inventario completo...");
+                  const headers = ["IDProducto", "Nombre", "SKU", "StockGestionado", "StockActual", "StockMinimo", "Unidad", "IDProveedor", "ProveedorNombre", "CostoUnitario", "ValorTotalCosto", "PrecioVentaUnitario", "ValorTotalVenta", "Categoria", "Descripcion"];
+
+                  const rows = allProducts.map(p => {
+                       const cost = p.cost ?? 0; const price = p.price ?? 0; const stock = p.manageStock ? (p.stock ?? 0) : 0;
+                       const providerName = getProviderName(p.providerId);
+                      return [
+                          escapeCsvValue(p.id), escapeCsvValue(p.name), escapeCsvValue(p.sku),
+                          p.manageStock ? 'SI' : 'NO', stock, p.manageStock ? (p.minStock ?? 0) : '', escapeCsvValue(p.unit),
+                          escapeCsvValue(p.providerId), escapeCsvValue(providerName), escapeCsvValue(cost.toFixed(2)),
+                          escapeCsvValue((stock * cost).toFixed(2)), escapeCsvValue(price.toFixed(2)), escapeCsvValue((stock * price).toFixed(2)),
+                          escapeCsvValue(p.category), escapeCsvValue(p.description)
+                      ];
+                  });
+                  let csvContent = headers.join(',') + '\r\n';
+                  rows.forEach(rowArray => { csvContent += rowArray.join(',') + '\r\n'; });
+                  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                  const link = document.createElement("a"); const url = URL.createObjectURL(blob);
+                  link.setAttribute("href", url); const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                  link.setAttribute("download", `inventario_export_${dateStr}.csv`);
+                  link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+                  console.log("Descarga iniciada.");
+              }
+
+            // --- Event Listeners Setup ---
+            inventoryFilter.addEventListener('change', renderInventoryTable);
+            inventorySearch.addEventListener('input', renderInventoryTable);
+            inventoryTableBody.addEventListener('click', (event) => { const target = event.target.closest('button'); if (target?.classList.contains('adjust-btn')) { prepareAdjustmentForm(target.dataset.id); } });
+            productSearchAdjustInput.addEventListener('input', searchProductForAdjustment);
+            productSearchAdjustInput.addEventListener('blur', () => { setTimeout(() => { if (!document.activeElement.closest('#product-search-results')) { productSearchResultsDiv.innerHTML = ''; productSearchResultsDiv.classList.add('hidden'); } }, 200); }); // Hide results if click is outside
+            adjustmentType.addEventListener('change', updateQuantityLabels);
+            adjustmentForm.addEventListener('submit', saveAdjustment);
+            cancelAdjustmentButton.addEventListener('click', resetAdjustmentForm);
+            downloadInventoryButton.addEventListener('click', downloadInventoryCSV);
+
+            // --- Logout Logic (Consistent) ---
+            document.getElementById('logout-button')?.addEventListener('click', (e) => { e.preventDefault(); let canLogout = true; try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } } catch(err) { console.error("Error checking cash status on logout", err); } if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; } });
+
+            // --- Initial Load Execution ---
+            loadInitialConfig();
+            loadProductsAndProviders(); // Also calls initial renderInventoryTable
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

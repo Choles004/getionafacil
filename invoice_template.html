@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center{
+            text-align: center;
+        }
+        .restaurant-info, .customer-info {
+            margin-bottom: 20px;
+        }
+        .restaurant-info p {
+            margin: 5px 0;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .delivery-details{
+            margin-bottom: 20px;
+        }
+        .editable {
+        border: 1px dotted #ccc;
+        padding: 2px;
+        min-width: 50px;
+        display: inline-block;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="restaurant-info">
+            <h2 class="text-center">Restaurant Name</h2>
+            <p class="text-center">Address: <span class="editable" contenteditable="true">Restaurant Address</span></p>
+            <p class="text-center">Phone: <span class="editable" contenteditable="true">Restaurant Phone</span></p>
+            <p class="text-center">Invoice #: <span class="editable" contenteditable="true">Invoice Number</span></p>
+            <p class="text-center">Date: <span class="editable" contenteditable="true">Date</span></p>
+        </div>
+
+        <div class="customer-info">
+            <h3>Customer Information</h3>
+            <p>Name: <span class="editable" contenteditable="true">Customer Name</span></p>
+            <p>Address: <span class="editable" contenteditable="true">Customer Address</span></p>
+        </div>
+
+        <div class="delivery-details">
+            <h3>Delivery Information</h3>
+            <p>Customer Name: <span class="editable" contenteditable="true">Client Name</span></p>
+            <p>Phone: <span class="editable" contenteditable="true">Client Phone</span></p>
+            <p>Address: <span class="editable" contenteditable="true">Delivery Address</span></p>
+            <p>Departure Time: <span class="editable" contenteditable="true">Departure Time</span></p>
+            <p>Delivery Cost: <span class="editable" contenteditable="true">Delivery Cost</span></p>
+            <p>Amount to Pay: <span class="editable" contenteditable="true">Amount to Pay</span></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="editable" contenteditable="true">Product 1</span></td>
+                    <td><span class="editable" contenteditable="true">1</span></td>
+                    <td><span class="editable" contenteditable="true">10.00</span></td>
+                    <td><span class="editable" contenteditable="true">10.00</span></td>
+                </tr>
+                <tr>
+                    <td><span class="editable" contenteditable="true">Product 2</span></td>
+                    <td><span class="editable" contenteditable="true">2</span></td>
+                    <td><span class="editable" contenteditable="true">5.00</span></td>
+                    <td><span class="editable" contenteditable="true">10.00</span></td>
+                </tr>
+                <tr>
+                    <td><span class="editable" contenteditable="true">Product 3</span></td>
+                    <td><span class="editable" contenteditable="true">1</span></td>
+                    <td><span class="editable" contenteditable="true">20.00</span></td>
+                    <td><span class="editable" contenteditable="true">20.00</span></td>
+                </tr>
+                <tr>
+                    <td><span class="editable" contenteditable="true"></span></td>
+                    <td><span class="editable" contenteditable="true"></span></td>
+                    <td><span class="editable" contenteditable="true"></span></td>
+                    <td><span class="editable" contenteditable="true"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-right">
+            <p>Subtotal: $<span class="editable" contenteditable="true">40.00</span></p>
+            <p>Discount: $<span class="editable" contenteditable="true">0.00</span></p>
+            <p>Tip: $<span class="editable" contenteditable="true">0.00</span></p>
+            <p class="bold">Total: $<span class="editable" contenteditable="true">40.00</span></p>
+            <p>Amount Paid: $<span class="editable" contenteditable="true">40.00</span></p>
+            <p>Refund: $<span class="editable" contenteditable="true">0.00</span></p>
+        </div>
+    </div>
+</body>
+</html>

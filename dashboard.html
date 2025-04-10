@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+             --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+             --warning-hover-color: #e0a800;
+             --warning-text-color: #856404; /* Darker text for light warning bg */
+             --warning-bg-color: #fff3cd;
+             --warning-border-color: #ffeeba;
+            --info-color: #17a2b8;
+             --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff; /* Added for potential future use */
+            --input-border-color: #ced4da; /* Added for potential future use */
+            --input-focus-border-color: #80bdff; /* Added for potential future use */
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15); /* Added */
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+             --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+             --warning-hover-color: #f8d347;
+             --warning-text-color: #fdc107; /* Lighter text for dark warning bg */
+             --warning-bg-color: rgba(253, 193, 7, 0.1);
+             --warning-border-color: rgba(253, 193, 7, 0.2);
+            --info-color: #3498db;
+             --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+            #low-stock-list li.low { color: var(--warning-text-color); } /* Explicit color */
+            #low-stock-list li.out { color: var(--danger-color); } /* Explicit color */
+             #no-low-stock { color: var(--success-color); }
+             .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Adjust minmax */
+            gap: 25px; /* Slightly more gap */
+            margin-bottom: 35px; /* More space below cards */
+        }
+        .card {
+            background-color: var(--card-bg-color);
+            padding: 25px; /* More padding */
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            transition: all var(--transition-speed) ease;
+             display: flex;
+             flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-4px); /* Slightly more lift */
+            box-shadow: var(--box-shadow-hover);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.05em; /* Slightly smaller title */
+            font-weight: 600;
+            color: var(--text-muted-color);
+             display: flex;
+             align-items: center;
+             gap: 10px; /* More gap */
+             text-transform: uppercase; /* Uppercase titles */
+             letter-spacing: 0.5px;
+        }
+         .card h3 i {
+             font-size: 1.3em; /* Larger icon */
+             opacity: 0.8;
+         }
+
+        .card .card-value {
+            font-size: 2em; /* Larger value */
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            line-height: 1.1;
+        }
+        .card .card-detail {
+            font-size: 0.9em;
+            color: var(--text-muted-color);
+             margin-top: auto; /* Push detail to bottom if card height varies */
+        }
+        /* Specific Card Icon Colors */
+        #sales-today-card h3 i { color: var(--success-color); }
+        #cashbox-status-card h3 i { color: var(--info-color); }
+        #low-stock-card h3 i { color: var(--warning-color); }
+        /* Specific Value Colors (Optional) */
+        #cashbox-status.open { color: var(--success-color); font-weight: bold; }
+        #cashbox-status.closed { color: var(--danger-color); font-weight: bold; }
+
+
+        /* Low Stock List */
+        #low-stock-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9em;
+            flex-grow: 1;
+             max-height: 150px; /* Limit height and allow scroll */
+             overflow-y: auto;
+        }
+        #low-stock-list li {
+            padding: 6px 0; /* Adjust padding */
+            border-bottom: 1px dotted var(--border-color);
+            font-weight: 500;
+             display: flex;
+             align-items: center;
+             gap: 6px;
+             transition: color 0.2s ease, border-color var(--transition-speed) ease;
+        }
+        #low-stock-list li.low { color: var(--warning-color); }
+        #low-stock-list li.out { color: var(--danger-color); }
+
+         #low-stock-list li i {
+            font-size: 0.9em; /* Match icon size */
+             width: 1em; /* Align icons */
+             text-align: center;
+             flex-shrink: 0;
+         }
+        #low-stock-list li:last-child { border-bottom: none; }
+
+        #no-low-stock {
+            color: var(--success-color);
+            font-weight: 500;
+            font-size: 0.95em; /* Slightly larger */
+             margin-top: 10px;
+             display: flex;
+             align-items: center;
+             gap: 6px;
+             transition: color 0.2s ease;
+        }
+
+
+        /* Quick Actions */
+        .quick-actions { margin-top: 20px; }
+        .quick-actions h2 { font-size: 1.5em; margin-bottom: 20px; font-weight: 600; }
+        .quick-actions .actions-container { display: flex; flex-wrap: wrap; gap: 15px; }
+
+        /* Use general action button style */
+        .quick-actions .action-button {
+            padding: 11px 20px; /* Consistent padding */
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease-out;
+             display: inline-flex; /* Use inline-flex */
+             align-items: center;
+             gap: 8px;
+             line-height: 1.5;
+        }
+         .quick-actions .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .quick-actions .action-button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+
+        .quick-actions .btn-primary { background-color: var(--primary-color); color: white; }
+        .quick-actions .btn-primary:hover { background-color: var(--primary-hover-color); }
+        .quick-actions .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .quick-actions .btn-secondary:hover { background-color: var(--secondary-hover-color); }
+        .quick-actions .btn-success { background-color: var(--success-color); color: white; }
+        .quick-actions .btn-success:hover { background-color: var(--success-hover-color); }
+         .quick-actions .btn-info { background-color: var(--info-color); color: white; }
+        .quick-actions .btn-info:hover { background-color: var(--info-hover-color); }
+
+
+        .hidden { display: none !important; } /* Use important to ensure override */
+
+         /* Theme Toggle Button (Consistent) */
+         .theme-toggle {
+             position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030;
+         }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments (Consistent) */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .summary-cards { grid-template-columns: 1fr; gap: 20px; } /* Stack cards */
+             .card { padding: 20px; }
+             .card .card-value { font-size: 1.8em; }
+             .quick-actions h2 { font-size: 1.3em; }
+             .quick-actions .actions-container { gap: 10px; }
+             .quick-actions .action-button { padding: 10px 15px; font-size: 0.95em; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+         @media (max-width: 480px) { /* Smaller Mobile */
+            .quick-actions .action-button { width: 100%; justify-content: center; } /* Full width quick actions */
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+         <div class="business-info">
+            <small id="business-name-sidebar">Cargando Negocio...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Dashboard</h1>
+            <p>Un resumen rápido de tu negocio hoy.</p>
+        </header>
+
+        <section class="summary-cards">
+            <div class="card" id="sales-today-card">
+                <h3><i class="fas fa-dollar-sign"></i> Ventas del Día</h3>
+                <p class="card-value" id="sales-today-amount">--.--</p>
+                <p class="card-detail"><span id="sales-today-count">0</span> transacciones</p>
+            </div>
+            <div class="card" id="cashbox-status-card">
+                <h3><i class="fas fa-cash-register"></i> Estado de Caja</h3>
+                <p class="card-value" id="cashbox-status">Cargando...</p>
+                <p class="card-detail">Desde: <span id="cashbox-open-time">-</span></p>
+            </div>
+            <div class="card" id="low-stock-card">
+                <h3><i class="fas fa-boxes-stacked"></i> Stock Crítico</h3>
+                <ul id="low-stock-list">
+                    <li>Cargando stock...</li>
+                </ul>
+                 <p id="no-low-stock" class="hidden"><i class="fas fa-check-circle"></i> ¡Stock bajo control!</p>
+            </div>
+            <!-- Add more cards as needed -->
+        </section>
+
+        <section class="quick-actions">
+            <h2>Accesos Rápidos</h2>
+            <div class="actions-container">
+                <button class="action-button btn-success" onclick="window.location.href='nueva_venta.html'">
+                    <i class="fas fa-plus-circle"></i> Nueva Venta
+                </button>
+                <button class="action-button btn-info" onclick="window.location.href='caja.html'">
+                    <i class="fas fa-door-open"></i> Abrir/Cerrar Caja
+                </button>
+                <button class="action-button btn-primary" onclick="window.location.href='productos.html'">
+                    <i class="fas fa-box"></i> Agregar Producto
+                </button>
+                <button id="go-to-restaurant" class="action-button btn-secondary hidden" onclick="window.location.href='restaurante.html'">
+                     <i class="fas fa-utensils"></i> Ver Mesas (Restaurante)
+                </button>
+                 <button class="action-button btn-secondary" onclick="window.location.href='gastos.html'">
+                    <i class="fas fa-money-bill-wave"></i> Registrar Gasto
+                 </button>
+            </div>
+        </section>
+
+    </main>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon';
+            function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); }
+            function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); }
+            function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; }
+            const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Dashboard Elements ---
+            const businessNameEl = document.getElementById('business-name-sidebar');
+            const salesTodayAmountEl = document.getElementById('sales-today-amount');
+            const salesTodayCountEl = document.getElementById('sales-today-count');
+            const cashboxStatusEl = document.getElementById('cashbox-status');
+            const cashboxOpenTimeEl = document.getElementById('cashbox-open-time');
+            const lowStockList = document.getElementById('low-stock-list');
+            const noLowStockMsg = document.getElementById('no-low-stock');
+            const goToRestaurantButton = document.getElementById('go-to-restaurant');
+            const restaurantLinkSidebar = document.getElementById('restaurant-link');
+            const logoutButton = document.getElementById('logout-button');
+
+            let currency = '$'; // Default
+
+            // --- Load Business Info & Settings ---
+            function loadInitialSettings() {
+                try {
+                    const savedBusinessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    businessNameEl.textContent = savedBusinessName;
+                    currency = localStorage.getItem('currency') || '$'; // Load currency symbol
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                     goToRestaurantButton.classList.toggle('hidden', !isRestaurant);
+                     restaurantLinkSidebar.classList.toggle('hidden', !isRestaurant);
+
+                } catch(e) {
+                    console.error("Error loading initial settings:", e);
+                    businessNameEl.textContent = 'Error Carga';
+                     // Hide restaurant links on error just in case
+                    goToRestaurantButton.classList.add('hidden');
+                    restaurantLinkSidebar.classList.add('hidden');
+                }
+            }
+
+            // --- Load Dashboard Data ---
+            function loadDashboardData() {
+                // Reset displays
+                 salesTodayAmountEl.textContent = `${currency}--.--`;
+                 salesTodayCountEl.textContent = `0`;
+                 cashboxStatusEl.textContent = 'Cargando...';
+                 cashboxOpenTimeEl.textContent = '-';
+                 lowStockList.innerHTML = '<li>Cargando...</li>';
+                 noLowStockMsg.classList.add('hidden');
+
+                // 1. Ventas del Día
+                try {
+                    const ventasData = localStorage.getItem('ventas');
+                    const ventas = ventasData ? JSON.parse(ventasData) : [];
+                    const today = new Date().toISOString().split('T')[0];
+                    const salesToday = ventas.filter(venta => venta.fecha && venta.fecha.startsWith(today));
+                    const totalSales = salesToday.reduce((sum, venta) => sum + (venta.total || 0), 0);
+
+                    salesTodayAmountEl.textContent = `${currency}${totalSales.toFixed(2)}`;
+                    salesTodayCountEl.textContent = `${salesToday.length}`;
+                } catch (e) {
+                    console.error("Error loading sales data:", e);
+                    salesTodayAmountEl.textContent = `${currency}Error`;
+                    salesTodayCountEl.textContent = `Error`;
+                }
+
+                // 2. Estado de Caja
+                try {
+                    const cashStatusData = localStorage.getItem('cashRegisterStatus');
+                    const cashStatus = cashStatusData ? JSON.parse(cashStatusData) : {};
+                    if (cashStatus.isOpen && cashStatus.openTime) {
+                        cashboxStatusEl.textContent = 'Abierta';
+                        cashboxStatusEl.className = 'card-value open'; // Add class for styling
+                        const openTime = new Date(cashStatus.openTime);
+                        cashboxOpenTimeEl.textContent = openTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                    } else {
+                        cashboxStatusEl.textContent = 'Cerrada';
+                        cashboxStatusEl.className = 'card-value closed'; // Add class for styling
+                        cashboxOpenTimeEl.textContent = '-';
+                    }
+                } catch (e) {
+                     console.error("Error loading cash register status:", e);
+                     cashboxStatusEl.textContent = 'Error';
+                     cashboxStatusEl.className = 'card-value';
+                     cashboxOpenTimeEl.textContent = '-';
+                }
+
+                // 3. Stock Crítico
+                try {
+                     const productosData = localStorage.getItem('productos');
+                     const productos = productosData ? JSON.parse(productosData) : [];
+                     const criticalItems = productos.filter(p => p.manageStock && p.stock <= (p.minStock || 0));
+
+                     lowStockList.innerHTML = ''; // Clear previous items
+                     let itemsFound = false;
+
+                     if (criticalItems.length > 0) {
+                          itemsFound = true;
+                           // Sort by severity (out of stock first)
+                           criticalItems.sort((a, b) => a.stock - b.stock);
+
+                          criticalItems.forEach(item => {
+                             const li = document.createElement('li');
+                             const stockLevel = item.stock || 0;
+                              if (stockLevel <= 0) {
+                                 li.className = 'out'; // Class for out of stock
+                                 li.innerHTML = `<i class="fas fa-times-circle fa-fw"></i> ${item.name || 'Producto sin nombre'} (Agotado)`;
+                             } else {
+                                 li.className = 'low'; // Class for low stock
+                                 li.innerHTML = `<i class="fas fa-exclamation-triangle fa-fw"></i> ${item.name || 'Producto sin nombre'} (Bajo: ${stockLevel})`;
+                             }
+                             lowStockList.appendChild(li);
+                         });
+                     }
+
+                    noLowStockMsg.classList.toggle('hidden', itemsFound); // Show message only if no items found
+
+                } catch (e) {
+                     console.error("Error loading product stock:", e);
+                     lowStockList.innerHTML = '<li>Error al cargar stock</li>';
+                     noLowStockMsg.classList.add('hidden');
+                }
+            }
+
+            // --- Logout Logic (Consistent) ---
+            logoutButton?.addEventListener('click', (e) => {
+                e.preventDefault();
+                 let canLogout = true;
+                 try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } }
+                 catch(err) { console.error("Error checking cash status on logout", err); }
+                 if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; }
+            });
+
+            // --- Initial Load ---
+            loadInitialSettings();
+            loadDashboardData();
+
+        });
+    </script>
+
+</body>
+</html>

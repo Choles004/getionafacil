@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastos y Pagos - Gestiona Fácil</title>
+     <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --warning-hover-color: #f8d347;
+            --info-color: #3498db;
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             .filters { background-color: rgba(255,255,255,0.03); }
+              .total-expenses { border-top-color: var(--border-color); }
+               .input-with-suffix span { background-color: #495057; border-color: var(--input-border-color); }
+               th { background-color: rgba(255,255,255,0.05) !important; }
+               tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+               #no-expenses-message { background-color: rgba(255,255,255,0.03); }
+               .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+               .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card {
+             background-color: var(--card-bg-color);
+             border: 1px solid var(--border-color);
+             padding: 25px 30px;
+             margin-bottom: 30px;
+             border-radius: var(--border-radius-lg);
+             box-shadow: var(--box-shadow);
+             transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+         }
+          .card h2 {
+             margin-top: 0; margin-bottom: 25px; font-size: 1.5em; font-weight: 600; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+         }
+         .card h2 i { font-size: 1em; opacity: 0.9; }
+
+        /* Form Styles */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 25px; /* Row and column gap */ }
+        .form-group { margin-bottom: 0; } /* Remove bottom margin, rely on grid gap */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+        .input-group { position: relative; }
+         .input-group i.fa-fw { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); transition: color var(--transition-speed) ease; font-size: 0.95em; pointer-events: none; width: 1.2em; text-align: center; }
+         .input-with-suffix { display: flex; align-items: center; }
+         .input-with-suffix input { flex-grow: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+         .input-with-suffix span { padding: 11px 15px; background-color: var(--bg-color); border: 1px solid var(--input-border-color); border-left: none; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; font-size: 0.9rem; color: var(--text-muted-color); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+
+        .form-group input[type="date"], .form-group input[type="number"], .form-group input[type="text"], .form-group select, .form-group textarea { width: 100%; padding: 11px 15px; box-sizing: border-box; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 1rem; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+         .form-group .input-group input { padding-left: 45px; }
+        .form-group select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%236c757d" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>'); background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; padding-right: 40px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--input-focus-border-color); outline: none; box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         .form-group .input-group input:focus ~ i.fa-fw { color: var(--primary-color); }
+         .form-group textarea { padding: 11px 15px; min-height: 60px; resize: vertical; }
+        .form-group.full-width { grid-column: 1 / -1; } /* Allow specific fields to span full width */
+
+        /* General Action Button Style */
+        .action-button { padding: 10px 20px; cursor: pointer; border: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease-out; display: inline-flex; align-items: center; gap: 8px; line-height: 1.5; }
+         .action-button .spinner { font-size: 0.9em; }
+         .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .action-button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+         .action-button:disabled { background-color: var(--secondary-color) !important; opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .form-actions { grid-column: 1 / -1; margin-top: 20px; }
+        .form-actions button { background-color: var(--success-color); color: white; }
+        .form-actions button:hover:not(:disabled) { background-color: var(--success-hover-color); }
+
+        /* Filters Section */
+        .filters { margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; /* Align items bottom */ background-color: rgba(0,0,0,0.02); padding: 15px 20px; border-radius: var(--border-radius-lg); }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filters label { font-weight: 500; color: var(--text-muted-color); font-size: 0.85em; }
+        .filters input, .filters select { padding: 8px 12px; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 0.95em; height: 38px; /* Consistent height */}
+         .filters select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%236c757d" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; background-size: 12px 12px; padding-right: 35px;}
+        .filter-buttons { display: flex; gap: 10px; margin-left: auto; /* Push buttons right if space allows */ align-items: flex-end; }
+         .filter-buttons button { padding: 8px 15px; font-size: 0.9em; height: 38px; }
+         .filter-buttons .filter-button { background-color: var(--primary-color); color: white; }
+         .filter-buttons .filter-button:hover:not(:disabled) { background-color: var(--primary-hover-color); }
+         .filter-buttons .reset-button { background-color: var(--secondary-color); color: white; }
+         .filter-buttons .reset-button:hover:not(:disabled) { background-color: var(--secondary-hover-color); }
+         .filter-buttons .download-button { background-color: var(--info-color); color: white; }
+         .filter-buttons .download-button:hover:not(:disabled) { background-color: var(--info-hover-color); }
+
+
+        /* Table Styles */
+        .table-container { /* Use card styles */ overflow: hidden; padding: 0; margin-bottom: 25px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0; min-width: 800px; /* Min width for scroll */ }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9em; white-space: nowrap; }
+        th { background-color: rgba(0,0,0,0.02); font-weight: 600; font-size: 0.85em; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.7px; position: sticky; top: 0; z-index: 1; }
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(0, 123, 255, 0.03); }
+         tbody tr:last-child td { border-bottom: none; }
+         td:nth-child(2) { text-align: right; font-weight: 500; } /* Align amount right */
+         th:nth-child(2) { text-align: right; }
+         td.actions { text-align: center; width: 80px; } /* Fixed width for actions */
+         td.actions button { margin: 0; padding: 5px 8px; background: none; border: 1px solid transparent; border-radius: var(--border-radius-md); font-size: 0.9em; transition: all 0.15s ease; color: var(--danger-color); line-height: 1; }
+         td.actions button:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         td.actions button i { pointer-events: none; }
+
+        .total-expenses { margin-top: 15px; padding: 15px 20px; font-weight: bold; text-align: right; border-top: 1px solid var(--border-color); font-size: 1.1em; background-color: var(--card-bg-color); border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg); margin-bottom: 25px; }
+        .total-expenses span { color: var(--primary-color); }
+
+        /* Error & Messages */
+        .message { font-size: 0.9em; margin-top: 10px; padding: 10px 15px; border-radius: var(--border-radius-md); border: 1px solid transparent; text-align: left; display: flex; align-items: center; gap: 8px; }
+        .message.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.15); grid-column: 1 / -1; /* Span full grid width */ }
+         .message.error i { font-size: 1.1em; }
+         #no-expenses-message { text-align: center; padding: 20px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); margin-top: 10px; }
+        .hidden { display: none !important; }
+
+         /* Theme Toggle Button (Consistent) */
+         .theme-toggle { position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030; }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments (Consistent) */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+             .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } /* Allow tighter packing */
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .card { padding: 20px; }
+             .card h2 { font-size: 1.3em; padding-bottom: 10px; margin-bottom: 20px; }
+             .form-grid { grid-template-columns: 1fr; } /* Stack form fields */
+             .form-group.full-width { grid-column: auto; }
+             .filters { flex-direction: column; align-items: stretch; gap: 10px; padding: 15px; }
+             .filter-buttons { margin-left: 0; width: 100%; flex-direction: column; gap: 8px; }
+              .filter-buttons button { width: 100%; justify-content: center; }
+             /* .table-container uses card styles */
+             .total-expenses { padding: 15px; border-radius: var(--border-radius-lg); margin-bottom: 20px; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html" class="active"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Registro de Gastos y Pagos</h1>
+            <p>Anota aquí todas las salidas de dinero de tu negocio.</p>
+        </header>
+
+        <section class="expense-form card">
+            <h2><i class="fas fa-plus-circle"></i> Registrar Nuevo Gasto/Pago</h2>
+            <form id="expense-form" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="expense-date">Fecha:</label>
+                         <input type="date" id="expense-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-amount">Monto:</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="expense-amount" step="0.01" min="0.01" required placeholder="0.00">
+                             <span class="currency-symbol">$</span>
+                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-type">Tipo:</label>
+                        <select id="expense-type" required>
+                            <option value="Gasto General">Gasto General</option>
+                            <option value="Pago Proveedor">Pago a Proveedor</option>
+                            <option value="Pago Empleado">Pago a Empleado</option>
+                            <option value="Retiro Socio">Retiro Socio/Dueño</option>
+                            <option value="Compra Activo">Compra Activo Fijo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-beneficiary">Beneficiario/Descripción:</label>
+                        <div class="input-group">
+                            <input type="text" id="expense-beneficiary" list="beneficiary-list" required placeholder="Ej: Proveedor XYZ, Alquiler...">
+                             <i class="fas fa-user-tag fa-fw"></i>
+                        </div>
+                        <datalist id="beneficiary-list">
+                            <!-- Options loaded by JS -->
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-category">Categoría:</label>
+                        <select id="expense-category" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="Compra Mercancía">Compra Mercancía</option>
+                            <option value="Sueldos y Salarios">Sueldos y Salarios</option>
+                            <option value="Alquiler">Alquiler</option>
+                            <option value="Servicios Públicos">Servicios Públicos</option>
+                            <option value="Marketing y Publicidad">Marketing y Publicidad</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Mantenimiento y Reparaciones">Mantenimiento y Reparaciones</option>
+                             <option value="Material Oficina">Material de Oficina</option>
+                             <option value="Comisiones Bancarias">Comisiones Bancarias</option>
+                             <option value="Impuestos">Impuestos</option>
+                             <option value="Intereses Préstamos">Intereses Préstamos</option>
+                             <option value="Retiros">Retiros</option>
+                             <option value="Activos Fijos">Compra Activos Fijos</option>
+                            <option value="Otros Gastos">Otros Gastos</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="expense-payment-method">Método de Pago:</label>
+                        <select id="expense-payment-method" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                             <option value="Tarjeta Débito/Crédito">Tarjeta Negocio</option>
+                             <option value="Cheque">Cheque</option>
+                             <!-- Banks loaded by JS -->
+                        </select>
+                        <!-- Optional field for bank reference -->
+                        <input type="text" id="expense-bank-ref" class="hidden" placeholder="Ref./Banco Origen (Opcional)" style="margin-top: 8px; font-size: 0.9em;">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="expense-notes">Notas (Opcional):</label>
+                        <textarea id="expense-notes" rows="2"></textarea>
+                    </div>
+                </div>
+                 <p id="expense-form-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                <div class="form-actions">
+                    <button type="submit" class="action-button">
+                        <i class="fas fa-save"></i> <span class="button-text">Guardar Gasto</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="expense-history">
+            <h2><i class="fas fa-history"></i> Historial de Gastos</h2>
+            <div class="filters">
+                 <div class="filter-group">
+                    <label for="filter-start-date">Desde:</label>
+                    <input type="date" id="filter-start-date">
+                 </div>
+                 <div class="filter-group">
+                    <label for="filter-end-date">Hasta:</label>
+                    <input type="date" id="filter-end-date">
+                 </div>
+                 <div class="filter-group">
+                    <label for="filter-category">Categoría:</label>
+                    <select id="filter-category">
+                        <option value="">Todas</option>
+                        <!-- Categories populated by JS -->
+                    </select>
+                 </div>
+                 <div class="filter-buttons">
+                    <button id="filter-button" class="action-button filter-button"><i class="fas fa-filter"></i> Filtrar</button>
+                    <button id="reset-filter-button" type="button" class="action-button reset-button"><i class="fas fa-undo"></i> Limpiar</button>
+                    <button id="download-expenses-csv" class="action-button download-button">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                 </div>
+            </div>
+
+            <div class="table-container card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Monto</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Beneficiario/Desc.</th>
+                                <th scope="col">Categoría</th>
+                                <th scope="col">Método Pago</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-table-body">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p id="no-expenses-message" class="hidden">No hay gastos registrados que coincidan con los filtros.</p>
+             <p class="total-expenses">Total Gastos Filtrados: <span id="total-filtered-expenses">--.--</span></p>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button'); const body = document.body; const themeIcon = themeToggleButton.querySelector('i'); const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon'; function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); } function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); } function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; } const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Elements & Config ---
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            let currency = '$';
+            const expenseForm = document.getElementById('expense-form');
+            const expenseDateInput = document.getElementById('expense-date');
+            const expenseAmountInput = document.getElementById('expense-amount');
+            const expenseTypeSelect = document.getElementById('expense-type');
+            const expenseBeneficiaryInput = document.getElementById('expense-beneficiary');
+            const beneficiaryDatalist = document.getElementById('beneficiary-list');
+            const expenseCategorySelect = document.getElementById('expense-category');
+            const expensePaymentMethodSelect = document.getElementById('expense-payment-method');
+            const expenseBankRefInput = document.getElementById('expense-bank-ref');
+            const expenseNotesInput = document.getElementById('expense-notes');
+            const expenseFormError = document.getElementById('expense-form-error');
+            const expenseFormErrorSpan = expenseFormError.querySelector('span');
+            const expenseTableBody = document.getElementById('expense-table-body');
+            const noExpensesMessage = document.getElementById('no-expenses-message');
+            const filterStartDate = document.getElementById('filter-start-date');
+            const filterEndDate = document.getElementById('filter-end-date');
+            const filterCategory = document.getElementById('filter-category');
+            const filterButton = document.getElementById('filter-button');
+            const resetFilterButton = document.getElementById('reset-filter-button');
+            const totalFilteredExpensesEl = document.getElementById('total-filtered-expenses');
+            const downloadExpensesButton = document.getElementById('download-expenses-csv');
+
+            let allExpenses = [];
+            let allProviders = [];
+            let allBanks = [];
+            let displayedExpenses = []; // For CSV download
+
+            // --- Utility Functions ---
+            const showError = (message) => { expenseFormErrorSpan.textContent = message; expenseFormError.classList.remove('hidden'); };
+            const hideError = () => expenseFormError.classList.add('hidden');
+            const setLoading = (button, text = "Guardando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`; };
+            const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+            const formatCurrency = (amount) => `${currency}${typeof amount === 'number' ? amount.toFixed(2) : '0.00'}`;
+            const escapeCsvValue = (value) => { if (value == null) return ''; const stringValue = String(value); if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) { return `"${stringValue.replace(/"/g, '""')}"`; } return stringValue; };
+
+            // --- Initial Load ---
+            function loadInitialConfig() {
+                try {
+                    const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    document.getElementById('business-name-sidebar').textContent = businessName;
+                    currency = localStorage.getItem('currency') || '$';
+                    document.querySelectorAll('.currency-symbol').forEach(el => el.textContent = currency);
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                    document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch(e) { console.error("Error loading config:", e); }
+            }
+
+            function setDefaultDate() {
+                try {
+                    expenseDateInput.value = new Date().toISOString().split('T')[0];
+                } catch (e) { console.error("Error setting default date", e); }
+            }
+
+            function loadAuxiliaryData() {
+                 try {
+                    allProviders = JSON.parse(localStorage.getItem('proveedores') || '[]');
+                    allBanks = JSON.parse(localStorage.getItem('config_banks') || '[]');
+                     allProviders.sort((a,b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                     // Clear only bank options before adding
+                    const bankOptions = expensePaymentMethodSelect.querySelectorAll('option[value^="banco_"]');
+                     bankOptions.forEach(opt => opt.remove());
+                     allBanks.forEach(bank => {
+                         const option = document.createElement('option');
+                         option.value = `banco_${bank.id}`;
+                         option.textContent = `Banco: ${bank.name}`; // Keep it concise
+                         expensePaymentMethodSelect.appendChild(option);
+                     });
+                } catch (error) { console.error("Error cargando datos auxiliares:", error); }
+                 updateBeneficiaryInput();
+            }
+
+            function loadExpenses() {
+                try {
+                    allExpenses = JSON.parse(localStorage.getItem('gastos') || '[]');
+                    populateCategoryFilter();
+                    renderExpenseTable(); // Render initial unfiltered table
+                } catch (error) {
+                    console.error("Error cargando gastos:", error);
+                    allExpenses = [];
+                    renderExpenseTable();
+                    noExpensesMessage.textContent = "Error al cargar los gastos.";
+                    noExpensesMessage.classList.remove('hidden');
+                }
+            }
+
+            function populateCategoryFilter() {
+                 try {
+                    const defaultCategories = [...expenseCategorySelect.options].map(opt => opt.value).filter(val => val);
+                    const expenseCategories = allExpenses.map(exp => exp.categoria);
+                    const uniqueCategories = [...new Set([...defaultCategories, ...expenseCategories])]
+                                                .filter(cat => cat)
+                                                .sort((a, b) => a.localeCompare(b));
+
+                    const firstOption = filterCategory.options[0]; // Keep "Todas"
+                    filterCategory.innerHTML = '';
+                    filterCategory.appendChild(firstOption);
+
+                    uniqueCategories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        option.textContent = cat;
+                        filterCategory.appendChild(option);
+                    });
+                 } catch(e) {
+                    console.error("Error populating category filter", e);
+                 }
+            }
+
+            // --- Form & Interaction Logic ---
+            function updateBeneficiaryInput() {
+                const type = expenseTypeSelect.value;
+                beneficiaryDatalist.innerHTML = '';
+                let placeholder = "Ej: Alquiler Local, Compra Papelería";
+                let isRequired = true; // Generally required
+
+                if (type === 'Pago Proveedor') {
+                    placeholder = "Selecciona o escribe proveedor";
+                    allProviders.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.nombre;
+                        beneficiaryDatalist.appendChild(option);
+                    });
+                } else if (type === 'Pago Empleado') {
+                    placeholder = "Nombre del empleado";
+                } else if (type === 'Retiro Socio') {
+                    placeholder = "Nombre del socio/dueño";
+                 }
+                 expenseBeneficiaryInput.placeholder = placeholder;
+                 expenseBeneficiaryInput.required = isRequired;
+            }
+
+            function toggleBankRefInput() {
+                 const selectedMethod = expensePaymentMethodSelect.value;
+                 const showRef = selectedMethod === 'Transferencia' || selectedMethod.startsWith('banco_');
+                 expenseBankRefInput.classList.toggle('hidden', !showRef);
+                 if (showRef) expenseBankRefInput.required = true; // Make required if shown
+                 else { expenseBankRefInput.required = false; expenseBankRefInput.value = ''; }
+            }
+
+            function handleExpenseFormSubmit(event) {
+                event.preventDefault();
+                hideError();
+                const button = event.target.querySelector('button[type="submit"]');
+                const originalHTML = button.innerHTML;
+                setLoading(button);
+
+                setTimeout(() => { // Simulate async
+                    try {
+                        const paymentMethodValue = expensePaymentMethodSelect.value;
+                        let paymentMethodText = expensePaymentMethodSelect.options[expensePaymentMethodSelect.selectedIndex].text;
+
+                        const expenseData = {
+                            id: `g_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+                            fecha: expenseDateInput.value,
+                            monto: parseFloat(expenseAmountInput.value),
+                            tipo: expenseTypeSelect.value,
+                            beneficiario: expenseBeneficiaryInput.value.trim(),
+                            categoria: expenseCategorySelect.value,
+                            metodoPago: paymentMethodText,
+                            metodoPagoId: paymentMethodValue,
+                            referenciaBanco: (paymentMethodValue === 'Transferencia' || paymentMethodValue.startsWith('banco_'))
+                                                ? expenseBankRefInput.value.trim() : null,
+                            notas: expenseNotesInput.value.trim() || null,
+                        };
+
+                        // --- Validation ---
+                        if (!expenseData.fecha) throw new Error('La Fecha es obligatoria.');
+                        if (isNaN(expenseData.monto) || expenseData.monto <= 0) throw new Error('El Monto debe ser un número positivo.');
+                        if (!expenseData.tipo) throw new Error('Selecciona un Tipo de gasto.');
+                        if (!expenseData.beneficiario) throw new Error('El Beneficiario/Descripción es obligatorio.');
+                        if (!expenseData.categoria) throw new Error('Selecciona una Categoría.');
+                        if (!expenseData.metodoPagoId) throw new Error('Selecciona un Método de Pago.');
+                         if ((paymentMethodValue === 'Transferencia' || paymentMethodValue.startsWith('banco_')) && !expenseData.referenciaBanco) {
+                             throw new Error('La Referencia/Banco es obligatoria para Transferencias o pagos desde Banco.');
+                         }
+
+                        saveExpense(expenseData);
+                        expenseForm.reset();
+                        setDefaultDate();
+                        updateBeneficiaryInput();
+                        toggleBankRefInput();
+                        loadExpenses(); // Reload & render table
+                        populateCategoryFilter(); // Update filters if a new category was used implicitly
+                        alert("Gasto guardado con éxito.");
+
+                    } catch (error) {
+                         console.error("Error guardando gasto:", error);
+                         showError(error.message || "Error desconocido al guardar.");
+                         // Focus logic could be added based on error type
+                    } finally {
+                         clearLoading(button, originalHTML);
+                    }
+                }, 150);
+            }
+
+            function saveExpense(expenseData) {
+                try {
+                    allExpenses.push(expenseData);
+                    localStorage.setItem('gastos', JSON.stringify(allExpenses));
+                    console.log("Gasto guardado:", expenseData.id);
+                     return true;
+                } catch (error) {
+                    console.error("Error guardando gasto en localStorage:", error);
+                    allExpenses.pop(); // Remove the item if save failed
+                     throw new Error("Error al guardar en almacenamiento. ¿Espacio lleno?"); // Rethrow for handler
+                }
+            }
+
+            // --- Table Rendering & Filtering ---
+            function renderExpenseTable() {
+                expenseTableBody.innerHTML = '';
+                const startDate = filterStartDate.value;
+                const endDate = filterEndDate.value;
+                const category = filterCategory.value;
+                let totalFiltered = 0;
+
+                const sortedExpenses = [...allExpenses].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                displayedExpenses = sortedExpenses.filter(exp => {
+                    const expenseDate = exp.fecha;
+                    if (startDate && expenseDate < startDate) return false;
+                    if (endDate && expenseDate > endDate) return false;
+                    if (category && exp.categoria !== category) return false;
+                    return true;
+                });
+
+                noExpensesMessage.classList.toggle('hidden', displayedExpenses.length > 0);
+                downloadExpensesButton.disabled = displayedExpenses.length === 0;
+
+                if (displayedExpenses.length > 0) {
+                    displayedExpenses.forEach(exp => {
+                        const row = expenseTableBody.insertRow();
+                        const displayDate = exp.fecha ? new Date(exp.fecha + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit'}) : '-';
+                        row.insertCell().textContent = displayDate;
+                        row.insertCell().textContent = formatCurrency(exp.monto);
+                        row.insertCell().textContent = exp.tipo || '-';
+                        row.insertCell().textContent = exp.beneficiario || '-';
+                        row.insertCell().textContent = exp.categoria || '-';
+                        row.insertCell().textContent = `${exp.metodoPago || '-'}${exp.referenciaBanco ? ` (${exp.referenciaBanco})` : ''}`;
+                        const actionsCell = row.insertCell();
+                        actionsCell.className = 'actions';
+                        actionsCell.innerHTML = `<button class="delete-expense-btn" data-id="${exp.id}" title="Eliminar Gasto"><i class="fas fa-trash-alt"></i></button>`;
+                        totalFiltered += exp.monto;
+                    });
+                }
+                totalFilteredExpensesEl.textContent = formatCurrency(totalFiltered);
+            }
+
+             function deleteExpense(expenseId) {
+                 try {
+                     const expenseIndex = allExpenses.findIndex(e => e.id === expenseId);
+                     if (expenseIndex === -1) throw new Error("Gasto no encontrado.");
+                     const expense = allExpenses[expenseIndex];
+                     if (confirm(`¿Eliminar gasto de ${formatCurrency(expense.monto)} para "${expense.beneficiario}" (${new Date(expense.fecha + 'T00:00:00').toLocaleDateString()})?`)) {
+                        allExpenses.splice(expenseIndex, 1);
+                        localStorage.setItem('gastos', JSON.stringify(allExpenses));
+                        console.log("Gasto eliminado:", expenseId);
+                        renderExpenseTable(); // Update display
+                        populateCategoryFilter(); // Update filters
+                    }
+                 } catch (error) {
+                     console.error("Error eliminando gasto:", error);
+                     alert(`Error al eliminar: ${error.message}`);
+                 }
+             }
+
+             // --- Download CSV Function ---
+             function downloadExpensesCSV() {
+                 if (displayedExpenses.length === 0) { alert("No hay gastos filtrados para descargar."); return; }
+                 console.log("Preparando descarga CSV de gastos filtrados...");
+                 const headers = ["ID", "Fecha", "Monto", "Tipo", "Beneficiario/Desc.", "Categoria", "Metodo Pago", "Referencia/Banco", "Notas"];
+                 const rows = displayedExpenses.map(exp => [
+                     escapeCsvValue(exp.id), escapeCsvValue(exp.fecha), escapeCsvValue(exp.monto.toFixed(2)),
+                     escapeCsvValue(exp.tipo), escapeCsvValue(exp.beneficiario), escapeCsvValue(exp.categoria),
+                     escapeCsvValue(exp.metodoPago), escapeCsvValue(exp.referenciaBanco), escapeCsvValue(exp.notas)
+                 ]);
+                 let csvContent = headers.join(',') + '\r\n';
+                 rows.forEach(rowArray => { csvContent += rowArray.join(',') + '\r\n'; });
+                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                 const link = document.createElement("a");
+                 const url = URL.createObjectURL(blob);
+                 link.setAttribute("href", url);
+                 const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                 const categoryFilterText = filterCategory.value ? `_cat-${filterCategory.value.replace(/[^a-z0-9]/gi, '_')}` : '';
+                 const dateFilterText = filterStartDate.value ? `_desde-${filterStartDate.value}` : '';
+                 link.setAttribute("download", `gastos_${dateStr}${categoryFilterText}${dateFilterText}.csv`);
+                 link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+                 console.log("Descarga iniciada.");
+             }
+
+            // --- Event Listeners Setup ---
+            expenseForm.addEventListener('submit', handleExpenseFormSubmit);
+            expenseTypeSelect.addEventListener('change', updateBeneficiaryInput);
+            expensePaymentMethodSelect.addEventListener('change', toggleBankRefInput);
+            filterButton.addEventListener('click', renderExpenseTable);
+            resetFilterButton.addEventListener('click', () => { filterStartDate.value = ''; filterEndDate.value = ''; filterCategory.value = ''; renderExpenseTable(); });
+            expenseTableBody.addEventListener('click', (event) => { const target = event.target.closest('button'); if (target?.classList.contains('delete-expense-btn')) { deleteExpense(target.dataset.id); } });
+            downloadExpensesButton.addEventListener('click', downloadExpensesCSV);
+
+            // --- Logout Logic (Consistent) ---
+            document.getElementById('logout-button')?.addEventListener('click', (e) => { e.preventDefault(); let canLogout = true; try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } } catch(err) { console.error("Error checking cash status on logout", err); } if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; } });
+
+            // --- Initial Load Execution ---
+            loadInitialConfig();
+            setDefaultDate();
+            loadAuxiliaryData();
+            loadExpenses(); // This will also call renderExpenseTable
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

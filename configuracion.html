@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Gestiona Fácil</title>
+     <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+         /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+             --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+             --warning-hover-color: #e0a800; /* Added */
+             --warning-text-color: #856404; /* Darker text for light warning bg */
+             --warning-bg-color: #fff3cd; /* Light warning bg */
+             --warning-border-color: #ffeeba;
+            --info-color: #17a2b8;
+             --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+             --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+             --warning-hover-color: #f8d347;
+             --warning-text-color: #fdc107; /* Lighter text for dark warning bg */
+             --warning-bg-color: rgba(253, 193, 7, 0.1);
+             --warning-border-color: rgba(253, 193, 7, 0.2);
+            --info-color: #3498db;
+             --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             #bank-list li { border-bottom-color: var(--border-color); }
+             #bank-list strong { color: var(--primary-color); }
+             #bank-list button { background-color: var(--danger-color); }
+             #bank-list button:hover { background-color: var(--danger-hover-color); }
+             .data-management .import-button { background-color: var(--warning-color); color: #111; } /* Dark text for dark theme warning */
+             .data-management .import-button:hover:not(:disabled) { background-color: var(--warning-hover-color); }
+              .data-management .import-button:disabled { background-color: #555; color: var(--text-muted-color); opacity: 0.7; }
+              .import-section input[type="file"] { border-color: var(--input-border-color); }
+              .import-section input[type="file"]::file-selector-button { background-color: var(--secondary-color); color: var(--text-color); }
+              .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+         /* General Card Styling */
+         .card {
+             background-color: var(--card-bg-color);
+             border: 1px solid var(--border-color);
+             padding: 25px 30px;
+             margin-bottom: 30px;
+             border-radius: var(--border-radius-lg);
+             box-shadow: var(--box-shadow);
+             transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+         }
+          .card h2 {
+             margin-top: 0;
+             margin-bottom: 25px;
+             font-size: 1.5em; /* Slightly larger */
+             font-weight: 600;
+             color: var(--primary-color);
+             border-bottom: 1px solid var(--border-color);
+             padding-bottom: 12px;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+         }
+         .card h2 i { font-size: 1em; opacity: 0.9; } /* Slightly smaller icon */
+         .card h3 { margin-top: 0; margin-bottom: 20px; font-weight: 600; font-size: 1.2em; color: var(--text-color); }
+
+         /* Form Styles within Cards */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+         .input-group { position: relative; }
+         .input-group i.fa-fw { /* Use fa-fw */
+             position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); transition: color var(--transition-speed) ease; font-size: 0.95em; pointer-events: none; width: 1.2em; text-align: center;
+         }
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group input[type="password"], .form-group select, .form-group textarea {
+            width: 100%; padding: 11px 15px; box-sizing: border-box; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 1rem; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+         .form-group .input-group input { padding-left: 45px; } /* Padding for fa-fw icon */
+         .form-group textarea { padding: 11px 15px; min-height: 60px; resize: vertical; }
+        .form-group select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%236c757d" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>'); background-repeat: no-repeat; background-position: right 15px center; background-size: 12px 12px; padding-right: 40px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--input-focus-border-color); outline: none; box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         .form-group .input-group input:focus ~ i.fa-fw { color: var(--primary-color); }
+         .form-group small { font-size: 0.85em; color: var(--text-muted-color); margin-top: 5px; display: block; line-height: 1.4; }
+          .form-group small i { margin-right: 4px; }
+
+        /* General Action Button Style */
+        .action-button {
+            padding: 10px 20px; cursor: pointer; border: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease-out; display: inline-flex; align-items: center; gap: 8px; line-height: 1.5;
+        }
+         .action-button .spinner { font-size: 0.9em; }
+         .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .action-button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+         .action-button:disabled { background-color: var(--secondary-color) !important; opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+         .form-actions { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px; }
+         .form-actions .save-button { background-color: var(--primary-color); color: white; }
+         .form-actions .save-button:hover:not(:disabled) { background-color: var(--primary-hover-color); }
+         .form-actions .change-pass-button { background-color: var(--secondary-color); color: white; }
+         .form-actions .change-pass-button:hover:not(:disabled) { background-color: var(--secondary-hover-color); }
+
+
+         /* Bank List Section */
+         #bank-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
+         #bank-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-color); font-size: 0.95em; transition: border-color var(--transition-speed) ease; }
+         #bank-list li:last-child { border-bottom: none; }
+         #bank-list strong { color: var(--primary-color); margin-right: 5px; }
+         #bank-list button { background: var(--danger-color); color: white; border: none; padding: 4px 9px; /* Slightly larger */ font-size: 0.85em; cursor: pointer; border-radius: var(--border-radius-md); transition: background-color 0.2s ease; line-height: 1; }
+         #bank-list button:hover { background-color: var(--danger-hover-color); }
+         #add-bank-form .form-group { margin-bottom: 0; } /* Remove margin within add bank form */
+         #add-bank-form .add-bank-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; /* Align button bottom */ }
+         #add-bank-form input { flex: 1; min-width: 150px; }
+          #add-bank-form button { background-color: var(--success-color); color: white; padding: 11px 15px; margin-top: 8px; /* Align with inputs */ }
+          #add-bank-form button:hover:not(:disabled) { background-color: var(--success-hover-color); }
+          .report-message { /* For no banks message */ text-align: center; padding: 15px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); }
+
+         /* Data Management Section */
+          .data-management p { line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; }
+          .data-management strong { font-weight: 600; color: var(--text-color); }
+          .data-management button.action-button { padding: 11px 22px; font-size: 1em; margin-right: 15px; margin-bottom: 10px; }
+          .data-management .export-button { background-color: var(--success-color); color: white; }
+          .data-management .export-button:hover:not(:disabled) { background-color: var(--success-hover-color); }
+          .data-management .import-button { background-color: var(--warning-color); color: var(--warning-text-color); }
+           .data-management .import-button:hover:not(:disabled) { background-color: var(--warning-hover-color); }
+
+          .import-section { margin-top: 25px; border-top: 1px dashed var(--border-color); padding-top: 25px; }
+         .import-section label { display: block; margin-bottom: 10px; font-weight: 500; }
+         .import-section input[type="file"] { display: block; margin-bottom: 15px; border: 1px solid var(--input-border-color); padding: 8px; border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); max-width: 450px; width: 100%; font-size: 0.9rem; }
+         .import-section input[type="file"]::file-selector-button { padding: 8px 15px; background-color: var(--secondary-color); color: white; border: none; border-radius: var(--border-radius-md); cursor: pointer; margin-right: 10px; transition: background-color 0.2s ease; font-weight: 500; }
+         .import-section input[type="file"]::file-selector-button:hover { background-color: var(--secondary-hover-color); }
+
+         .warning-box { /* Improved warning box style */
+             color: var(--warning-text-color);
+             font-weight: 500;
+             border: 1px solid var(--warning-border-color);
+             padding: 15px 20px;
+             border-radius: var(--border-radius-md);
+             background-color: var(--warning-bg-color);
+             margin-top: 20px;
+             font-size: 0.95em;
+             line-height: 1.5;
+             display: flex;
+             align-items: flex-start; /* Align icon top */
+             gap: 10px;
+         }
+          .warning-box i { font-size: 1.2em; color: var(--warning-color); margin-top: 2px; flex-shrink: 0; }
+          .warning-box strong { color: inherit; } /* Inherit color */
+
+         #import-status { margin-top: 15px; font-weight: 500; font-size: 0.95rem; padding: 10px 15px; border-radius: var(--border-radius-md); }
+         #import-status.success { color: var(--success-color); background-color: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.2); }
+         #import-status.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border: 1px solid rgba(220, 53, 69, 0.15); }
+         #import-status.importing { color: var(--info-color); background-color: rgba(23, 162, 184, 0.1); border: 1px solid rgba(23, 162, 184, 0.2); }
+         #import-status:not(.hidden) { display: inline-block; } /* Allow background */
+
+         /* Error & Success Messages (General) */
+        .message { font-size: 0.9em; margin-top: 10px; padding: 8px 12px; border-radius: var(--border-radius-md); border: 1px solid transparent; }
+        .message.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.15); }
+         .message.error i { margin-right: 5px; }
+        .message.success { color: var(--success-color); background-color: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.2); font-weight: 500; }
+         .message.success i { margin-right: 5px; }
+        .hidden { display: none; }
+
+
+         /* Theme Toggle Button */
+         .theme-toggle { /* Consistent Style */
+             position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030;
+         }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+        /* Responsive Adjustments - Consistent */
+         @media (max-width: 992px) { /* Tablet and below */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .card { padding: 20px; }
+             .card h2 { font-size: 1.3em; padding-bottom: 10px; margin-bottom: 20px; }
+             .card h3 { font-size: 1.15em; }
+             .form-actions { flex-direction: column; gap: 8px; }
+             .form-actions button { width: 100%; }
+             #add-bank-form .add-bank-controls { flex-direction: column; align-items: stretch; }
+              #add-bank-form input { min-width: 0; }
+              #add-bank-form button { width: 100%; margin-top: 10px; }
+              .data-management button.action-button { width: 100%; margin-right: 0; justify-content: center; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Updated icons with fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html" class="active"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Configuración General</h1>
+            <p>Ajusta la información de tu negocio y gestiona tus datos.</p>
+        </header>
+
+        <!-- Sección Información del Negocio -->
+        <section class="config-section card">
+            <h2><i class="fas fa-store"></i> Información del Negocio</h2>
+            <form id="business-info-form" novalidate>
+                <div class="form-group">
+                    <label for="config-business-name">Nombre del Negocio:</label>
+                     <div class="input-group">
+                        <input type="text" id="config-business-name" required>
+                        <i class="fas fa-tag fa-fw"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="config-business-address">Dirección (Opcional):</label>
+                    <textarea id="config-business-address" rows="2"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="config-business-phone">Teléfono (Opcional):</label>
+                    <div class="input-group">
+                        <input type="tel" id="config-business-phone">
+                        <i class="fas fa-phone fa-fw"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="config-business-taxid">RIF / NIT / ID Fiscal (Opcional):</label>
+                    <div class="input-group">
+                        <input type="text" id="config-business-taxid">
+                        <i class="fas fa-id-card fa-fw"></i>
+                    </div>
+                </div>
+                 <div class="form-actions">
+                     <button type="submit" class="action-button save-button">
+                         <i class="fas fa-save"></i> <span class="button-text">Guardar Información</span>
+                     </button>
+                 </div>
+            </form>
+        </section>
+
+        <!-- Sección Ajustes de la Aplicación -->
+        <section class="config-section card">
+            <h2><i class="fas fa-sliders-h"></i> Ajustes de la Aplicación</h2>
+             <form id="app-settings-form" novalidate>
+                 <div class="form-group">
+                    <label for="config-currency">Moneda Principal:</label>
+                    <select id="config-currency" required>
+                        <option value="$">Dólar ($)</option>
+                        <option value="€">Euro (€)</option>
+                        <option value="Bs.">Bolívares (Bs.)</option>
+                        <option value="COP">Peso Colombiano (COP)</option>
+                         <option value="PEN">Sol Peruano (PEN)</option>
+                        <!-- Add more -->
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="config-business-type">Tipo de Negocio:</label>
+                    <select id="config-business-type" required>
+                        <option value="store">Tienda / Almacén</option>
+                        <option value="restaurant">Restaurante</option>
+                    </select>
+                    <small><i class="fas fa-info-circle"></i> Seleccionar "Restaurante" habilitará opciones específicas en el menú.</small>
+                </div>
+                 <div class="form-actions">
+                     <button type="submit" class="action-button save-button">
+                         <i class="fas fa-save"></i> <span class="button-text">Guardar Ajustes</span>
+                    </button>
+                 </div>
+            </form>
+        </section>
+
+         <!-- Sección Seguridad -->
+        <section class="config-section card">
+            <h2><i class="fas fa-shield-alt"></i> Seguridad</h2>
+             <form id="password-change-form" novalidate>
+                <h3>Cambiar Contraseña Maestra</h3>
+                <div class="form-group">
+                    <label for="current-password">Contraseña Actual:</label>
+                     <div class="input-group">
+                        <input type="password" id="current-password" required autocomplete="current-password">
+                         <i class="fas fa-lock fa-fw"></i>
+                     </div>
+                </div>
+                 <div class="form-group">
+                    <label for="new-password">Nueva Contraseña (mín. 4 caracteres):</label>
+                    <div class="input-group">
+                        <input type="password" id="new-password" required autocomplete="new-password" minlength="4">
+                        <i class="fas fa-key fa-fw"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password">Confirmar Nueva Contraseña:</label>
+                    <div class="input-group">
+                        <input type="password" id="confirm-new-password" required autocomplete="new-password" minlength="4">
+                        <i class="fas fa-check-circle fa-fw"></i>
+                    </div>
+                </div>
+                <p id="password-change-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                <p id="password-change-success" class="message success hidden" aria-live="polite"><i class="fas fa-check-circle"></i> Contraseña actualizada con éxito.</p>
+                 <div class="form-actions">
+                     <button type="submit" class="action-button change-pass-button">
+                         <i class="fas fa-sync-alt"></i> <span class="button-text">Cambiar Contraseña</span>
+                    </button>
+                 </div>
+             </form>
+        </section>
+
+         <!-- Sección Cuentas Bancarias -->
+        <section class="config-section card">
+             <h2><i class="fas fa-university"></i> Cuentas Bancarias</h2>
+             <p><small>Agrega aquí las cuentas bancarias que usas para pagos (transferencia, tarjeta de débito). Útil como referencia al registrar gastos.</small></p>
+            <div>
+                <ul id="bank-list">
+                    <!-- Bancos se listarán aquí -->
+                </ul>
+                 <p id="no-banks-message" class="report-message hidden">No hay cuentas bancarias registradas.</p>
+            </div>
+             <form id="add-bank-form" novalidate>
+                  <div class="form-group">
+                     <label for="bank-name">Añadir Nueva Cuenta:</label>
+                      <div class="add-bank-controls">
+                         <input type="text" id="bank-name" placeholder="Nombre Banco / Alias" required>
+                         <input type="text" id="bank-info" placeholder="Número Cuenta / Info Adicional" required>
+                         <button type="submit" class="action-button" style="background-color: var(--success-color); color: white;">
+                             <i class="fas fa-plus"></i> <span class="button-text">Añadir</span>
+                        </button>
+                      </div>
+                  </div>
+             </form>
+        </section>
+
+        <!-- Sección Gestión de Datos -->
+        <section class="config-section card data-management">
+            <h2><i class="fas fa-database"></i> Gestión de Datos (¡MUY IMPORTANTE!)</h2>
+             <p>Como tus datos se guardan <strong>únicamente en el almacenamiento local de este navegador</strong>, es fundamental que hagas copias de seguridad frecuentes.</p>
+
+             <button id="export-data-button" class="action-button export-button">
+                 <i class="fas fa-file-export"></i> <span class="button-text">Exportar TODOS los Datos (Backup)</span>
+             </button>
+             <p><small>Guarda el archivo <code>.json</code> descargado en un lugar seguro y externo (pendrive, Google Drive, Dropbox, email, etc.). <strong>Recomendación:</strong> Haz esto al final de cada día de trabajo.</small></p>
+
+             <hr style="margin: 30px 0; border: none; border-top: 1px dashed var(--border-color);">
+
+             <div class="import-section">
+                 <h3><i class="fas fa-file-import"></i> Importar Datos (Restaurar desde Backup)</h3>
+                 <label for="import-file-input">Selecciona tu archivo de backup (<code>backup_gestiona_facil_*.json</code>):</label>
+                 <input type="file" id="import-file-input" accept=".json,application/json">
+                 <button id="import-data-button" class="action-button import-button" disabled>
+                      <i class="fas fa-upload"></i> <span class="button-text">Cargar e Importar Datos</span>
+                 </button>
+                 <div class="warning-box">
+                     <i class="fas fa-exclamation-triangle"></i>
+                     <div>
+                        <strong>¡ADVERTENCIA MÁXIMA!</strong> Importar un archivo <strong>BORRARÁ IRREVERSIBLEMENTE TODOS LOS DATOS ACTUALES</strong> (ventas, productos, clientes, caja, TODO) y los reemplazará con los contenidos en el archivo. Asegúrate al 100% de seleccionar el archivo de backup correcto y reciente. <strong>No hay forma de deshacer esto.</strong>
+                     </div>
+                 </div>
+                 <p id="import-status" class="hidden" aria-live="polite"></p>
+            </div>
+        </section>
+
+    </main>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon';
+            function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); }
+            function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); }
+            function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; }
+            const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+             // --- Config & Elements ---
+             const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+             const businessNameEl = document.getElementById('business-name-sidebar');
+             const configBusinessNameInput = document.getElementById('config-business-name');
+             const configAddressInput = document.getElementById('config-business-address');
+             const configPhoneInput = document.getElementById('config-business-phone');
+             const configTaxIdInput = document.getElementById('config-business-taxid');
+             const configCurrencySelect = document.getElementById('config-currency');
+             const configBusinessTypeSelect = document.getElementById('config-business-type');
+             const businessInfoForm = document.getElementById('business-info-form');
+             const appSettingsForm = document.getElementById('app-settings-form');
+             const passwordChangeForm = document.getElementById('password-change-form');
+             const currentPasswordInput = document.getElementById('current-password');
+             const newPasswordInput = document.getElementById('new-password');
+             const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+             const passwordChangeError = document.getElementById('password-change-error');
+             const passwordChangeSuccess = document.getElementById('password-change-success');
+             const bankListUl = document.getElementById('bank-list');
+             const noBanksMessage = document.getElementById('no-banks-message');
+             const addBankForm = document.getElementById('add-bank-form');
+             const exportButton = document.getElementById('export-data-button');
+             const importFileInput = document.getElementById('import-file-input');
+             const importButton = document.getElementById('import-data-button');
+             const importStatus = document.getElementById('import-status');
+
+            // --- Utility Functions ---
+             const showPasswordError = (message) => { passwordChangeError.querySelector('span').textContent = message; passwordChangeError.classList.remove('hidden'); passwordChangeSuccess.classList.add('hidden'); };
+             const hidePasswordMessages = () => { passwordChangeError.classList.add('hidden'); passwordChangeSuccess.classList.add('hidden'); };
+             const showPasswordSuccess = () => { passwordChangeSuccess.classList.remove('hidden'); passwordChangeError.classList.add('hidden'); };
+             const setLoading = (button, text = "Procesando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`; };
+             const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+             const showImportStatus = (message, type = 'info') => { importStatus.textContent = message; importStatus.className = type; importStatus.classList.remove('hidden'); };
+             const hideImportStatus = () => importStatus.classList.add('hidden');
+
+            // --- Keys used in localStorage (Centralized for Export/Import) ---
+            const LOCALSTORAGE_KEYS = [
+                'businessName', 'businessAddress', 'businessPhone', 'businessTaxId',
+                'currency', 'businessType', 'masterPassword', 'config_banks',
+                'productos', 'proveedores', 'clientes', 'ventas', 'gastos',
+                'cashRegisterStatus', 'cashHistory', 'inventoryAdjustments', 'restaurantTables',
+                // Add any future keys here
+            ];
+
+            // --- Load Initial Data ---
+            function loadInitialConfig() {
+                try {
+                    const name = localStorage.getItem('businessName') || '';
+                    businessNameEl.textContent = name || 'Nombre Negocio';
+                    configBusinessNameInput.value = name;
+                    configAddressInput.value = localStorage.getItem('businessAddress') || '';
+                    configPhoneInput.value = localStorage.getItem('businessPhone') || '';
+                    configTaxIdInput.value = localStorage.getItem('businessTaxId') || '';
+                    configCurrencySelect.value = localStorage.getItem('currency') || '$';
+                    configBusinessTypeSelect.value = localStorage.getItem('businessType') || 'store';
+
+                     const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                     document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch (error) {
+                    console.error("Error cargando configuración:", error);
+                    alert("Error al cargar la configuración guardada.");
+                }
+            }
+
+            function loadBanks() {
+                 try {
+                    const banks = JSON.parse(localStorage.getItem('config_banks') || '[]');
+                    renderBankList(banks);
+                 } catch(e) {
+                     console.error("Error loading banks", e);
+                     renderBankList([]);
+                 }
+            }
+
+            // --- Event Handlers ---
+            function saveBusinessInfo(event) {
+                event.preventDefault();
+                 const button = event.target.querySelector('button[type="submit"]');
+                 const originalHTML = button.innerHTML;
+                 setLoading(button, 'Guardando...');
+
+                setTimeout(() => { // Simulate async
+                    try {
+                        const newName = configBusinessNameInput.value.trim();
+                         if (!newName) { throw new Error("El nombre del negocio no puede estar vacío."); }
+
+                        localStorage.setItem('businessName', newName);
+                        localStorage.setItem('businessAddress', configAddressInput.value.trim());
+                        localStorage.setItem('businessPhone', configPhoneInput.value.trim());
+                        localStorage.setItem('businessTaxId', configTaxIdInput.value.trim());
+                        businessNameEl.textContent = newName;
+                        alert("Información del negocio guardada con éxito.");
+                    } catch (error) {
+                         console.error("Error guardando info negocio:", error);
+                         alert(`Error al guardar: ${error.message || 'Error desconocido'}`);
+                    } finally {
+                        clearLoading(button, originalHTML);
+                    }
+                }, 150);
+            }
+
+            function saveAppSettings(event) {
+                event.preventDefault();
+                const button = event.target.querySelector('button[type="submit"]');
+                const originalHTML = button.innerHTML;
+                setLoading(button, 'Guardando...');
+
+                 setTimeout(() => {
+                     try {
+                         const oldType = localStorage.getItem('businessType');
+                         const newCurrency = configCurrencySelect.value;
+                         const newType = configBusinessTypeSelect.value;
+
+                        localStorage.setItem('currency', newCurrency);
+                        localStorage.setItem('businessType', newType);
+
+                         alert("Ajustes de la aplicación guardados.");
+                         if (oldType !== newType) { window.location.reload(); }
+
+                    } catch (error) {
+                        console.error("Error guardando ajustes app:", error);
+                        alert("Error al guardar los ajustes.");
+                    } finally {
+                        clearLoading(button, originalHTML);
+                    }
+                 }, 150);
+            }
+
+             function changePassword(event) {
+                event.preventDefault();
+                hidePasswordMessages();
+                const button = event.target.querySelector('button[type="submit"]');
+                const originalHTML = button.innerHTML;
+                setLoading(button, 'Cambiando...');
+
+                 setTimeout(() => {
+                    try {
+                        const currentPass = currentPasswordInput.value;
+                        const newPass = newPasswordInput.value;
+                        const confirmPass = confirmNewPasswordInput.value;
+
+                         if (!currentPass || !newPass || !confirmPass) { throw new Error('Todos los campos son obligatorios.'); }
+                        const storedPassword = localStorage.getItem('masterPassword');
+                         if (currentPass !== storedPassword) { throw new Error('La contraseña actual es incorrecta.'); }
+                         if (newPass.length < 4) { throw new Error('La nueva contraseña debe tener al menos 4 caracteres.'); }
+                         if (newPass !== confirmPass) { throw new Error('La nueva contraseña y la confirmación no coinciden.'); }
+                         if (newPass === currentPass) { throw new Error('La nueva contraseña debe ser diferente a la actual.'); }
+
+                        localStorage.setItem('masterPassword', newPass);
+                        showPasswordSuccess();
+                        passwordChangeForm.reset();
+                        console.log("Contraseña actualizada.");
+
+                    } catch (error) {
+                         console.error("Error cambiando contraseña:", error);
+                         showPasswordError(error.message || 'Error desconocido.');
+                          // Focus logic based on error type could be added here
+                         if (error.message.includes("actual")) currentPasswordInput.focus();
+                         else if (error.message.includes("nueva")) newPasswordInput.focus();
+                         else if (error.message.includes("coinciden")) confirmNewPasswordInput.focus();
+
+                    } finally {
+                         clearLoading(button, originalHTML);
+                    }
+                 }, 150);
+             }
+
+             // --- Bank Management ---
+             function renderBankList(banks) {
+                 bankListUl.innerHTML = '';
+                 noBanksMessage.classList.toggle('hidden', banks.length > 0);
+                 banks.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                 banks.forEach(bank => {
+                     const li = document.createElement('li');
+                     const nameSpan = document.createElement('span'); nameSpan.textContent = bank.name; nameSpan.style.fontWeight = 'bold'; nameSpan.style.color='var(--primary-color)';
+                     const infoSpan = document.createElement('span'); infoSpan.textContent = `: ${bank.info}`;
+                     const textDiv = document.createElement('div'); textDiv.appendChild(nameSpan); textDiv.appendChild(infoSpan);
+                     const deleteButton = document.createElement('button'); deleteButton.className = 'delete-bank-btn'; deleteButton.dataset.id = bank.id; deleteButton.title = 'Eliminar Banco'; deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                     li.appendChild(textDiv);
+                     li.appendChild(deleteButton);
+                     bankListUl.appendChild(li);
+                 });
+             }
+
+             function addBank(event) {
+                 event.preventDefault();
+                 const bankNameInput = document.getElementById('bank-name');
+                 const bankInfoInput = document.getElementById('bank-info');
+                 const name = bankNameInput.value.trim();
+                 const info = bankInfoInput.value.trim();
+                 if (!name || !info) { alert("Debes ingresar el nombre y la información del banco."); return; }
+
+                 try {
+                     let banks = JSON.parse(localStorage.getItem('config_banks') || '[]');
+                     const newBank = { id: `b_${Date.now()}`, name: name, info: info };
+                     banks.push(newBank);
+                     localStorage.setItem('config_banks', JSON.stringify(banks));
+                     renderBankList(banks);
+                     addBankForm.reset();
+                     bankNameInput.focus(); // Focus back on name for next entry
+                 } catch(e) { console.error("Error adding bank", e); alert("Error al agregar la cuenta bancaria."); }
+             }
+
+             function deleteBank(bankId) {
+                  try {
+                     let banks = JSON.parse(localStorage.getItem('config_banks') || '[]');
+                     const bankToDelete = banks.find(b=>b.id === bankId);
+                     if (!bankToDelete) return;
+                      if (confirm(`¿Estás seguro de que quieres eliminar la cuenta "${bankToDelete.name}"?`)) {
+                         banks = banks.filter(b => b.id !== bankId);
+                         localStorage.setItem('config_banks', JSON.stringify(banks));
+                         renderBankList(banks);
+                     }
+                  } catch(e) { console.error("Error deleting bank", e); alert("Error al eliminar la cuenta bancaria."); }
+             }
+
+             // --- Data Management ---
+             function exportAllData() {
+                 console.log("Iniciando exportación de datos...");
+                 const originalHTML = exportButton.innerHTML;
+                 setLoading(exportButton, 'Exportando...');
+
+                 setTimeout(() => { // Simulate work
+                     try {
+                        const dataToExport = {};
+                        LOCALSTORAGE_KEYS.forEach(key => {
+                             const data = localStorage.getItem(key);
+                             // Only include keys that actually exist in localStorage
+                             if (data !== null) { dataToExport[key] = data; }
+                        });
+
+                         if (Object.keys(dataToExport).length === 0) { throw new Error("No hay datos guardados para exportar."); }
+
+                        const jsonDataString = JSON.stringify(dataToExport, null, 2); // Pretty print JSON
+                        const blob = new Blob([jsonDataString], { type: 'application/json;charset=utf-8;' });
+                        const link = document.createElement("a");
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                        link.setAttribute("download", `backup_gestiona_facil_${dateStr}.json`);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                        URL.revokeObjectURL(url); // Clean up
+
+                        console.log("Exportación completada.");
+                        alert("¡Exportación completada! Guarda el archivo .json descargado en un lugar SEGURO.");
+
+                    } catch (error) {
+                        console.error("Error durante la exportación:", error);
+                        alert(`¡Error durante la exportación! ${error.message || 'Error desconocido.'}`);
+                    } finally {
+                         clearLoading(exportButton, originalHTML);
+                     }
+                 }, 200);
+             }
+
+             function importAllData() {
+                const file = importFileInput.files[0];
+                if (!file) { alert("Por favor, selecciona un archivo de backup (.json) primero."); return; }
+                if (!confirm("¡ADVERTENCIA MÁXIMA!\n\n¿Estás ABSOLUTAMENTE SEGURO de importar este archivo?\n\nSe borrarán TODOS los datos actuales y se reemplazarán con los del archivo.\n¡ESTA ACCIÓN NO SE PUEDE DESHACER!")) {
+                    importFileInput.value = ''; importButton.disabled = true; return;
+                }
+
+                 const originalHTML = importButton.innerHTML;
+                 setLoading(importButton, 'Importando...');
+                 showImportStatus("Leyendo archivo...", 'importing');
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        showImportStatus("Validando archivo...", 'importing');
+                        const fileContent = event.target.result;
+                        const importedData = JSON.parse(fileContent);
+
+                        if (typeof importedData !== 'object' || importedData === null) { throw new Error("El archivo no contiene datos JSON válidos."); }
+                        // Simple validation: Check for at least one core key
+                         if (!LOCALSTORAGE_KEYS.some(key => importedData.hasOwnProperty(key))) {
+                            throw new Error("El archivo JSON no parece contener datos de Gestiona Fácil.");
+                        }
+
+                        showImportStatus("Limpiando datos actuales...", 'importing');
+                        LOCALSTORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+                        console.log("LocalStorage conocido limpiado.");
+
+                        showImportStatus("Guardando datos importados...", 'importing');
+                        let itemCount = 0;
+                        for (const key in importedData) {
+                            // Ensure we only import keys we know about and that the value is a string (as stored)
+                             if (LOCALSTORAGE_KEYS.includes(key) && typeof importedData[key] === 'string') {
+                                 try {
+                                     localStorage.setItem(key, importedData[key]);
+                                     itemCount++;
+                                 } catch (storageError) {
+                                     // Handle potential quota errors during import
+                                     console.error(`Error guardando la clave '${key}':`, storageError);
+                                     throw new Error(`Error guardando datos (¿espacio lleno?). La importación falló.`);
+                                 }
+                             } else if (LOCALSTORAGE_KEYS.includes(key)) {
+                                 console.warn(`Valor para clave '${key}' no es string, omitiendo.`);
+                             } else {
+                                 console.warn(`Clave '${key}' del archivo no reconocida, omitiendo.`);
+                             }
+                        }
+
+                        console.log(`${itemCount} claves importadas.`);
+                        showImportStatus(`¡Importación completada! ${itemCount} elementos cargados. Recarga la página (F5 / Ctrl+R) para ver los cambios.`, 'success');
+                        alert("¡Importación completada!\n\nPor favor, RECARGA LA PÁGINA AHORA (F5 o Ctrl+R) para usar los datos importados.");
+
+                    } catch (error) {
+                        console.error("Error durante la importación:", error);
+                        showImportStatus(`Error en la importación: ${error.message}.`, 'error');
+                        alert("¡Error durante la importación! Revisa el mensaje de estado y la consola.");
+                        // Attempt to restore previous state? Difficult without a transaction...
+                    } finally {
+                        importFileInput.value = ''; // Reset file input
+                        clearLoading(importButton, originalHTML);
+                        importButton.disabled = true; // Keep disabled until new file selected
+                    }
+                };
+                reader.onerror = function() {
+                     console.error("Error leyendo el archivo.");
+                     showImportStatus("Error crítico al leer el archivo seleccionado.", 'error');
+                     alert("Error al leer el archivo seleccionado.");
+                     clearLoading(importButton, originalHTML);
+                     importButton.disabled = true;
+                 };
+                reader.readAsText(file);
+            }
+
+            // --- Event Listeners Setup ---
+            businessInfoForm.addEventListener('submit', saveBusinessInfo);
+            appSettingsForm.addEventListener('submit', saveAppSettings);
+            passwordChangeForm.addEventListener('submit', changePassword);
+            addBankForm.addEventListener('submit', addBank);
+            bankListUl.addEventListener('click', (event) => { const target = event.target.closest('button'); if (target?.classList.contains('delete-bank-btn')) { deleteBank(target.dataset.id); } });
+            exportButton.addEventListener('click', exportAllData);
+            importFileInput.addEventListener('change', () => { importButton.disabled = !importFileInput.files?.length; hideImportStatus(); });
+            importButton.addEventListener('click', importAllData);
+
+             // Logout Logic (Consistent)
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                 let canLogout = true;
+                 try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } }
+                 catch(err) { console.error("Error checking cash status on logout", err); }
+                 if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; }
+            });
+
+            // --- Initial Load Execution ---
+            loadInitialConfig();
+            loadBanks();
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Gestiona Fácil</title>
+     <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --warning-hover-color: #f8d347;
+            --info-color: #3498db;
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             .filters { background-color: var(--card-bg-color); border-color: var(--border-color); }
+             .report-section { border-color: var(--border-color); }
+             .table-container, .summary-item, .value-summary { background-color: var(--card-bg-color); border-color: var(--border-color); }
+              th { background-color: rgba(255,255,255,0.05) !important; }
+              tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+             .report-message { background-color: rgba(255,255,255,0.03); }
+             .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); box-shadow: var(--box-shadow); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; }
+
+        /* Filters Section */
+        .filters { /* Use card styles */ padding: 20px 25px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 15px 25px; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filters label { font-weight: 500; color: var(--text-muted-color); font-size: 0.85em; }
+        .filters input[type="date"], .filters select { padding: 9px 12px; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 0.95em; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; height: 40px; }
+        .filters input[type="date"]:focus, .filters select:focus { outline: none; border-color: var(--input-focus-border-color); box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         /* General Action Button Style */
+         .action-button { padding: 10px 20px; cursor: pointer; border: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease-out; display: inline-flex; align-items: center; gap: 8px; line-height: 1.5; height: 40px; }
+         .action-button .spinner { font-size: 0.9em; }
+         .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .action-button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+         .action-button:disabled { background-color: var(--secondary-color) !important; opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+         #generate-reports-button { background-color: var(--primary-color); color: white; }
+         #generate-reports-button:hover:not(:disabled) { background-color: var(--primary-hover-color); }
+
+
+        /* Report Sections */
+        .report-section { margin-bottom: 35px; padding-bottom: 25px; border-bottom: 1px dashed var(--border-color); }
+        .report-section:last-child { border-bottom: none; margin-bottom: 0; }
+        .report-section h2 { margin-top: 0; margin-bottom: 20px; font-size: 1.5em; font-weight: 600; color: var(--primary-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+         .report-section h2 i { margin-right: 10px; opacity: 0.9; }
+         .export-button { padding: 6px 12px; font-size: 0.85em; background-color: var(--info-color); color: white; border: none; border-radius: var(--border-radius-md); cursor: pointer; transition: all 0.2s ease-out; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+         .export-button:hover:not(:disabled) { background-color: var(--info-hover-color); transform: translateY(-1px); }
+         .export-button:disabled { background-color: var(--secondary-color) !important; }
+
+        /* Report Summary Styles */
+        .report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .summary-item { /* Use card styles */ padding: 15px 20px; }
+        .summary-item p { margin: 0 0 5px 0; font-size: 0.85em; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-item strong { font-size: 1.6em; font-weight: 600; color: var(--text-color); display: block; line-height: 1.2; }
+
+        /* Table Styles within Reports */
+        .table-container { /* Use card styles */ overflow: hidden; padding: 0; margin-top: 20px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0; min-width: 600px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9em; white-space: nowrap; }
+        th { background-color: rgba(0,0,0,0.02); font-weight: 600; font-size: 0.85em; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.7px; position: sticky; top: 0; z-index: 1; }
+        tbody tr:hover { background-color: rgba(0, 123, 255, 0.03); }
+        tbody tr:last-child td { border-bottom: none; }
+        td.currency, th.currency { text-align: right; font-weight: 500; }
+         th.currency { font-weight: 600; }
+
+        /* Value Summaries */
+         .value-summary { margin-top: 20px; text-align: right; /* Use card styles */ padding: 15px 20px; }
+        .value-summary p { margin: 5px 0; font-size: 1em; color: var(--text-muted-color); }
+        .value-summary strong { font-size: 1.2em; color: var(--primary-color); margin-left: 10px; font-weight: bold; }
+
+         /* Messages */
+         .report-message { text-align: center; padding: 20px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); margin-top: 15px; font-size: 0.95em; }
+         .hidden { display: none !important; }
+
+         /* Theme Toggle Button (Consistent) */
+         .theme-toggle { position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030; }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments (Consistent) */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .filters { flex-direction: column; align-items: stretch; gap: 10px; padding: 15px; }
+              .filters .action-button { width: 100%; justify-content: center; }
+             .report-section h2 { font-size: 1.3em; flex-direction: column; align-items: flex-start; }
+             .export-button { margin-left: 0; margin-top: 10px; }
+             .report-summary { grid-template-columns: 1fr; }
+             .table-wrapper { overflow-x: auto; } /* Ensure scroll on mobile */
+             .table-container, .value-summary { /* Remove card style for tables/summary on mobile */ background-color: transparent; border: none; box-shadow: none; padding: 0; margin-top: 10px; }
+              .value-summary { border-top: 1px solid var(--border-color); border-radius: 0; padding-top: 15px; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html" class="active"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Reportes del Negocio</h1>
+            <p>Visualiza el rendimiento y estado de tu negocio en el periodo seleccionado.</p>
+        </header>
+
+        <section class="filters card">
+             <div class="filter-group">
+                <label for="report-start-date">Desde:</label>
+                <input type="date" id="report-start-date">
+             </div>
+            <div class="filter-group">
+                <label for="report-end-date">Hasta:</label>
+                <input type="date" id="report-end-date">
+            </div>
+            <button id="generate-reports-button" class="action-button">
+                <i class="fas fa-sync-alt"></i> <span class="button-text">Generar Reportes</span>
+            </button>
+        </section>
+
+        <!-- Sección Reporte de Ventas -->
+        <section class="report-section" id="sales-report">
+            <h2>
+                <span><i class="fas fa-dollar-sign"></i> Reporte de Ventas</span>
+                <button class="export-button action-button" id="export-sales-csv" disabled>
+                    <i class="fas fa-download"></i> <span class="button-text">Exportar</span>
+                </button>
+            </h2>
+            <div class="report-summary">
+                 <div class="summary-item card">
+                    <p>Total Ventas</p>
+                    <strong id="sales-total">--.--</strong>
+                 </div>
+                  <div class="summary-item card">
+                    <p>Nº Transacciones</p>
+                    <strong id="sales-count">0</strong>
+                 </div>
+                  <div class="summary-item card">
+                    <p>Venta Promedio</p>
+                    <strong id="sales-average">--.--</strong>
+                 </div>
+            </div>
+            <p id="no-sales-report" class="report-message hidden">No hay ventas en el periodo seleccionado.</p>
+        </section>
+
+        <!-- Sección Reporte de Productos Más Vendidos -->
+        <section class="report-section" id="top-products-report">
+             <h2>
+                 <span><i class="fas fa-star"></i> Productos Más Vendidos</span>
+                 <button class="export-button action-button" id="export-top-products-csv" disabled>
+                      <i class="fas fa-download"></i> <span class="button-text">Exportar</span>
+                 </button>
+            </h2>
+             <div class="table-container card">
+                 <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Cantidad Vendida</th>
+                                <th scope="col" class="currency">Ingresos Generados</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-products-body"></tbody>
+                    </table>
+                 </div>
+             </div>
+            <p id="no-top-products" class="report-message hidden">No hay datos de ventas de productos en el periodo seleccionado.</p>
+        </section>
+
+        <!-- Sección Reporte de Inventario -->
+        <section class="report-section" id="inventory-report">
+             <h2>
+                 <span><i class="fas fa-boxes-stacked"></i> Reporte de Inventario (Estado Actual)</span>
+                 <button class="export-button action-button" id="export-inventory-csv" disabled>
+                     <i class="fas fa-download"></i> <span class="button-text">Exportar</span>
+                 </button>
+            </h2>
+            <div class="table-container card">
+                 <div class="table-wrapper">
+                     <table>
+                         <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col" class="currency">Stock Actual</th>
+                                <th scope="col" class="currency">Stock Mínimo</th>
+                                <th scope="col">Unidad</th>
+                                <th scope="col" class="currency">Costo Unit.</th>
+                                <th scope="col" class="currency">Precio Venta Unit.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-body"></tbody>
+                    </table>
+                 </div>
+             </div>
+             <p id="no-inventory-report" class="report-message hidden">No hay productos con inventario gestionado.</p>
+             <div class="value-summary card">
+                 <p>Valor Total Inventario (al Costo): <strong id="inventory-total-cost-value">--.--</strong></p>
+                 <p>Valor Total Inventario (a la Venta): <strong id="inventory-total-sale-value">--.--</strong></p>
+            </div>
+        </section>
+
+        <!-- Sección Reporte de Gastos -->
+        <section class="report-section" id="expenses-report">
+            <h2>
+                 <span><i class="fas fa-receipt"></i> Reporte de Gastos</span>
+                 <button class="export-button action-button" id="export-expenses-csv" disabled>
+                     <i class="fas fa-download"></i> <span class="button-text">Exportar</span>
+                 </button>
+            </h2>
+             <div class="table-container card">
+                  <div class="table-wrapper">
+                     <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Categoría</th>
+                                <th scope="col" class="currency">Total Gastado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-by-category-body"></tbody>
+                    </table>
+                  </div>
+             </div>
+             <p id="no-expenses-report" class="report-message hidden">No hay gastos registrados en el periodo seleccionado.</p>
+             <div class="value-summary card" style="text-align: right;">
+                 <p>Total Gastos del Periodo: <strong id="expenses-total">--.--</strong></p>
+             </div>
+        </section>
+
+    </main>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button'); const body = document.body; const themeIcon = themeToggleButton.querySelector('i'); const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon'; function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); } function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); } function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; } const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+             // --- Elements & Config ---
+             const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+             let currency = '$';
+             const startDateInput = document.getElementById('report-start-date');
+             const endDateInput = document.getElementById('report-end-date');
+             const generateButton = document.getElementById('generate-reports-button');
+             const salesTotalEl = document.getElementById('sales-total');
+             const salesCountEl = document.getElementById('sales-count');
+             const salesAverageEl = document.getElementById('sales-average');
+             const noSalesReportMsg = document.getElementById('no-sales-report');
+             const topProductsBody = document.getElementById('top-products-body');
+             const noTopProductsMsg = document.getElementById('no-top-products');
+             const inventoryBody = document.getElementById('inventory-body');
+             const noInventoryReportMsg = document.getElementById('no-inventory-report');
+             const inventoryTotalCostEl = document.getElementById('inventory-total-cost-value');
+             const inventoryTotalSaleEl = document.getElementById('inventory-total-sale-value');
+             const expensesByCategoryBody = document.getElementById('expenses-by-category-body');
+             const noExpensesReportMsg = document.getElementById('no-expenses-report');
+             const expensesTotalEl = document.getElementById('expenses-total');
+             const exportSalesBtn = document.getElementById('export-sales-csv');
+             const exportTopProductsBtn = document.getElementById('export-top-products-csv');
+             const exportInventoryBtn = document.getElementById('export-inventory-csv');
+             const exportExpensesBtn = document.getElementById('export-expenses-csv');
+
+             let loadedSales = [];
+             let loadedProducts = [];
+             let loadedExpenses = [];
+             let filteredSalesData = []; // For export
+             let filteredExpensesData = []; // For export
+             let topProductsData = []; // For export
+             let inventoryData = []; // For export
+
+             // --- Utility Functions ---
+             const formatCurrency = (amount) => `${currency}${typeof amount === 'number' ? amount.toFixed(2) : '0.00'}`;
+             const escapeCsvValue = (value) => { if (value == null) return ''; const stringValue = String(value); if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) { return `"${stringValue.replace(/"/g, '""')}"`; } return stringValue; };
+             const setLoading = (button, text = "Generando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`; };
+             const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+
+             // --- Initial Load ---
+             function loadInitialConfig() {
+                 try {
+                     const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                     document.getElementById('business-name-sidebar').textContent = businessName;
+                     currency = localStorage.getItem('currency') || '$';
+                     const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                     document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                 } catch(e) { console.error("Error loading config:", e); }
+             }
+
+             function setDefaultDates() {
+                 try {
+                     const today = new Date();
+                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Last day of current month
+                     startDateInput.value = firstDay.toISOString().split('T')[0];
+                     endDateInput.value = lastDay.toISOString().split('T')[0];
+                 } catch (e) { console.error("Error setting default dates", e); }
+             }
+
+             function loadData() {
+                 try {
+                    loadedSales = JSON.parse(localStorage.getItem('ventas') || '[]');
+                    loadedProducts = JSON.parse(localStorage.getItem('productos') || '[]');
+                    loadedExpenses = JSON.parse(localStorage.getItem('gastos') || '[]');
+                    console.log(`Datos cargados: ${loadedSales.length} ventas, ${loadedProducts.length} productos, ${loadedExpenses.length} gastos.`);
+                 } catch (error) {
+                      console.error("Error crítico cargando datos para reportes:", error);
+                      alert("Error al cargar los datos base para los reportes. Intenta recargar.");
+                      // Disable generate button if core data fails to load
+                      generateButton.disabled = true;
+                      generateButton.textContent = 'Error al Cargar Datos';
+                 }
+             }
+
+             // --- Report Generation ---
+             function generateReports() {
+                 const originalBtnHTML = generateButton.innerHTML;
+                 setLoading(generateButton);
+                 console.log("Generando reportes...");
+
+                 const startDate = startDateInput.value;
+                 const endDate = endDateInput.value;
+
+                 // Basic date validation
+                 if (startDate && endDate && startDate > endDate) {
+                    alert("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
+                    clearLoading(generateButton, originalBtnHTML);
+                    return;
+                 }
+
+                  // Filter data based on dates
+                 filteredSalesData = loadedSales.filter(sale => {
+                     const saleDate = sale.fecha ? sale.fecha.split('T')[0] : null;
+                     return saleDate && (!startDate || saleDate >= startDate) && (!endDate || saleDate <= endDate);
+                 });
+                 filteredExpensesData = loadedExpenses.filter(exp => {
+                     const expDate = exp.fecha; // Assumes YYYY-MM-DD format
+                     return expDate && (!startDate || expDate >= startDate) && (!endDate || expDate <= endDate);
+                 });
+
+                 // Use setTimeout to allow UI update before potentially long calculations
+                 setTimeout(() => {
+                     try {
+                         generateSalesReport(filteredSalesData);
+                         generateTopProductsReport(filteredSalesData);
+                         generateInventoryReport(); // Inventory is always current state
+                         generateExpensesReport(filteredExpensesData);
+                         console.log("Reportes generados.");
+                     } catch (error) {
+                         console.error("Error generando reportes:", error);
+                         alert("Ocurrió un error al generar los reportes.");
+                     } finally {
+                         clearLoading(generateButton, originalBtnHTML);
+                     }
+                 }, 50); // Short delay
+             }
+
+             function generateSalesReport(sales) {
+                 let totalSales = sales.reduce((sum, sale) => sum + (sale.total || 0), 0);
+                 const salesCount = sales.length;
+                 const averageSale = salesCount > 0 ? totalSales / salesCount : 0;
+
+                 salesTotalEl.textContent = formatCurrency(totalSales);
+                 salesCountEl.textContent = salesCount;
+                 salesAverageEl.textContent = formatCurrency(averageSale);
+                 noSalesReportMsg.classList.toggle('hidden', salesCount > 0);
+                 exportSalesBtn.disabled = salesCount === 0;
+                 // Prepare data for export (map fields if needed)
+                 filteredSalesData = sales.map(s => ({ // Overwrite global filteredSalesData
+                      ID: s.id, Fecha: s.fecha, Subtotal: s.subtotal?.toFixed(2) ?? '0.00',
+                      Total: s.total?.toFixed(2) ?? '0.00', MetodoPago: s.metodoPago,
+                      EfectivoRecibido: s.efectivoRecibido?.toFixed(2) ?? '', CambioDado: s.cambioDado?.toFixed(2) ?? '',
+                      TipoVenta: s.tipoVenta || '', MesaID: s.mesaId || '', MesaNombre: s.mesaNombre || '',
+                      ItemsJSON: JSON.stringify(s.items || [])
+                 }));
+             }
+
+             function generateTopProductsReport(sales) {
+                 topProductsBody.innerHTML = '';
+                 topProductsData = []; // Clear previous data for export
+                 noTopProductsMsg.classList.add('hidden');
+                 exportTopProductsBtn.disabled = true;
+
+                 if (sales.length === 0) { noTopProductsMsg.classList.remove('hidden'); return; }
+
+                 const productSummary = sales.flatMap(sale => sale.items || [])
+                     .reduce((summary, item) => {
+                         const productId = item.id;
+                         const productInfo = loadedProducts.find(p => p.id === productId);
+                         const name = productInfo ? productInfo.name : `Producto ID ${productId}`;
+                         summary[productId] = summary[productId] || { id: productId, name: name, qty: 0, revenue: 0 };
+                         summary[productId].qty += item.quantity;
+                         summary[productId].revenue += (item.price * item.quantity);
+                         return summary;
+                     }, {});
+
+                 const sortedProducts = Object.values(productSummary).sort((a, b) => b.revenue - a.revenue);
+
+                 if (sortedProducts.length === 0) { noTopProductsMsg.classList.remove('hidden'); }
+                 else {
+                     sortedProducts.forEach(prod => {
+                         const row = topProductsBody.insertRow();
+                         const displayQty = Number.isInteger(prod.qty) ? prod.qty : prod.qty.toFixed(2);
+                         row.insertCell().textContent = prod.name;
+                         row.insertCell().textContent = displayQty;
+                         const revenueCell = row.insertCell(); revenueCell.className = 'currency'; revenueCell.textContent = formatCurrency(prod.revenue);
+                         topProductsData.push({ IDProducto: prod.id, Nombre: prod.name, CantidadVendida: displayQty, IngresosGenerados: prod.revenue.toFixed(2) });
+                     });
+                      exportTopProductsBtn.disabled = false;
+                 }
+             }
+
+             function generateInventoryReport() {
+                 inventoryBody.innerHTML = '';
+                 inventoryData = [];
+                 noInventoryReportMsg.classList.add('hidden');
+                 exportInventoryBtn.disabled = true;
+                 let totalCostValue = 0, totalSaleValue = 0;
+                 const managedInventory = loadedProducts.filter(p => p.manageStock);
+
+                 if (managedInventory.length === 0) { noInventoryReportMsg.classList.remove('hidden'); }
+                 else {
+                     managedInventory.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+                     managedInventory.forEach(product => {
+                         const row = inventoryBody.insertRow();
+                         const stock = product.stock ?? 0; const cost = product.cost ?? 0; const price = product.price ?? 0;
+                         row.insertCell().textContent = product.name;
+                         row.insertCell().textContent = stock;
+                         row.insertCell().textContent = product.minStock ?? 0;
+                         row.insertCell().textContent = product.unit || 'unidad';
+                         const costCell = row.insertCell(); costCell.className = 'currency'; costCell.textContent = cost > 0 ? formatCurrency(cost) : '-';
+                         const priceCell = row.insertCell(); priceCell.className = 'currency'; priceCell.textContent = price > 0 ? formatCurrency(price) : '-';
+                         totalCostValue += stock * cost; totalSaleValue += stock * price;
+                         inventoryData.push({ ID: product.id, Nombre: product.name, SKU: product.sku, StockActual: stock, StockMinimo: product.minStock, Unidad: product.unit, CostoUnit: cost.toFixed(2), PrecioVentaUnit: price.toFixed(2), IDProveedor: product.providerId });
+                     });
+                      exportInventoryBtn.disabled = false;
+                 }
+                 inventoryTotalCostEl.textContent = formatCurrency(totalCostValue);
+                 inventoryTotalSaleEl.textContent = formatCurrency(totalSaleValue);
+             }
+
+             function generateExpensesReport(expenses) {
+                 expensesByCategoryBody.innerHTML = '';
+                 noExpensesReportMsg.classList.add('hidden');
+                 exportExpensesBtn.disabled = true;
+                 let totalExpenses = 0;
+
+                 if (expenses.length === 0) { noExpensesReportMsg.classList.remove('hidden'); expensesTotalEl.textContent = formatCurrency(0); return; }
+
+                 const expensesByCategory = expenses.reduce((summary, exp) => {
+                     const category = exp.categoria || 'Sin Categoría';
+                     summary[category] = (summary[category] || 0) + (exp.monto || 0);
+                     return summary;
+                 }, {});
+                 totalExpenses = expenses.reduce((sum, exp) => sum + (exp.monto || 0), 0);
+
+                 const sortedCategories = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1]); // Sort by amount desc
+
+                 sortedCategories.forEach(([category, amount]) => {
+                     const row = expensesByCategoryBody.insertRow();
+                     row.insertCell().textContent = category;
+                     const amountCell = row.insertCell(); amountCell.className = 'currency'; amountCell.textContent = formatCurrency(amount);
+                 });
+                 expensesTotalEl.textContent = formatCurrency(totalExpenses);
+                 exportExpensesBtn.disabled = false;
+                 // Prepare data for export
+                  filteredExpensesData = expenses.map(e => ({ // Overwrite global filteredExpensesData
+                      ID: e.id, Fecha: e.fecha, Monto: e.monto?.toFixed(2) ?? '0.00', Tipo: e.tipo,
+                      Beneficiario: e.beneficiario, Categoria: e.categoria, MetodoPago: e.metodoPago,
+                      RefBanco: e.referenciaBanco || '', Notas: e.notas || ''
+                 }));
+             }
+
+            // --- Generic Download Function ---
+             function downloadCSV(data, filenamePrefix, headers) {
+                 if (!data || data.length === 0) { alert(`No hay datos de ${filenamePrefix} para descargar.`); return; }
+                 console.log(`Preparando descarga CSV de ${filenamePrefix}...`);
+
+                 const rows = data.map(item => headers.map(header => escapeCsvValue(item[header] ?? item[header.toLowerCase()] ?? ''))); // Try header casing then lowercase
+                 let csvContent = headers.join(',') + '\r\n';
+                 rows.forEach(rowArray => { csvContent += rowArray.join(',') + '\r\n'; });
+
+                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                 const link = document.createElement("a"); const url = URL.createObjectURL(blob);
+                 link.setAttribute("href", url); const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                 const startDateStr = startDateInput.value ? `_desde-${startDateInput.value}` : '';
+                 const endDateStr = endDateInput.value ? `_hasta-${endDateInput.value}` : '';
+                 link.setAttribute("download", `${filenamePrefix}_${dateStr}${startDateStr}${endDateStr}.csv`);
+                 link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+                 console.log("Descarga iniciada.");
+             }
+
+
+             // --- Lógica botón Salir ---
+             document.getElementById('logout-button')?.addEventListener('click', (e) => { e.preventDefault(); let canLogout = true; try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } } catch(err) { console.error("Error checking cash status on logout", err); } if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; } });
+
+             // --- Event Listeners Setup ---
+             generateButton.addEventListener('click', generateReports);
+             exportSalesBtn.addEventListener('click', () => downloadCSV(filteredSalesData, 'ventas', Object.keys(filteredSalesData[0] || {}))); // Use actual keys from processed data
+             exportTopProductsBtn.addEventListener('click', () => downloadCSV(topProductsData, 'productos_mas_vendidos', Object.keys(topProductsData[0] || {})));
+             exportInventoryBtn.addEventListener('click', () => downloadCSV(inventoryData, 'inventario', Object.keys(inventoryData[0] || {})));
+             exportExpensesBtn.addEventListener('click', () => downloadCSV(filteredExpensesData, 'gastos', Object.keys(filteredExpensesData[0] || {})));
+
+             // --- Initial Load Execution ---
+             loadInitialConfig();
+             setDefaultDates();
+             loadData();
+             generateReports(); // Initial report generation
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

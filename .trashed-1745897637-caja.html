@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Caja - Mi App de Gestión</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <style>
+        /* Estilos muy básicos para demostración */
+        body { font-family: sans-serif; display: flex; margin: 0;}
+        .sidebar { width: 200px; background-color: #f4f4f4; padding: 15px; height: 100vh; box-sizing: border-box; overflow-y: auto;}
+        .sidebar h2 { margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li a { text-decoration: none; color: #333; display: block; padding: 8px 0; }
+        .sidebar ul li a.active { font-weight: bold; }
+        .content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .content header { margin-bottom: 20px; }
+        .cash-status { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background-color: #f9f9f9; border-radius: 5px; }
+        .cash-status h2 { margin-top: 0; }
+        .cash-actions button { padding: 12px 20px; font-size: 1.1em; cursor: pointer; margin-right: 10px; border-radius: 4px;}
+        .open-cash { background-color: #28a745; color: white; border: none;}
+        .close-cash { background-color: #dc3545; color: white; border: none;}
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold;}
+        .form-group input[type="number"] { width: 100%; max-width: 250px; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;}
+        .summary-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .summary-section p { margin: 8px 0; }
+        .summary-section strong { display: inline-block; min-width: 180px; }
+        .difference { font-weight: bold; }
+        .difference.positive { color: green; }
+        .difference.negative { color: red; }
+        .hidden { display: none; }
+        .error { color: red; font-size: 0.9em; }
+        #history-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
+        #history-table th, #history-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        #history-table th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <p><small id="business-name-sidebar">Nombre Negocio</small></p>
+         <ul>
+            <li><a href="dashboard.html">Inicio / Dashboard</a></li>
+            <li><a href="nueva_venta.html">Nueva Venta (POS)</a></li>
+            <li><a href="restaurante.html">Restaurante</a></li>
+            <li><a href="caja.html" class="active">Caja</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="inventario.html">Inventario</a></li>
+            <li><a href="proveedores.html">Proveedores</a></li>
+            <li><a href="clientes.html">Clientes</a></li>
+            <li><a href="gastos.html">Gastos / Pagos</a></li>
+            <li><a href="reportes.html">Reportes</a></li>
+            <li><a href="configuracion.html">Configuración</a></li>
+            <li><a href="login.html" id="logout-button">Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Caja</h1>
+            <p>Abre la caja al iniciar el día y ciérrala al terminar.</p>
+        </header>
+
+        <section class="cash-status">
+            <h2>Estado Actual de la Caja</h2>
+            <p><strong>Estado:</strong> <span id="status-text">Cerrada</span></p>
+            <p><strong>Abierta desde:</strong> <span id="open-time-text">-</span></p>
+            <p><strong>Fondo Inicial:</strong> <span id="initial-fund-text">-</span></p>
+        </section>
+
+        <section class="cash-actions">
+             <!-- Formulario para Abrir Caja (Visible si está cerrada) -->
+            <div id="open-cash-section">
+                <h3>Abrir Caja</h3>
+                <form id="open-cash-form">
+                    <div class="form-group">
+                        <label for="initial-fund">Fondo Inicial (Efectivo):</label>
+                        <input type="number" id="initial-fund" step="0.01" min="0" required>
+                         <span class="currency-symbol"></span>
+                    </div>
+                    <p id="open-error" class="error hidden"></p>
+                    <button type="submit" class="open-cash">Abrir Caja Ahora</button>
+                </form>
+            </div>
+
+             <!-- Formulario para Cerrar Caja (Visible si está abierta) -->
+             <div id="close-cash-section" class="hidden">
+                 <h3>Cerrar Caja</h3>
+                 <form id="close-cash-form">
+                     <div class="summary-section">
+                         <h4>Resumen Calculado</h4>
+                         <p><strong>Fondo Inicial:</strong> <span id="summary-initial">0.00</span></p>
+                         <p><strong>(+) Ventas en Efectivo:</strong> <span id="summary-cash-sales">0.00</span></p>
+                         <p><strong>(-) Pagos en Efectivo:</strong> <span id="summary-cash-expenses">0.00</span></p>
+                         <hr>
+                         <p><strong>(=) Efectivo Esperado en Caja:</strong> <strong id="summary-expected">0.00</strong></p>
+                     </div>
+
+                     <div class="form-group" style="margin-top: 20px;">
+                         <label for="actual-cash">Conteo Real de Efectivo en Caja:</label>
+                         <input type="number" id="actual-cash" step="0.01" min="0" required>
+                          <span class="currency-symbol"></span>
+                     </div>
+
+                      <div class="summary-section">
+                         <h4>Resultado del Cierre</h4>
+                         <p><strong>Efectivo Contado:</strong> <span id="summary-counted">0.00</span></p>
+                         <p><strong>Diferencia (Sobrante/Faltante):</strong> <span id="summary-difference" class="difference">0.00</span></p>
+                         <hr>
+                         <p><strong>Ventas con Tarjeta:</strong> <span id="summary-card-sales">0.00</span></p>
+                         <p><strong>Ventas por Transferencia:</strong> <span id="summary-transfer-sales">0.00</span></p>
+                     </div>
+
+                     <p id="close-error" class="error hidden"></p>
+                     <button type="submit" class="close-cash">Confirmar Cierre de Caja</button>
+                      <!-- Botón para descargar resumen (se activa después de cerrar) -->
+                    <button type="button" id="download-summary-button" class="hidden" style="margin-left: 10px; background-color: #17a2b8; color:white; border:none;">Descargar Resumen</button>
+                 </form>
+             </div>
+        </section>
+
+        <section class="cash-history" style="margin-top: 30px;">
+            <h2>Historial de Cierres de Caja</h2>
+             <table id="history-table">
+                 <thead>
+                     <tr>
+                         <th>Fecha Cierre</th>
+                         <th>Hora Apertura</th>
+                         <th>Hora Cierre</th>
+                         <th>Fondo Inicial</th>
+                         <th>Efectivo Esperado</th>
+                         <th>Efectivo Contado</th>
+                         <th>Diferencia</th>
+                         <!-- Podrían añadirse columnas de Totales por método de pago -->
+                     </tr>
+                 </thead>
+                 <tbody id="history-table-body">
+                     <!-- Filas del historial se cargarán aquí -->
+                 </tbody>
+             </table>
+             <p id="no-history-message" class="hidden">Aún no hay cierres de caja registrados.</p>
+        </section>
+
+    </main>
+
+    <!-- <script src="js/app.js"></script> -->
+    <!-- <script src="js/caja.js"></script> -->
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+            document.getElementById('business-name-sidebar').textContent = businessName;
+            const currency = localStorage.getItem('currency') || '$';
+            document.querySelectorAll('.currency-symbol').forEach(el => el.textContent = currency); // Poner símbolo de moneda
+
+            // Elementos UI
+            const statusText = document.getElementById('status-text');
+            const openTimeText = document.getElementById('open-time-text');
+            const initialFundText = document.getElementById('initial-fund-text');
+            const openCashSection = document.getElementById('open-cash-section');
+            const closeCashSection = document.getElementById('close-cash-section');
+            const openCashForm = document.getElementById('open-cash-form');
+            const closeCashForm = document.getElementById('close-cash-form');
+            const initialFundInput = document.getElementById('initial-fund');
+            const actualCashInput = document.getElementById('actual-cash');
+            const downloadButton = document.getElementById('download-summary-button');
+            const historyTableBody = document.getElementById('history-table-body');
+            const noHistoryMessage = document.getElementById('no-history-message');
+            const openError = document.getElementById('open-error');
+            const closeError = document.getElementById('close-error');
+
+            let cashRegisterStatus = {}; // Objeto para guardar el estado actual
+            let cashHistory = []; // Array para el historial
+
+            // --- Carga Inicial ---
+            loadCashRegisterState();
+            loadCashHistory();
+            updateUI();
+
+            // --- Event Listeners ---
+            openCashForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                openError.classList.add('hidden');
+                const initialFund = parseFloat(initialFundInput.value);
+
+                if (isNaN(initialFund) || initialFund < 0) {
+                     openError.textContent = 'El fondo inicial debe ser un número válido y no negativo.';
+                     openError.classList.remove('hidden');
+                     return;
+                }
+
+                openCashRegister(initialFund);
+                updateUI();
+            });
+
+            closeCashForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 closeError.classList.add('hidden');
+                 const actualCash = parseFloat(actualCashInput.value);
+
+                 if (isNaN(actualCash) || actualCash < 0) {
+                     closeError.textContent = 'El conteo real de efectivo debe ser un número válido y no negativo.';
+                     closeError.classList.remove('hidden');
+                     return;
+                 }
+
+                 closeCashRegister(actualCash);
+                 updateUI();
+                 downloadButton.classList.remove('hidden'); // Mostrar botón de descarga
+            });
+
+             downloadButton.addEventListener('click', downloadSummary);
+
+
+             // Lógica botón Salir
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (cashRegisterStatus.isOpen) {
+                    alert("Debes cerrar la caja antes de salir.");
+                } else if (confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+
+
+            // --- Funciones ---
+            function loadCashRegisterState() {
+                 try {
+                     cashRegisterStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}');
+                 } catch (error) {
+                     console.error("Error cargando estado de caja:", error);
+                     cashRegisterStatus = {};
+                 }
+            }
+
+            function saveCashRegisterState() {
+                 try {
+                     localStorage.setItem('cashRegisterStatus', JSON.stringify(cashRegisterStatus));
+                 } catch (error) {
+                      console.error("Error guardando estado de caja:", error);
+                      alert("Error al guardar el estado de la caja.");
+                 }
+            }
+
+             function loadCashHistory() {
+                try {
+                    cashHistory = JSON.parse(localStorage.getItem('cashHistory') || '[]');
+                    renderHistoryTable();
+                } catch (error) {
+                    console.error("Error cargando historial de caja:", error);
+                    cashHistory = [];
+                }
+            }
+
+             function saveCashHistory() {
+                try {
+                    localStorage.setItem('cashHistory', JSON.stringify(cashHistory));
+                } catch (error) {
+                    console.error("Error guardando historial de caja:", error);
+                    alert("Error al guardar el historial de caja.");
+                }
+            }
+
+
+            function updateUI() {
+                if (cashRegisterStatus.isOpen) {
+                    statusText.textContent = 'Abierta';
+                    openTimeText.textContent = new Date(cashRegisterStatus.openTime).toLocaleString();
+                    initialFundText.textContent = `${currency}${cashRegisterStatus.initialFund.toFixed(2)}`;
+                    openCashSection.classList.add('hidden');
+                    closeCashSection.classList.remove('hidden');
+                    calculateAndDisplaySummary(); // Calcular resumen para mostrar en el form de cierre
+                     downloadButton.classList.add('hidden'); // Ocultar botón descarga hasta confirmar cierre
+                } else {
+                    statusText.textContent = 'Cerrada';
+                    openTimeText.textContent = '-';
+                    initialFundText.textContent = '-';
+                    openCashSection.classList.remove('hidden');
+                    closeCashSection.classList.add('hidden');
+                    openCashForm.reset(); // Limpiar form de apertura
+                }
+                 renderHistoryTable(); // Actualizar tabla de historial
+            }
+
+
+            function openCashRegister(initialFund) {
+                cashRegisterStatus = {
+                    isOpen: true,
+                    openTime: new Date().toISOString(),
+                    initialFund: initialFund
+                };
+                saveCashRegisterState();
+                console.log("Caja abierta:", cashRegisterStatus);
+            }
+
+             function calculateAndDisplaySummary() {
+                // --- ¡ESTA ES LA PARTE CLAVE QUE NECESITA DATOS REALES! ---
+                // Necesitas leer las ventas y gastos DESDE que la caja se abrió.
+                const openTimestamp = new Date(cashRegisterStatus.openTime).getTime();
+
+                // 1. Filtrar Ventas desde apertura
+                let salesSinceOpen = [];
+                try {
+                    const allSales = JSON.parse(localStorage.getItem('ventas') || '[]');
+                    salesSinceOpen = allSales.filter(sale => new Date(sale.fecha).getTime() >= openTimestamp);
+                } catch (e) { console.error("Error leyendo ventas", e); }
+
+                // 2. Filtrar Gastos desde apertura
+                let expensesSinceOpen = [];
+                 try {
+                    const allExpenses = JSON.parse(localStorage.getItem('gastos') || '[]');
+                    expensesSinceOpen = allExpenses.filter(exp => new Date(exp.fecha).getTime() >= openTimestamp);
+                } catch (e) { console.error("Error leyendo gastos", e); }
+
+
+                // 3. Calcular totales por método de pago
+                let cashSalesTotal = 0;
+                let cardSalesTotal = 0;
+                let transferSalesTotal = 0;
+                salesSinceOpen.forEach(sale => {
+                    if (sale.metodoPago === 'Efectivo') {
+                        cashSalesTotal += sale.total;
+                    } else if (sale.metodoPago === 'Tarjeta') {
+                        cardSalesTotal += sale.total;
+                    } else if (sale.metodoPago === 'Transferencia') {
+                        transferSalesTotal += sale.total;
+                    }
+                });
+
+                let cashExpensesTotal = 0;
+                 expensesSinceOpen.forEach(exp => {
+                    if (exp.metodoPago === 'Efectivo') { // Asumiendo que los gastos tienen 'metodoPago'
+                        cashExpensesTotal += exp.monto; // Asumiendo que tienen 'monto'
+                    }
+                });
+
+                const initialFund = cashRegisterStatus.initialFund || 0;
+                const expectedCash = initialFund + cashSalesTotal - cashExpensesTotal;
+
+                // Actualizar la UI del formulario de cierre
+                document.getElementById('summary-initial').textContent = `${currency}${initialFund.toFixed(2)}`;
+                document.getElementById('summary-cash-sales').textContent = `${currency}${cashSalesTotal.toFixed(2)}`;
+                document.getElementById('summary-cash-expenses').textContent = `${currency}${cashExpensesTotal.toFixed(2)}`;
+                document.getElementById('summary-expected').textContent = `${currency}${expectedCash.toFixed(2)}`;
+
+                 // También actualizar los otros métodos de pago en el resumen final
+                 document.getElementById('summary-card-sales').textContent = `${currency}${cardSalesTotal.toFixed(2)}`;
+                 document.getElementById('summary-transfer-sales').textContent = `${currency}${transferSalesTotal.toFixed(2)}`;
+
+                 return { // Devolver los valores calculados para usarlos al cerrar
+                     initialFund,
+                     cashSalesTotal,
+                     cashExpensesTotal,
+                     expectedCash,
+                     cardSalesTotal,
+                     transferSalesTotal
+                 };
+            }
+
+
+            function closeCashRegister(actualCash) {
+                 if (!cashRegisterStatus.isOpen) {
+                     alert("La caja ya está cerrada.");
+                     return;
+                 }
+
+                const summaryData = calculateAndDisplaySummary(); // Obtener los datos calculados
+                const closeTime = new Date().toISOString();
+                const difference = actualCash - summaryData.expectedCash;
+
+                 // Actualizar UI con el conteo y diferencia
+                 document.getElementById('summary-counted').textContent = `${currency}${actualCash.toFixed(2)}`;
+                 const diffElement = document.getElementById('summary-difference');
+                 diffElement.textContent = `${currency}${difference.toFixed(2)}`;
+                 diffElement.className = 'difference'; // Reset class
+                 if (difference > 0) diffElement.classList.add('positive');
+                 if (difference < 0) diffElement.classList.add('negative');
+
+
+                 // Crear registro del cierre para el historial
+                 const closingRecord = {
+                     id: Date.now(),
+                     openTime: cashRegisterStatus.openTime,
+                     closeTime: closeTime,
+                     initialFund: summaryData.initialFund,
+                     cashSales: summaryData.cashSalesTotal,
+                     cashExpenses: summaryData.cashExpensesTotal,
+                     expectedCash: summaryData.expectedCash,
+                     countedCash: actualCash,
+                     difference: difference,
+                     cardSales: summaryData.cardSalesTotal,
+                     transferSales: summaryData.transferSalesTotal,
+                     // Podrías añadir aquí un resumen de las ventas/gastos si fuera necesario
+                 };
+
+                 // Guardar en historial
+                 cashHistory.push(closingRecord);
+                 saveCashHistory();
+
+                 // Marcar la caja como cerrada
+                 cashRegisterStatus = { isOpen: false }; // Resetear estado
+                 saveCashRegisterState();
+
+                 console.log("Caja cerrada. Registro:", closingRecord);
+                 alert("Caja cerrada exitosamente.");
+            }
+
+             function renderHistoryTable() {
+                 historyTableBody.innerHTML = '';
+                 if (cashHistory.length === 0) {
+                     noHistoryMessage.classList.remove('hidden');
+                 } else {
+                     noHistoryMessage.classList.add('hidden');
+                     // Ordenar por fecha de cierre descendente (más reciente primero)
+                     const sortedHistory = [...cashHistory].sort((a, b) => new Date(b.closeTime) - new Date(a.closeTime));
+
+                     sortedHistory.forEach(record => {
+                         const row = historyTableBody.insertRow();
+                         const diff = record.difference;
+                         const diffClass = diff > 0 ? 'positive' : (diff < 0 ? 'negative' : '');
+
+                         row.innerHTML = `
+                             <td>${new Date(record.closeTime).toLocaleDateString()}</td>
+                             <td>${new Date(record.openTime).toLocaleTimeString()}</td>
+                             <td>${new Date(record.closeTime).toLocaleTimeString()}</td>
+                             <td>${currency}${record.initialFund.toFixed(2)}</td>
+                             <td>${currency}${record.expectedCash.toFixed(2)}</td>
+                             <td>${currency}${record.countedCash.toFixed(2)}</td>
+                             <td class="difference ${diffClass}">${currency}${diff.toFixed(2)}</td>
+                         `;
+                     });
+                 }
+             }
+
+             function downloadSummary() {
+                 // Obtener el último registro del historial (el que acabamos de cerrar)
+                 if (cashHistory.length === 0) return;
+                 const lastClosing = cashHistory[cashHistory.length - 1];
+
+                 // Crear contenido del archivo (ejemplo simple en texto)
+                 let summaryContent = `Resumen de Caja - Cierre ${new Date(lastClosing.closeTime).toLocaleString()}\n`;
+                 summaryContent += "=================================================\n";
+                 summaryContent += `Apertura: ${new Date(lastClosing.openTime).toLocaleString()}\n`;
+                 summaryContent += `Cierre:   ${new Date(lastClosing.closeTime).toLocaleString()}\n`;
+                 summaryContent += "-------------------------------------------------\n";
+                 summaryContent += `Fondo Inicial:         ${currency}${lastClosing.initialFund.toFixed(2)}\n`;
+                 summaryContent += `(+) Ventas Efectivo:   ${currency}${lastClosing.cashSales.toFixed(2)}\n`;
+                 summaryContent += `(-) Gastos Efectivo:   ${currency}${lastClosing.cashExpenses.toFixed(2)}\n`;
+                 summaryContent += `(=) Efectivo Esperado: ${currency}${lastClosing.expectedCash.toFixed(2)}\n`;
+                 summaryContent += `-------------------------------------------------\n`;
+                 summaryContent += `Efectivo Contado:      ${currency}${lastClosing.countedCash.toFixed(2)}\n`;
+                 summaryContent += `Diferencia:            ${currency}${lastClosing.difference.toFixed(2)} (${lastClosing.difference > 0 ? 'Sobrante' : lastClosing.difference < 0 ? 'Faltante' : 'Exacto'})\n`;
+                 summaryContent += "-------------------------------------------------\n";
+                  summaryContent += `Ventas Tarjeta:        ${currency}${lastClosing.cardSales.toFixed(2)}\n`;
+                 summaryContent += `Ventas Transferencia:  ${currency}${lastClosing.transferSales.toFixed(2)}\n`;
+                 summaryContent += "=================================================\n";
+
+                  // --- Aquí podrías agregar detalle de ventas y gastos si quisieras ---
+
+                 // Crear un Blob (objeto binario) con el contenido
+                 const blob = new Blob([summaryContent], { type: 'text/plain;charset=utf-8' });
+
+                 // Crear un enlace temporal para la descarga
+                 const link = document.createElement('a');
+                 link.href = URL.createObjectURL(blob);
+                 const dateStr = new Date(lastClosing.closeTime).toISOString().split('T')[0]; // YYYY-MM-DD
+                 link.download = `cierre_caja_${dateStr}.txt`; // Nombre del archivo
+
+                 // Simular clic en el enlace
+                 document.body.appendChild(link);
+                 link.click();
+                 document.body.removeChild(link); // Limpiar el enlace temporal
+
+                 console.log("Resumen descargado.");
+             }
+
+        });
+    </script>
+
+</body>
+</html>

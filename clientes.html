@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with caja.html */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff; /* Used for form & table container */
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+             --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent with caja.html */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --info-color: #3498db;
+             --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             .search-input { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%23adb5bd" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); }
+             th { background-color: rgba(255,255,255,0.05) !important; }
+             tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+             #no-clients-message { background-color: rgba(255,255,255,0.03); }
+             .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+            .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent with caja.html) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; } /* Use fa-fw for consistency */
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card {
+             border: 1px solid var(--border-color);
+             background-color: var(--card-bg-color);
+             border-radius: var(--border-radius-lg);
+             box-shadow: var(--box-shadow);
+             transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+         }
+
+        /* Add/Search Section */
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .action-button { /* General class for Add/Download etc. */
+            padding: 10px 18px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.5;
+        }
+         .action-button .spinner { font-size: 0.9em; }
+
+        .add-button { background-color: var(--primary-color); color: white; }
+        .add-button:hover:not(:disabled) { background-color: var(--primary-hover-color); transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+        .download-button { background-color: var(--info-color); color: white; }
+        .download-button:hover:not(:disabled) { background-color: var(--info-hover-color); transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .action-button:disabled { background-color: var(--secondary-color); opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+
+        .search-input {
+            padding: 10px 15px 10px 35px; /* Space for icon */
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md);
+            font-size: 0.95em;
+            width: 100%; /* Default full width */
+            max-width: 350px; /* Limit max width */
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%236c757d" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            background-size: 14px 14px;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+         .search-input:focus {
+             outline: none;
+             border-color: var(--input-focus-border-color);
+             box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
+         }
+
+
+        /* Table Styles */
+        .table-container {
+             /* Uses .card styling */
+             overflow: hidden; /* Clip content to rounded corners */
+             margin-bottom: 25px;
+             padding: 0; /* Remove padding from card for table */
+        }
+        .table-wrapper { /* Added wrapper for horizontal scroll */
+             overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+             min-width: 600px; /* Ensure minimum width for better layout */
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            white-space: nowrap; /* Prevent wrapping, rely on scroll */
+        }
+        th {
+            background-color: rgba(0,0,0,0.02);
+            font-weight: 600;
+            font-size: 0.85em; /* Smaller header */
+            color: var(--text-muted-color);
+            text-transform: uppercase;
+            letter-spacing: 0.7px; /* Increased spacing */
+             position: sticky; top: 0; z-index: 1; /* Sticky header */
+        }
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(0, 123, 255, 0.03); }
+         tbody tr:last-child td { border-bottom: none; }
+
+        .actions button {
+            margin-right: 5px;
+            padding: 5px 8px;
+            cursor: pointer;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius-md);
+            font-size: 0.9em;
+            transition: all 0.15s ease;
+             line-height: 1; /* Ensure icon aligns */
+             color: var(--text-muted-color); /* Default muted color */
+        }
+        .actions .edit-btn:hover { color: var(--primary-color); background-color: rgba(0, 123, 255, 0.1); }
+        .actions .delete-btn:hover { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.1); }
+        .actions button i { pointer-events: none; /* Allow click on button */ }
+
+
+        /* Form Styles */
+        .data-form {
+            /* Uses .card styling */
+            padding: 25px 30px;
+            margin-top: 20px; /* Only appears when visible */
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin-top 0.4s ease-out, padding 0.4s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+             border: none; /* Hide border when collapsed */
+        }
+         .data-form.visible {
+             max-height: 1000px; /* Large enough */
+             opacity: 1;
+             margin-bottom: 25px;
+             border: 1px solid var(--border-color); /* Show border when visible */
+         }
+
+        .data-form h3 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1.4em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+         .input-group { position: relative; }
+         .input-group i.fa-fw { /* Use fa-fw */
+            position: absolute;
+            left: 15px;
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%);
+            color: var(--text-muted-color);
+            transition: color var(--transition-speed) ease;
+            font-size: 0.95em;
+            pointer-events: none;
+             width: 1.2em; /* Ensure fixed width */
+             text-align: center;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 15px 11px 45px; /* Adjusted padding for fa-fw icon */
+            box-sizing: border-box;
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md);
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+         .form-group textarea { padding: 11px 15px; min-height: 60px; resize: vertical; } /* Textarea specifics */
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--input-focus-border-color);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
+        }
+         .form-group input:focus ~ i.fa-fw { color: var(--primary-color); } /* Use sibling selector */
+
+        .form-actions { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-actions button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: all 0.2s ease-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+             line-height: 1.5;
+        }
+        .form-actions .save-button { background-color: var(--success-color); color: white; }
+        .form-actions .save-button:hover:not(:disabled) { background-color: var(--success-hover-color); transform: translateY(-2px); box-shadow: 0 3px 6px rgba(40, 167, 69, 0.2); }
+        .form-actions .cancel-button { background-color: var(--secondary-color); color: white; }
+        .form-actions .cancel-button:hover:not(:disabled) { background-color: var(--secondary-hover-color); transform: translateY(-2px); box-shadow: 0 3px 6px rgba(108, 117, 125, 0.2); }
+         .form-actions button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+         .form-actions button:disabled { background-color: var(--secondary-color); opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+
+        .error { /* Consistent with caja.html */
+            color: var(--danger-color); font-size: 0.88em; margin-top: 15px; background-color: rgba(220, 53, 69, 0.08); border: 1px solid rgba(220, 53, 69, 0.15); padding: 10px 15px; border-radius: var(--border-radius-md); text-align: left; transition: all var(--transition-speed) ease; display: flex; align-items: center; gap: 8px;
+        }
+        .error i { font-size: 1.1em; }
+        .error.hidden { display: none; opacity: 0; }
+        .error:not(.hidden) { opacity: 1; margin-bottom: 15px; /* Add margin when visible */ }
+
+
+         #no-clients-message { /* Consistent with caja.html */
+             text-align: center; padding: 25px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); margin-top: 10px;
+         }
+
+         /* Theme Toggle Button */
+         .theme-toggle { /* Consistent Style */
+             position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030;
+         }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments - Consistent with caja.html */
+         @media (max-width: 992px) { /* Tablet and below */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+         }
+
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+
+             .controls-section { flex-direction: column; align-items: stretch; }
+             .search-input { max-width: none; }
+              /* .table-container already uses card styles */
+             .data-form { padding: 20px; }
+             .form-actions { flex-direction: column; gap: 8px; } /* Stack buttons */
+             .form-actions button { width: 100%; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Updated icons with fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html" class="active"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+        <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Clientes</h1>
+            <p>Administra la información básica de tus clientes.</p>
+        </header>
+
+        <div class="controls-section">
+             <button id="show-add-form-button" class="action-button add-button">
+                 <i class="fas fa-plus"></i> <span>Agregar Cliente</span>
+             </button>
+             <input type="search" id="client-search-table" class="search-input" placeholder="Buscar cliente por nombre, telf, email...">
+        </div>
+
+
+        <!-- Formulario para Agregar/Editar Cliente -->
+        <section id="client-form-section" class="data-form card"> <!-- Start hidden -->
+            <h3 id="form-title">Agregar Nuevo Cliente</h3>
+            <form id="client-form" novalidate>
+                <input type="hidden" id="client-id">
+
+                <div class="form-group">
+                    <label for="client-name">Nombre del Cliente:</label>
+                    <div class="input-group">
+                        <input type="text" id="client-name" required>
+                        <i class="fas fa-user fa-fw"></i>
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label for="client-phone">Teléfono (Opcional):</label>
+                     <div class="input-group">
+                        <input type="tel" id="client-phone">
+                        <i class="fas fa-phone fa-fw"></i>
+                     </div>
+                </div>
+                 <div class="form-group">
+                    <label for="client-email">Correo Electrónico (Opcional):</label>
+                    <div class="input-group">
+                        <input type="email" id="client-email">
+                        <i class="fas fa-envelope fa-fw"></i>
+                    </div>
+                 </div>
+                 <div class="form-group">
+                    <label for="client-address">Dirección (Opcional):</label>
+                    <textarea id="client-address" rows="2"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="client-notes">Notas Adicionales (Opcional):</label>
+                    <textarea id="client-notes" rows="3"></textarea>
+                </div>
+                <p id="client-form-error" class="error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                <div class="form-actions">
+                    <button type="submit" id="save-client-button" class="save-button">
+                        <i class="fas fa-save"></i> <span class="button-text">Guardar Cliente</span>
+                    </button>
+                    <button type="button" id="cancel-edit-button" class="cancel-button">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <h2>Listado de Clientes</h2>
+        <div class="table-container card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Teléfono</th>
+                            <th scope="col">Email</th>
+                             <th scope="col">Dirección</th> <!-- Added Dirección -->
+                             <th scope="col">Notas</th> <!-- Added Notas -->
+                            <th scope="col" style="width: 100px;">Acciones</th> <!-- Fixed width for actions -->
+                        </tr>
+                    </thead>
+                    <tbody id="client-table-body">
+                        <!-- Rows loaded by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+         <p id="no-clients-message" class="hidden">No tienes clientes registrados todavía.</p>
+
+         <!-- Botón Descargar -->
+         <button id="download-clients-csv" class="action-button download-button" style="margin-top: 15px;">
+             <i class="fas fa-download"></i> <span>Descargar Lista (CSV)</span>
+         </button>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon';
+            function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); }
+            function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); }
+            function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; }
+            const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Config & Elements ---
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            const showClientFormButton = document.getElementById('show-add-form-button');
+            const clientFormSection = document.getElementById('client-form-section');
+            const clientForm = document.getElementById('client-form');
+            const clientFormTitle = document.getElementById('form-title');
+            const cancelClientEditButton = document.getElementById('cancel-edit-button');
+            const saveClientButton = document.getElementById('save-client-button');
+            const clientTableBody = document.getElementById('client-table-body');
+            const noClientsMessage = document.getElementById('no-clients-message');
+            const clientSearchTable = document.getElementById('client-search-table');
+            const clientIdField = document.getElementById('client-id');
+            const clientNameField = document.getElementById('client-name');
+            const clientPhoneField = document.getElementById('client-phone');
+            const clientEmailField = document.getElementById('client-email');
+            const clientAddressField = document.getElementById('client-address');
+            const clientNotesField = document.getElementById('client-notes');
+            const clientFormError = document.getElementById('client-form-error');
+            const clientFormErrorSpan = clientFormError.querySelector('span');
+            const downloadClientsButton = document.getElementById('download-clients-csv');
+
+            let allClients = []; // Array to hold client data
+
+            // --- Utility Functions ---
+            const showError = (message) => { clientFormErrorSpan.textContent = message; clientFormError.classList.remove('hidden'); };
+            const hideError = () => clientFormError.classList.add('hidden');
+            const setLoading = (button, text = "Guardando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} ${text}`; };
+            const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+
+            // --- Load Initial Data ---
+            function loadInitialConfig() {
+                try {
+                    const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    document.getElementById('business-name-sidebar').textContent = businessName;
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                    document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch(e) { console.error("Error loading config:", e); }
+            }
+
+            function loadClients() {
+                try {
+                    allClients = JSON.parse(localStorage.getItem('clientes') || '[]');
+                    // Ensure clients are sorted initially
+                    allClients.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                    renderClientTable();
+                } catch (error) {
+                    console.error("Error cargando clientes:", error);
+                    allClients = [];
+                    renderClientTable();
+                    noClientsMessage.textContent = "Error al cargar los clientes.";
+                    noClientsMessage.classList.remove('hidden');
+                }
+            }
+
+            // --- Render Table ---
+            function renderClientTable() {
+                clientTableBody.innerHTML = '';
+                const searchTerm = clientSearchTable.value.trim().toLowerCase();
+
+                const filteredClients = searchTerm
+                    ? allClients.filter(client =>
+                        (client.nombre || '').toLowerCase().includes(searchTerm) ||
+                        (client.telefono || '').toLowerCase().includes(searchTerm) ||
+                        (client.email || '').toLowerCase().includes(searchTerm) ||
+                        (client.direccion || '').toLowerCase().includes(searchTerm) ||
+                        (client.notas || '').toLowerCase().includes(searchTerm)
+                      )
+                    : allClients; // Show all if search is empty
+
+                 noClientsMessage.classList.toggle('hidden', allClients.length > 0); // Base visibility on *all* clients
+                 downloadClientsButton.disabled = allClients.length === 0;
+
+                if (filteredClients.length > 0) {
+                    filteredClients.forEach(client => {
+                        const row = clientTableBody.insertRow();
+                        // Use textContent for safety against XSS
+                        const cellName = row.insertCell(); cellName.textContent = client.nombre || 'N/A';
+                        const cellPhone = row.insertCell(); cellPhone.textContent = client.telefono || '-';
+                        const cellEmail = row.insertCell(); cellEmail.textContent = client.email || '-';
+                         const cellAddress = row.insertCell(); cellAddress.textContent = client.direccion || '-'; // Added
+                         const cellNotes = row.insertCell(); cellNotes.textContent = client.notas || '-'; // Added
+
+                        const cellActions = row.insertCell();
+                        cellActions.className = 'actions';
+                        cellActions.style.whiteSpace = 'nowrap'; // Prevent actions wrapping
+                        cellActions.innerHTML = `
+                            <button class="edit-btn" data-id="${client.id}" title="Editar Cliente"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${client.id}" title="Eliminar Cliente"><i class="fas fa-trash-alt"></i></button>
+                        `;
+                    });
+                 } else if (searchTerm && allClients.length > 0) {
+                      // Show message if search yields no results but clients exist
+                      const row = clientTableBody.insertRow();
+                      const cell = row.insertCell();
+                      cell.colSpan = 6; // Span all columns
+                      cell.textContent = 'No se encontraron clientes que coincidan con la búsqueda.';
+                      cell.style.textAlign = 'center';
+                      cell.style.padding = '20px';
+                      cell.style.color = 'var(--text-muted-color)';
+                 }
+            }
+
+            // --- Form Handling ---
+            function handleClientFormSubmit(event) {
+                event.preventDefault();
+                hideError();
+
+                const clientData = {
+                    id: clientIdField.value || `c_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+                    nombre: clientNameField.value.trim(),
+                    telefono: clientPhoneField.value.trim() || null,
+                    email: clientEmailField.value.trim().toLowerCase() || null,
+                    direccion: clientAddressField.value.trim() || null,
+                    notas: clientNotesField.value.trim() || null,
+                };
+
+                // --- Validation ---
+                if (!clientData.nombre) {
+                    showError('El Nombre del Cliente es obligatorio.');
+                    clientNameField.focus();
+                    return;
+                }
+                 if (clientData.email && !/\S+@\S+\.\S+/.test(clientData.email)) {
+                     showError('El formato del Correo Electrónico no es válido.');
+                      clientEmailField.focus();
+                     return;
+                 }
+                 // Add more specific validation if needed (e.g., phone format)
+
+                 // --- Save ---
+                const originalButtonHTML = saveClientButton.innerHTML;
+                setLoading(saveClientButton);
+
+                // Simulate save (localStorage is sync, but good practice for future async)
+                 setTimeout(() => {
+                    if (saveClient(clientData)) {
+                        resetClientForm();
+                        hideClientForm();
+                        loadClients(); // Reload and re-render
+                    } else {
+                        // Error saving (likely storage full)
+                         clearLoading(saveClientButton, originalButtonHTML);
+                         showError("Error al guardar. Verifica el espacio de almacenamiento.");
+                    }
+                 }, 150); // Short delay for visual feedback
+            }
+
+            function saveClient(clientData) {
+                 try {
+                    const index = allClients.findIndex(c => c.id === clientData.id);
+                    if (index > -1) {
+                        allClients[index] = clientData;
+                         console.log("Cliente actualizado:", clientData.id);
+                    } else {
+                        allClients.push(clientData);
+                         console.log("Cliente agregado:", clientData.id);
+                    }
+                    allClients.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '')); // Keep sorted
+                    localStorage.setItem('clientes', JSON.stringify(allClients));
+                     return true; // Indicate success
+                } catch (error) {
+                    console.error("Error guardando cliente:", error);
+                     return false; // Indicate failure
+                }
+            }
+
+             function editClient(clientId) {
+                const client = allClients.find(c => c.id === clientId); // Use strict equality
+                if (client) {
+                    resetClientForm();
+                    clientIdField.value = client.id;
+                    clientNameField.value = client.nombre || '';
+                    clientPhoneField.value = client.telefono || '';
+                    clientEmailField.value = client.email || '';
+                    clientAddressField.value = client.direccion || '';
+                    clientNotesField.value = client.notas || '';
+
+                    clientFormTitle.textContent = 'Editar Cliente';
+                    showClientForm();
+                     clientFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     clientNameField.focus(); // Focus first field on edit
+                } else {
+                    console.error("Cliente no encontrado para editar:", clientId);
+                    alert("Error: No se encontró el cliente seleccionado.");
+                }
+            }
+
+             function deleteClient(clientId) {
+                 const clientIndex = allClients.findIndex(c => c.id === clientId);
+                 if (clientIndex > -1) {
+                     const client = allClients[clientIndex];
+                     if (confirm(`¿Estás seguro de que quieres eliminar al cliente "${client.nombre || 'N/A'}"?\nEsta acción no se puede deshacer.`)) {
+                        try {
+                            allClients.splice(clientIndex, 1);
+                            localStorage.setItem('clientes', JSON.stringify(allClients));
+                            console.log("Cliente eliminado:", clientId);
+                            // If the form was open editing this client, close it
+                            if (clientIdField.value === clientId) {
+                                hideClientForm();
+                                resetClientForm();
+                            }
+                            renderClientTable(); // Update the table display
+                        } catch (error) {
+                             console.error("Error eliminando cliente:", error);
+                             alert("Hubo un error al eliminar el cliente.");
+                        }
+                     }
+                 } else {
+                      console.error("Cliente no encontrado para eliminar:", clientId);
+                      alert("Error: No se encontró el cliente seleccionado para eliminar.");
+                 }
+            }
+
+            function showClientForm() {
+                clientFormSection.classList.add('visible');
+                showClientFormButton.style.display = 'none';
+            }
+            function hideClientForm() {
+                clientFormSection.classList.remove('visible');
+                showClientFormButton.style.display = 'inline-flex';
+            }
+
+             function resetClientForm() {
+                clientForm.reset();
+                clientIdField.value = '';
+                clientFormTitle.textContent = 'Agregar Nuevo Cliente'; // Reset title
+                clearLoading(saveClientButton, '<i class="fas fa-save"></i> <span class="button-text">Guardar Cliente</span>'); // Reset button state
+                hideError();
+            }
+
+            // --- Download CSV Function ---
+             function escapeCsvValue(value) {
+                 if (value == null) return ''; // Handle null/undefined
+                 const stringValue = String(value);
+                 // If the value contains a comma, newline, or double quote, enclose it in double quotes
+                 if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) {
+                     // Escape existing double quotes by doubling them
+                     return `"${stringValue.replace(/"/g, '""')}"`;
+                 }
+                 return stringValue;
+             }
+
+             function downloadClientsCSV() {
+                 if (allClients.length === 0) { alert("No hay clientes para descargar."); return; }
+                 console.log("Preparando descarga CSV de clientes...");
+
+                 const headers = ["ID", "Nombre", "Telefono", "Email", "Direccion", "Notas"];
+                 const rows = allClients.map(client => [
+                     escapeCsvValue(client.id),
+                     escapeCsvValue(client.nombre),
+                     escapeCsvValue(client.telefono),
+                     escapeCsvValue(client.email),
+                     escapeCsvValue(client.direccion),
+                     escapeCsvValue(client.notas)
+                 ]);
+
+                 let csvContent = headers.join(',') + '\r\n'; // Header row
+                 rows.forEach(rowArray => { csvContent += rowArray.join(',') + '\r\n'; });
+
+                 // Create download link
+                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                 const link = document.createElement("a");
+                 if (link.download !== undefined) { // Feature detection
+                     const url = URL.createObjectURL(blob);
+                     link.setAttribute("href", url);
+                     const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                     link.setAttribute("download", `clientes_export_${dateStr}.csv`);
+                     link.style.visibility = 'hidden';
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                     URL.revokeObjectURL(url); // Clean up blob URL
+                 } else {
+                      alert("La descarga directa de CSV no es compatible con tu navegador.");
+                 }
+                 console.log("Descarga iniciada.");
+             }
+
+            // --- Event Listeners Setup ---
+            showClientFormButton.addEventListener('click', () => {
+                 resetClientForm(); // Ensure form is clean before showing
+                 showClientForm();
+                 clientFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                 clientNameField.focus();
+            });
+            cancelClientEditButton.addEventListener('click', () => {
+                 hideClientForm();
+                 resetClientForm();
+            });
+            clientForm.addEventListener('submit', handleClientFormSubmit);
+            clientTableBody.addEventListener('click', (event) => {
+                 const target = event.target.closest('button');
+                 if (!target) return; // Exit if click wasn't on or inside a button
+                 if (target.classList.contains('edit-btn')) { editClient(target.dataset.id); }
+                 else if (target.classList.contains('delete-btn')) { deleteClient(target.dataset.id); }
+            });
+            clientSearchTable.addEventListener('input', renderClientTable);
+            downloadClientsButton.addEventListener('click', downloadClientsCSV);
+
+             // Logout Logic (Consistent with caja.html)
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                 let canLogout = true;
+                 try {
+                     const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}');
+                     if (cashStatus.isOpen) {
+                         alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir.");
+                         canLogout = false;
+                     }
+                 } catch(err) { console.error("Error checking cash status on logout", err); }
+
+                 if (canLogout && confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // --- Initial Load Execution ---
+            loadInitialConfig();
+            loadClients();
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

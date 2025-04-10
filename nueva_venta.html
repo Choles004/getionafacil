@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Venta (POS) - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* --- CSS VARIABLES (Light Theme - Default) --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #ffffff; /* White background for POS content area */
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #f8f9fa; /* Slightly off-white inputs */
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e0e0e0; /* Slightly softer border */
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* --- DARK THEME VARIABLES --- */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #1e1e1e; /* Darker content bg for POS */
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --warning-hover-color: #f8d347;
+            --info-color: #3498db; /* Using primary blue for info in dark */
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             /* Dark theme specific adjustments */
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             #product-search { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%23adb5bd" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); }
+             #search-results { background-color: var(--card-bg-color); border-color: var(--border-color); }
+             #search-results button { border-bottom-color: var(--border-color); color: var(--text-color); }
+             #search-results button:hover { background-color: rgba(52, 152, 219, 0.1); }
+             #search-results button .price-info { color: var(--primary-color); }
+             #cart-items { background-color: var(--card-bg-color); border-color: var(--border-color); }
+             #cart-items li { border-bottom-color: var(--border-color); }
+             #cart-items li:hover { background-color: rgba(255,255,255,0.02); }
+             #cart-items .qty-btn { background-color: var(--input-bg-color); border-color: var(--input-border-color); color: var(--primary-color); }
+             #cart-items .qty-btn:hover { background-color: var(--primary-color); color: white; }
+             #cart-items .item-qty input { color: var(--text-color); background-color: transparent; }
+             .totals { border-top-color: var(--border-color); }
+             .totals strong { color: var(--primary-color); }
+             .totals strong span { color: var(--primary-color); }
+             .payment { border-top-color: var(--border-color); }
+             .payment .payment-method { background-color: var(--input-bg-color); color: var(--text-color); border-color: var(--input-border-color); }
+             .payment .payment-method:hover { border-color: var(--primary-color); background-color: rgba(52, 152, 219, 0.1); }
+             .payment .payment-method.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+             .payment .payment-method.selected i { color: white !important; }
+             .cash-details input[type="number"] { background-color: var(--input-bg-color); color: var(--text-color); border-color: var(--input-border-color); }
+             .cash-details strong { color: var(--success-color); }
+             #finalize-sale:disabled { background-color: #555; opacity: 0.7; }
+             .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+        /* --- GLOBAL STYLES --- */
+         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { height: 100%; overflow: hidden; /* Prevent scrolling on html/body for POS */ }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing);
+            font-size: 15px;
+            height: 100%;
+            overflow: hidden; /* Ensure body doesn't scroll */
+            line-height: 1.5;
+        }
+
+        /* --- SIDEBAR (Consistent) --- */
+         .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            padding: 20px 15px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 8px rgba(0,0,0,0.04);
+            transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            z-index: 100; /* Ensure sidebar is above content */
+         }
+         .sidebar h2 {
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+            font-size: 1.6em;
+            text-align: center;
+            font-weight: 600;
+            transition: color var(--transition-speed) var(--transition-easing);
+         }
+         .sidebar .business-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+            transition: border-color var(--transition-speed) var(--transition-easing);
+         }
+         .sidebar .business-info small {
+            font-size: 0.9em;
+            color: var(--text-muted-color);
+            transition: color var(--transition-speed) var(--transition-easing);
+         }
+         .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1; /* Takes remaining space */
+            overflow-y: auto; /* Allows scrolling if many items */
+         }
+         .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text-muted-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 15px;
+            margin-bottom: 6px;
+            border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, color 0.2s ease;
+            font-weight: 500;
+         }
+         .sidebar ul li a i.fa-fw { /* Font Awesome Fixed Width */
+            width: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            color: var(--text-muted-color);
+            transition: color 0.2s ease;
+         }
+         .sidebar ul li a:hover {
+            background-color: rgba(0, 123, 255, 0.08);
+            color: var(--link-hover-color);
+         }
+         .sidebar ul li a:hover i.fa-fw {
+            color: var(--link-hover-color);
+         }
+         .sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-weight: 600;
+         }
+         .sidebar ul li a.active i.fa-fw {
+            color: #ffffff;
+         }
+         .sidebar .logout-link {
+            margin-top: auto; /* Pushes to the bottom */
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+         }
+         .sidebar .logout-link a {
+            color: var(--danger-color);
+         }
+         .sidebar .logout-link a i.fa-fw {
+            color: var(--danger-color);
+         }
+         .sidebar .logout-link a:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-hover-color);
+         }
+         .sidebar .logout-link a:hover i.fa-fw {
+            color: var(--danger-hover-color);
+         }
+
+
+        /* --- CONTENT AREA --- */
+        .content {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--content-bg); /* Specific background for POS content */
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent content area scroll */
+            transition: margin-left 0.3s ease, background-color var(--transition-speed) ease;
+        }
+        .content header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--sidebar-bg); /* Match sidebar bg for header */
+            flex-shrink: 0; /* Prevent header shrinking */
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+         .content header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+         }
+         .content header p#cash-open-warning { /* Style from caja.html */
+            font-size: 0.85em;
+            padding: 5px 10px;
+            margin: 8px 0 0 0;
+            border-radius: var(--border-radius-md);
+            display: inline-block;
+            border: 1px solid var(--danger-color);
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            transition: all var(--transition-speed) ease;
+         }
+         .content header p#cash-open-warning i { margin-right: 5px; }
+         .content header p#cash-open-warning.hidden { display: none; opacity: 0;}
+         .content header p#cash-open-warning:not(.hidden) { opacity: 1;}
+
+        /* --- POS LAYOUT --- */
+        .pos-layout {
+            display: flex;
+            flex-grow: 1; /* Take remaining vertical space */
+            overflow: hidden; /* Important: Prevent scroll within layout */
+        }
+        .product-selection {
+            flex-basis: 40%; /* Adjust ratio as needed */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-color); /* Slightly different background for contrast */
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+            overflow: hidden; /* Prevent scroll within this section */
+        }
+        .cart {
+            flex-basis: 60%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack cart items, totals, payment */
+            background-color: var(--content-bg); /* Match main content area bg */
+            transition: background-color var(--transition-speed) ease;
+            overflow: hidden; /* Prevent scroll within this section */
+        }
+
+        /* --- PRODUCT SELECTION AREA --- */
+         .product-selection h2 {
+            margin-top: 0; margin-bottom: 15px; font-size: 1.2em; font-weight: 600;
+            color: var(--text-muted-color); flex-shrink: 0; /* Prevent shrinking */
+            display: flex; align-items: center; gap: 8px;
+         }
+        #product-search {
+            width: 100%; padding: 11px 15px 11px 40px; /* Space for icon */
+            margin-bottom: 15px; box-sizing: border-box;
+            border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md);
+            font-size: 1rem; background-color: var(--input-bg-color); color: var(--text-color);
+            /* Search Icon */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%236c757d" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+            background-repeat: no-repeat; background-position: left 12px center; background-size: 16px 16px;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+         #product-search:focus {
+            outline: none; border-color: var(--input-focus-border-color);
+            box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
+         }
+        #search-results {
+            border: 1px solid var(--border-color); border-radius: var(--border-radius-md);
+            background-color: var(--card-bg-color);
+            flex-grow: 1; /* Takes remaining space in product section */
+            overflow-y: auto; /* Enable scrolling for results */
+            padding: 5px;
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+         #search-results button {
+            display: block; width: 100%; text-align: left;
+            padding: 10px 12px; margin-bottom: 2px;
+            background-color: transparent; border: none;
+            border-radius: var(--border-radius-md); cursor: pointer;
+            font-size: 0.95em; color: var(--text-color);
+            transition: background-color 0.15s ease;
+            line-height: 1.4; /* Improve readability */
+         }
+         #search-results button:hover { background-color: rgba(0, 123, 255, 0.05); }
+         #search-results button .price-info { float: right; font-weight: 600; color: var(--primary-color); }
+         #search-results button .stock-info { font-size: 0.85em; color: var(--text-muted-color); margin-left: 10px; }
+          #search-results button:disabled {
+             opacity: 0.5; cursor: not-allowed; background-color: transparent !important; color: var(--text-muted-color);
+          }
+         #search-results button:disabled .price-info { color: var(--text-muted-color); }
+         #search-results .no-results {
+            text-align: center; padding: 15px; color: var(--text-muted-color);
+            font-size: 0.9em; font-style: italic;
+         }
+
+        /* --- CART AREA --- */
+        .cart h2 {
+            margin-top: 0; margin-bottom: 15px; font-size: 1.2em; font-weight: 600;
+            color: var(--text-muted-color); flex-shrink: 0; /* Prevent shrinking */
+            display: flex; align-items: center; gap: 8px;
+        }
+        #cart-items {
+            list-style: none; padding: 5px; margin: 0 0 15px 0;
+            flex-grow: 1; /* Takes most space in cart section */
+            overflow-y: auto; /* Enable scrolling for cart items */
+            border: 1px solid var(--border-color); border-radius: var(--border-radius-md);
+            background-color: var(--card-bg-color);
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        #cart-items li {
+            display: grid;
+            grid-template-columns: 1fr 110px 90px 35px; /* Flexible name, fixed others */
+            gap: 10px; align-items: center; padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.15s ease;
+        }
+         #cart-items li:last-child { border-bottom: none; }
+         #cart-items li:hover { background-color: rgba(0,0,0,0.01); }
+         #cart-empty-msg {
+            text-align: center; padding: 20px; color: var(--text-muted-color);
+            font-size: 0.9em; font-style: italic;
+         }
+
+        #cart-items .item-name {
+            font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 0.95em;
+        }
+        #cart-items .item-qty { display: flex; align-items: center; justify-content: center; }
+        #cart-items .qty-btn {
+            background-color: var(--input-bg-color); border: 1px solid var(--input-border-color);
+            color: var(--primary-color); width: 26px; height: 26px;
+            font-size: 1.1em; line-height: 1; border-radius: 50%; cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease; padding: 0;
+            display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
+        }
+         #cart-items .qty-btn:hover { background-color: var(--primary-color); color: white; }
+        #cart-items .item-qty input {
+            width: 40px; text-align: center; font-size: 1em;
+            border: none; background: none; color: var(--text-color);
+            margin: 0 4px; padding: 2px;
+            -moz-appearance: textfield; /* Firefox */
+        }
+          /* Hide spinners on number input */
+          #cart-items .item-qty input::-webkit-outer-spin-button,
+          #cart-items .item-qty input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+          }
+         #cart-items .item-unit { font-size: 0.8em; color: var(--text-muted-color); margin-left: 3px; }
+
+        #cart-items .item-subtotal { text-align: right; font-weight: 600; font-size: 0.95em; }
+        #cart-items .item-remove button {
+            color: var(--danger-color); background: none; border: none; cursor: pointer;
+            font-size: 1.1em; padding: 5px; line-height: 1;
+            transition: color 0.15s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+         #cart-items .item-remove button:hover { color: var(--danger-hover-color); }
+
+        /* --- TOTALS SECTION --- */
+        .totals {
+            text-align: right; padding: 15px 10px;
+            margin-top: auto; /* Pushes totals down */
+            border-top: 2px solid var(--border-color);
+            flex-shrink: 0; /* Prevent shrinking */
+            transition: border-color var(--transition-speed) ease;
+        }
+        .totals p { margin: 4px 0; font-size: 1em; color: var(--text-muted-color); }
+        .totals p span { color: var(--text-color); font-weight: 500; display: inline-block; min-width: 90px; }
+        .totals strong { font-size: 1.5em; color: var(--primary-color); }
+         .totals strong span { color: var(--primary-color); font-weight: bold; }
+
+        /* --- PAYMENT SECTION --- */
+        .payment {
+            margin-top: 15px; border-top: 1px solid var(--border-color);
+            padding-top: 15px; flex-shrink: 0; /* Prevent shrinking */
+            transition: border-color var(--transition-speed) ease;
+        }
+        .payment h3 {
+            margin-top: 0; margin-bottom: 10px; font-size: 1.1em; font-weight: 600;
+             color: var(--text-muted-color);
+        }
+        .payment .payment-methods { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .payment .payment-method {
+            padding: 8px 15px; cursor: pointer; border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md); background-color: var(--input-bg-color);
+            color: var(--text-color); transition: all 0.15s ease;
+            display: inline-flex; align-items: center; gap: 6px; font-size: 0.9em;
+        }
+        .payment .payment-method:hover { border-color: var(--primary-color); background-color: rgba(0, 123, 255, 0.05); }
+        .payment .payment-method.selected {
+            background-color: var(--primary-color); color: white; border-color: var(--primary-color);
+            font-weight: 500;
+        }
+         .payment .payment-method.selected i { color: white !important; /* Ensure icon color changes */ }
+         #selected-payment-method {
+            display: block; margin-top: -10px; margin-bottom: 10px; font-style: italic;
+            font-size: 0.85em; color: var(--text-muted-color); height: 1.1em; /* Reserve space */
+         }
+
+         .cash-details {
+            margin-top: 10px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;
+            padding: 10px 0;
+         }
+         .cash-details label { font-weight: 500; font-size: 0.95rem; color: var(--text-muted-color); }
+         .cash-details input[type="number"] {
+            padding: 9px 12px; border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md); width: 120px; font-size: 1rem;
+            background-color: var(--input-bg-color); color: var(--text-color);
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+             -moz-appearance: textfield; /* Firefox */
+          }
+          .cash-details input[type="number"]::-webkit-outer-spin-button,
+          .cash-details input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+          }
+          .cash-details input[type="number"]:focus { outline: none; border-color: var(--input-focus-border-color); box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         .cash-details p { margin: 0; font-size: 1em; }
+         .cash-details strong { font-size: 1.1em; color: var(--success-color); font-weight: bold; }
+
+        /* --- FINALIZE BUTTON & MESSAGES --- */
+        #finalize-sale {
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            width: 100%; padding: 14px; background-color: var(--success-color); color: white;
+            border: none; font-size: 1.15em; font-weight: 600; cursor: pointer;
+            margin-top: 15px; border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        #finalize-sale:disabled { background-color: var(--secondary-color); cursor: not-allowed; opacity: 0.7; }
+        #finalize-sale:hover:not(:disabled) { background-color: var(--success-hover-color); }
+         #finalize-sale .spinner { font-size: 0.9em; }
+
+         /* General Message Styling */
+         .message {
+            font-size: 0.9em; margin-top: 10px; padding: 10px 15px;
+            border-radius: var(--border-radius-md); border: 1px solid transparent;
+            text-align: left; display: flex; align-items: center; gap: 8px;
+            transition: all var(--transition-speed) ease;
+         }
+         .message.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.15); }
+         .message.error i { font-size: 1.1em; }
+         .hidden { display: none !important; opacity: 0 !important; } /* Ensure hidden works */
+         .message:not(.hidden) { opacity: 1; }
+
+         /* --- THEME TOGGLE (Consistent) --- */
+         .theme-toggle {
+            position: fixed; top: 15px; right: 15px; background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color); border-radius: 50%;
+            width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: var(--text-color); font-size: 1.2em;
+            transition: all var(--transition-speed) ease; z-index: 1030; /* High z-index */
+         }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* --- RESPONSIVE ADJUSTMENTS --- */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+
+             .pos-layout {
+                flex-direction: column;
+                height: calc(100vh - 60px); /* Adjust height considering header */
+             }
+              .product-selection {
+                 flex-basis: auto; /* Remove fixed basis */
+                 height: 45vh; /* Or adjust percentage */
+                 border-right: none; border-bottom: 1px solid var(--border-color);
+              }
+              .cart {
+                 flex-basis: auto; /* Remove fixed basis */
+                 flex-grow: 1; /* Cart takes remaining space */
+                 overflow: hidden; /* Ensure cart itself doesn't scroll, content inside does */
+              }
+              #cart-items { flex-grow: 1; } /* Allow cart items to take space */
+         }
+
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+             html { height: auto; overflow: auto; } /* Allow scrolling on mobile */
+             body { flex-direction: column; height: auto; overflow: auto; }
+             .sidebar {
+                 width: 100%; height: auto; position: sticky; top: 0;
+                 border-right: none; border-bottom: 1px solid var(--border-color);
+                 flex-direction: row; overflow-x: auto; overflow-y: hidden;
+                 padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                 justify-content: space-between; white-space: nowrap;
+             }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 0; height: auto; overflow: visible; }
+             .content header { padding: 15px; }
+             .content header h1 { font-size: 1.3em; }
+             .pos-layout { flex-direction: column; height: auto; } /* Remove fixed height */
+             .product-selection { padding: 15px; height: auto; min-height: 300px; } /* Ensure minimum height */
+             .cart { padding: 15px; }
+             #cart-items li { grid-template-columns: 1fr 90px 70px 30px; gap: 5px; padding: 8px 5px;}
+              .totals p { font-size: 0.95em; } .totals strong { font-size: 1.3em; }
+              .payment .payment-methods { justify-content: space-around; }
+             .payment .payment-method { font-size: 0.85em; padding: 7px 10px; gap: 4px; }
+             .cash-details { flex-direction: column; align-items: flex-start; gap: 8px;}
+             #finalize-sale { font-size: 1.1em; padding: 12px; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw for fixed width icons -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html" class="active"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1><i class="fas fa-cash-register"></i> Nueva Venta (Punto de Venta)</h1>
+            <p id="cash-open-warning" class="message error hidden" aria-live="polite">
+                <i class="fas fa-exclamation-triangle"></i> La caja está cerrada. Las ventas no se incluirán en el cierre de caja.
+            </p>
+        </header>
+
+        <div class="pos-layout">
+
+            <section class="product-selection">
+                <h2><i class="fas fa-search"></i> Buscar Producto</h2>
+                <input type="search" id="product-search" placeholder="Escribe nombre o código...">
+                <div id="search-results">
+                    <!-- Initial Message -->
+                    <p class="no-results"><small>Busca un producto para agregarlo al carrito.</small></p>
+                    <!-- Search results loaded by JS -->
+                </div>
+            </section>
+
+            <section class="cart">
+                <h2><i class="fas fa-shopping-cart"></i> Carrito de Compra</h2>
+                <ul id="cart-items">
+                     <!-- Empty cart message -->
+                     <p id="cart-empty-msg" class="no-results">El carrito está vacío.</p>
+                    <!-- Cart items loaded by JS -->
+                </ul>
+
+                <div class="totals">
+                    <p><span>Subtotal:</span> <span id="cart-subtotal">--.--</span></p>
+                    <!-- Add taxes here if needed in the future -->
+                    <p><strong><span>Total a Pagar:</span> <strong id="cart-total">--.--</strong></strong></p>
+                </div>
+
+                <div class="payment">
+                    <h3>Método de Pago</h3>
+                    <div class="payment-methods">
+                        <button class="payment-method" data-method="Efectivo"><i class="fas fa-money-bill-wave"></i> Efectivo</button>
+                        <button class="payment-method" data-method="Tarjeta"><i class="fas fa-credit-card"></i> Tarjeta</button>
+                        <button class="payment-method" data-method="Transferencia"><i class="fas fa-exchange-alt"></i> Transferencia</button>
+                         <!-- Add more buttons for other methods if needed -->
+                    </div>
+                     <span id="selected-payment-method"></span> <!-- Hint Text for selected method -->
+
+                    <!-- Cash Details (hidden by default) -->
+                    <div id="cash-details" class="cash-details hidden">
+                        <label for="cash-received">Efectivo Recibido:</label>
+                        <input type="number" id="cash-received" step="0.01" min="0" placeholder="0.00">
+                        <p>Cambio a dar: <strong id="change-due">--.--</strong></p>
+                    </div>
+                </div>
+
+                <button id="finalize-sale" class="action-button" disabled>
+                    <i class="fas fa-check-circle"></i> <span class="button-text">Finalizar Venta</span>
+                </button>
+                 <p id="sale-error" class="message error hidden" aria-live="polite">
+                    <i class="fas fa-exclamation-circle"></i> <span><!-- Error message here --></span>
+                 </p>
+
+            </section>
+
+        </div> <!-- Fin pos-layout -->
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management (Consistent with other pages) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const sunIcon = 'fa-sun';
+            const moonIcon = 'fa-moon';
+
+            function applyTheme(theme) {
+                body.classList.remove('dark-theme', 'light-theme');
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                    themeIcon.classList.remove(sunIcon);
+                    themeIcon.classList.add(moonIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro');
+                } else {
+                    body.classList.add('light-theme');
+                    themeIcon.classList.remove(moonIcon);
+                    themeIcon.classList.add(sunIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro');
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            function toggleTheme() {
+                const currentTheme = localStorage.getItem('theme') || getDefaultTheme();
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                themeToggleButton.classList.add('changing');
+                themeIcon.style.transform = 'scale(0)';
+                applyTheme(newTheme);
+                setTimeout(() => {
+                    themeToggleButton.classList.remove('changing');
+                    themeIcon.style.transform = '';
+                }, 400);
+            }
+
+            function getDefaultTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            }
+            const savedTheme = localStorage.getItem('theme') || getDefaultTheme();
+            applyTheme(savedTheme);
+            themeToggleButton.addEventListener('click', toggleTheme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                // Only update if no theme is explicitly set by the user
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+            // --- End Theme Management ---
+
+
+             // --- Global Configuration & State ---
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            let currency = '$'; // Default currency
+            let availableProducts = []; // Master list of products from localStorage
+            let currentCart = []; // Array holding items currently in the cart
+            let selectedPaymentMethod = null; // e.g., 'Efectivo', 'Tarjeta'
+            let isCashRegisterOpen = false; // Tracks status from caja.html
+
+            // --- DOM Element References ---
+            const searchInput = document.getElementById('product-search');
+            const searchResults = document.getElementById('search-results');
+            const cartItemsUl = document.getElementById('cart-items');
+            const cartEmptyMsg = document.getElementById('cart-empty-msg');
+            const cartSubtotalEl = document.getElementById('cart-subtotal');
+            const cartTotalEl = document.getElementById('cart-total');
+            const paymentButtons = document.querySelectorAll('.payment button[data-method]');
+            const cashDetails = document.getElementById('cash-details');
+            const cashReceivedInput = document.getElementById('cash-received');
+            const changeDueEl = document.getElementById('change-due');
+            const finalizeButton = document.getElementById('finalize-sale');
+            const selectedPaymentMethodEl = document.getElementById('selected-payment-method');
+            const saleError = document.getElementById('sale-error');
+            const saleErrorSpan = saleError.querySelector('span');
+            const cashOpenWarning = document.getElementById('cash-open-warning');
+            const logoutButton = document.getElementById('logout-button'); // Added reference
+
+
+            // --- Utility Functions ---
+             const formatCurrency = (amount) => {
+                 // Ensure amount is a number, default to 0 if not
+                 const numericAmount = (typeof amount === 'number' && !isNaN(amount)) ? amount : 0;
+                 return `${currency}${numericAmount.toFixed(2)}`;
+             };
+
+             const displayError = (message) => {
+                 saleErrorSpan.textContent = message;
+                 saleError.classList.remove('hidden');
+             };
+
+             const hideError = () => {
+                 saleError.classList.add('hidden');
+                 saleErrorSpan.textContent = ''; // Clear previous message
+             };
+
+             const setLoading = (button, text = "Procesando...") => {
+                 button.disabled = true;
+                 // Store original HTML if needed, or reconstruct it in clearLoading
+                 button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`;
+             };
+
+             const clearLoading = (button, originalHTML) => {
+                 button.disabled = false; // Re-enable determined by updateFinalizeButtonState later
+                 button.innerHTML = originalHTML;
+             };
+
+
+             // --- Initial Data Loading ---
+             function loadInitialData() {
+                 console.log("Loading initial data...");
+                 try {
+                     // 1. Load Configuration (Currency, Business Info)
+                     const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                     document.getElementById('business-name-sidebar').textContent = businessName;
+                     currency = localStorage.getItem('currency') || '$';
+                     // Update currency symbols in the HTML if needed (none in this specific structure yet, but good practice)
+                     const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                     document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+
+                     // 2. Load Products from localStorage
+                     const productsJSON = localStorage.getItem('productos');
+                     if (productsJSON) {
+                         availableProducts = JSON.parse(productsJSON);
+                         console.log(`Loaded ${availableProducts.length} products.`);
+                         // Optional: Validate product structure here if needed
+                     } else {
+                         console.warn("No products found in localStorage.");
+                         availableProducts = [];
+                         // Maybe display a warning to the user?
+                     }
+
+                     // 3. Load Cash Register Status
+                     const cashStatusData = localStorage.getItem('cashRegisterStatus');
+                     const cashStatus = cashStatusData ? JSON.parse(cashStatusData) : {};
+                     isCashRegisterOpen = cashStatus.isOpen === true;
+                     cashOpenWarning.classList.toggle('hidden', isCashRegisterOpen);
+                     console.log("Cash register open:", isCashRegisterOpen);
+
+                     // 4. Reset Displays & Render Initial Cart
+                     cartSubtotalEl.textContent = formatCurrency(0);
+                     cartTotalEl.textContent = formatCurrency(0);
+                     changeDueEl.textContent = formatCurrency(0);
+                     renderCart(); // Initial render (will show empty message)
+                     updateFinalizeButtonState(); // Ensure button starts disabled
+
+                 } catch(e) {
+                     console.error("FATAL: Error loading initial data:", e);
+                     displayError("Error crítico al cargar datos. Intenta recargar la página.");
+                     // Disable critical functionality
+                     finalizeButton.disabled = true;
+                     searchInput.disabled = true;
+                     paymentButtons.forEach(btn => btn.disabled = true);
+                 }
+             }
+
+
+            // --- Product Search Logic ---
+             function handleProductSearch() {
+                const query = searchInput.value.toLowerCase().trim();
+                searchResults.innerHTML = ''; // Clear previous results
+
+                if (query.length < 1) { // Show initial message if query is too short
+                    searchResults.innerHTML = '<p class="no-results"><small>Busca un producto por nombre o código...</small></p>';
+                    return;
+                }
+
+                const filtered = availableProducts.filter(p =>
+                    (p.name || '').toLowerCase().includes(query) ||
+                    (p.sku || '').toLowerCase().includes(query)
+                ).slice(0, 20); // Limit results for performance
+
+                if (filtered.length > 0) {
+                    filtered.forEach(p => {
+                        const btn = document.createElement('button');
+                        // Determine stock display
+                        const stock = p.manageStock ? (p.stock ?? 0) : Infinity; // Use ?? for null/undefined -> 0
+                        const stockInfo = p.manageStock ? `<span class="stock-info">(Stock: ${stock})</span>` : '';
+                        const priceInfo = `${formatCurrency(p.price || 0)}${p.unit && p.unit !== 'unidad' ? '/'+p.unit : ''}`;
+
+                        btn.innerHTML = `${p.name || 'Producto sin Nombre'} ${stockInfo} <span class="price-info">${priceInfo}</span>`;
+                        btn.dataset.productId = p.id;
+
+                        // Disable button if out of stock
+                        if (p.manageStock && stock <= 0) {
+                             btn.disabled = true;
+                             btn.title = 'Producto agotado';
+                        } else {
+                            btn.addEventListener('click', () => addProductToCart(p.id)); // Pass ID to fetch latest product data
+                        }
+                        searchResults.appendChild(btn);
+                    });
+                } else {
+                    searchResults.innerHTML = '<p class="no-results"><small>No se encontraron productos.</small></p>';
+                }
+            }
+             // Debounce search input to avoid excessive filtering on fast typing
+             let searchTimeout;
+             searchInput.addEventListener('input', () => {
+                 clearTimeout(searchTimeout);
+                 searchTimeout = setTimeout(handleProductSearch, 250); // Adjust delay (ms) as needed
+             });
+
+
+            // --- Cart Management Logic ---
+            function addProductToCart(productId) {
+                hideError(); // Clear any previous errors
+                // Find the product in the *master* list to get the most current data (esp. stock)
+                const productToAdd = availableProducts.find(p => p.id === productId);
+
+                if (!productToAdd) {
+                    console.error(`Product with ID ${productId} not found in availableProducts.`);
+                    displayError("Error: Producto no encontrado.");
+                    return;
+                }
+
+                const existingItemIndex = currentCart.findIndex(item => item.id === productToAdd.id);
+                const currentStock = productToAdd.manageStock ? (productToAdd.stock ?? 0) : Infinity;
+
+                // Initial stock check before adding/incrementing
+                if (productToAdd.manageStock && currentStock <= 0) {
+                     displayError(`"${productToAdd.name}" está agotado.`);
+                     // Re-render search results to potentially disable the button if needed
+                     handleProductSearch();
+                     return;
+                 }
+
+                if (existingItemIndex > -1) { // Product already in cart
+                     const itemInCart = currentCart[existingItemIndex];
+                     const isDiscreteUnit = ['unidad', 'paquete', 'caja', 'servicio'].includes(itemInCart.unit || 'unidad');
+                     const quantityToAdd = 1; // Default increment for discrete units
+
+                     if (isDiscreteUnit) {
+                         const requiredQty = itemInCart.quantity + quantityToAdd;
+                         // Stock check for incrementing
+                         if (productToAdd.manageStock && requiredQty > currentStock) {
+                             displayError(`No hay suficiente stock de "${productToAdd.name}". Disponible: ${currentStock}, En carrito: ${itemInCart.quantity}`);
+                             return;
+                         }
+                         itemInCart.quantity += quantityToAdd;
+                     } else {
+                         // For non-discrete (kg, l, etc.), don't auto-increment. Focus the input.
+                         const inputElement = cartItemsUl.querySelector(`li[data-cart-item-id="${productToAdd.id}"] .item-qty input`);
+                         if (inputElement) {
+                             inputElement.focus();
+                             inputElement.select(); // Select text for easy typing
+                         }
+                         // Optionally display a message: "Ajusta la cantidad manualmente"
+                         return; // Exit without changing cart or re-rendering yet
+                     }
+                } else { // Add new item to cart
+                    // Check stock before adding the first item
+                    const initialQuantity = 1; // Always start with 1
+                    if (productToAdd.manageStock && initialQuantity > currentStock) {
+                        displayError(`No hay suficiente stock de "${productToAdd.name}". Disponible: ${currentStock}`);
+                        return;
+                    }
+                     currentCart.push({
+                        id: productToAdd.id,
+                        name: productToAdd.name || 'Sin Nombre',
+                        price: productToAdd.price || 0,
+                        unit: productToAdd.unit || 'unidad',
+                        manageStock: productToAdd.manageStock || false, // Store this info
+                        quantity: initialQuantity
+                    });
+                }
+
+                searchInput.value = ''; // Clear search input
+                searchResults.innerHTML = '<p class="no-results"><small>Busca un producto...</small></p>'; // Reset search results
+                renderCart(); // Update the cart display
+            }
+
+             function updateQuantity(productId, newQuantityStr) {
+                 hideError();
+                 const itemIndex = currentCart.findIndex(item => item.id === productId);
+                 if (itemIndex === -1) return; // Item not found
+
+                 const itemInCart = currentCart[itemIndex];
+                 let newQuantity = parseFloat(newQuantityStr);
+
+                 // Basic validation for the input value
+                 if (isNaN(newQuantity)) {
+                     // Maybe reset to previous value? For now, just re-render.
+                     renderCart();
+                     return;
+                 }
+
+                 // If quantity becomes zero or less, remove the item
+                 if (newQuantity <= 0) {
+                     removeFromCart(productId);
+                     return;
+                 }
+
+                 // Fetch the product again for the latest stock check
+                 const productInStorage = availableProducts.find(p => p.id === itemInCart.id);
+                 const currentStock = (productInStorage && productInStorage.manageStock) ? (productInStorage.stock ?? 0) : Infinity;
+
+                 // Check against available stock
+                  if (itemInCart.manageStock && newQuantity > currentStock) {
+                     displayError(`No hay suficiente stock de "${itemInCart.name}". Disponible: ${currentStock}`);
+                     // Restore visual quantity in the input field to the last valid quantity
+                     const inputElement = cartItemsUl.querySelector(`li[data-cart-item-id="${itemInCart.id}"] .item-qty input`);
+                     if(inputElement) inputElement.value = itemInCart.quantity;
+                     return; // Prevent update
+                 }
+
+                 // Ensure quantity format matches unit type (integer for discrete units)
+                 const isDiscreteUnit = ['unidad', 'paquete', 'caja', 'servicio'].includes(itemInCart.unit || 'unidad');
+                 if (isDiscreteUnit) {
+                     newQuantity = Math.round(newQuantity); // Ensure integer
+                 } else {
+                     newQuantity = parseFloat(newQuantity.toFixed(3)); // Allow up to 3 decimals for weights/volumes
+                 }
+
+                 // Update quantity in the cart array
+                 currentCart[itemIndex].quantity = newQuantity;
+                 renderCart(); // Re-render the cart with updated quantity and totals
+             }
+
+            function removeFromCart(productId) {
+                currentCart = currentCart.filter(item => item.id !== productId);
+                hideError(); // Clear errors when cart changes
+                renderCart(); // Update display
+            }
+
+            function renderCart() {
+                cartItemsUl.innerHTML = ''; // Clear existing items
+                let subtotal = 0;
+
+                // Toggle empty message visibility
+                cartEmptyMsg.classList.toggle('hidden', currentCart.length > 0);
+
+                if (currentCart.length > 0) {
+                    currentCart.forEach(item => {
+                        const li = document.createElement('li');
+                        li.dataset.cartItemId = item.id;
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'item-name';
+                        nameSpan.textContent = item.name;
+                        nameSpan.title = item.name; // Tooltip for long names
+
+                        const qtySpan = document.createElement('span');
+                        qtySpan.className = 'item-qty';
+
+                        const qtyInput = document.createElement('input');
+                        qtyInput.type = 'number';
+                        qtyInput.value = item.quantity;
+                        qtyInput.min = "0"; // Allow 0 temporarily before removal on blur/change
+                        qtyInput.dataset.itemId = item.id; // Store ID for event listeners
+
+                        const isDiscreteUnit = ['unidad', 'paquete', 'caja', 'servicio'].includes(item.unit || 'unidad');
+                        qtyInput.step = isDiscreteUnit ? '1' : 'any'; // 'any' allows decimals
+
+                        // Use 'change' for final validation, 'input' might be too aggressive
+                        qtyInput.addEventListener('change', (e) => updateQuantity(item.id, e.target.value));
+                         // Optional: Add 'blur' listener as well for validation when leaving the field
+                         qtyInput.addEventListener('blur', (e) => updateQuantity(item.id, e.target.value));
+
+                        if (isDiscreteUnit) {
+                            const decreaseBtn = document.createElement('button');
+                            decreaseBtn.className = 'qty-btn';
+                            decreaseBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                            decreaseBtn.setAttribute('aria-label', 'Disminuir cantidad');
+                            decreaseBtn.onclick = () => updateQuantity(item.id, item.quantity - 1);
+
+                            const increaseBtn = document.createElement('button');
+                            increaseBtn.className = 'qty-btn';
+                            increaseBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                            increaseBtn.setAttribute('aria-label', 'Aumentar cantidad');
+                            increaseBtn.onclick = () => updateQuantity(item.id, item.quantity + 1);
+
+                            qtySpan.append(decreaseBtn, qtyInput, increaseBtn);
+                        } else {
+                            // For non-discrete units, just show input and unit label
+                            qtySpan.appendChild(qtyInput);
+                            const unitLabel = document.createElement('span');
+                            unitLabel.className = 'item-unit';
+                            unitLabel.textContent = item.unit;
+                            qtySpan.appendChild(unitLabel);
+                        }
+
+                        const itemSubtotalValue = (item.price || 0) * item.quantity;
+                        subtotal += itemSubtotalValue;
+
+                        const subtotalSpan = document.createElement('span');
+                        subtotalSpan.className = 'item-subtotal';
+                        subtotalSpan.textContent = formatCurrency(itemSubtotalValue);
+
+                        const removeSpan = document.createElement('span');
+                        removeSpan.className = 'item-remove';
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        removeBtn.title = "Quitar producto";
+                        removeBtn.setAttribute('aria-label', `Quitar ${item.name}`);
+                        removeBtn.onclick = () => removeFromCart(item.id);
+                        removeSpan.appendChild(removeBtn);
+
+                        li.append(nameSpan, qtySpan, subtotalSpan, removeSpan);
+                        cartItemsUl.appendChild(li);
+                    });
+                }
+
+                // Update totals display
+                cartSubtotalEl.textContent = formatCurrency(subtotal);
+                cartTotalEl.textContent = formatCurrency(subtotal); // Assuming no taxes/discounts for now
+
+                updateFinalizeButtonState(); // Check if sale can be finalized
+
+                 // Recalculate change if cash payment was selected and details are visible
+                 if (selectedPaymentMethod === 'Efectivo' && !cashDetails.classList.contains('hidden')) {
+                     handleCashReceivedInput();
+                 }
+            }
+
+
+            // --- Payment Logic ---
+            paymentButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Deselect other buttons
+                    paymentButtons.forEach(btn => btn.classList.remove('selected'));
+                    // Select clicked button
+                    button.classList.add('selected');
+                    selectedPaymentMethod = button.dataset.method;
+
+                    // Update hint text
+                    selectedPaymentMethodEl.textContent = `Seleccionado: ${selectedPaymentMethod}`;
+
+                    // Show/hide cash details section
+                    cashDetails.classList.toggle('hidden', selectedPaymentMethod !== 'Efectivo');
+
+                    hideError(); // Clear errors when payment method changes
+
+                    if (selectedPaymentMethod === 'Efectivo') {
+                        cashReceivedInput.focus();
+                        handleCashReceivedInput(); // Calculate initial change (likely 0.00)
+                    } else {
+                        // Clear cash fields if switching away from cash
+                        cashReceivedInput.value = '';
+                        changeDueEl.textContent = formatCurrency(0);
+                    }
+                    updateFinalizeButtonState(); // Check if finalize button should be enabled
+                });
+            });
+
+            function handleCashReceivedInput() {
+                const totalText = cartTotalEl.textContent.replace(currency, '');
+                const total = parseFloat(totalText) || 0;
+                const received = parseFloat(cashReceivedInput.value) || 0;
+                const change = Math.max(0, received - total); // Ensure change is not negative
+
+                changeDueEl.textContent = formatCurrency(change);
+                updateFinalizeButtonState(); // Re-check finalize button status based on received amount
+            }
+            cashReceivedInput.addEventListener('input', handleCashReceivedInput);
+
+
+            // --- Enable/Disable Finalize Button ---
+            function updateFinalizeButtonState() {
+                const totalText = cartTotalEl.textContent.replace(currency, '');
+                const total = totalText ? parseFloat(totalText) : 0;
+                let enabled = currentCart.length > 0 && selectedPaymentMethod !== null;
+
+                // Additional check for cash payment
+                if (enabled && selectedPaymentMethod === 'Efectivo') {
+                    const received = parseFloat(cashReceivedInput.value) || 0;
+                    if (received < total) {
+                        enabled = false; // Disable if cash received is less than total
+                    }
+                }
+                finalizeButton.disabled = !enabled;
+            }
+
+
+            // --- Finalize Sale ---
+             function finalizeSale() {
+                 if (finalizeButton.disabled) return; // Extra safety check
+                 hideError();
+                 const originalButtonHTML = finalizeButton.innerHTML;
+                 setLoading(finalizeButton, 'Procesando...');
+
+                 // --- Final Validations (Client-Side) ---
+                 try {
+                     // 1. Basic Checks
+                     if (currentCart.length === 0) throw new Error('El carrito está vacío.');
+                     if (!selectedPaymentMethod) throw new Error('Selecciona un método de pago.');
+
+                     const total = parseFloat(cartTotalEl.textContent.replace(currency, '')) || 0;
+
+                     // 2. Cash Payment Check
+                     if (selectedPaymentMethod === 'Efectivo') {
+                         const received = parseFloat(cashReceivedInput.value) || 0;
+                         if (received < total) throw new Error('El efectivo recibido es menor que el total a pagar.');
+                     }
+
+                      // 3. CRITICAL: Final Stock Check just before finalizing
+                      console.log("Performing final stock check...");
+                      for (const item of currentCart) {
+                          // Find the *latest* version of the product from our master list
+                          const productInStorage = availableProducts.find(p => p.id === item.id);
+                          if (!productInStorage) {
+                              // This shouldn't happen if cart logic is correct, but safety first
+                              throw new Error(`Producto "${item.name}" no encontrado en la lista maestra.`);
+                          }
+                          const currentStock = (productInStorage.manageStock) ? (productInStorage.stock ?? 0) : Infinity;
+                          if (item.manageStock && item.quantity > currentStock) {
+                              console.warn(`Stock check failed for ${item.name}. Required: ${item.quantity}, Available: ${currentStock}`);
+                              throw new Error(`Stock insuficiente para "${item.name}". Disponible: ${currentStock}`);
+                          }
+                      }
+                      console.log("Final stock check passed.");
+
+                 } catch (validationError) {
+                      console.error("Validation Error:", validationError.message);
+                      displayError(validationError.message);
+                      clearLoading(finalizeButton, originalButtonHTML);
+                      updateFinalizeButtonState(); // Ensure button state is correct after error
+                      // Focus appropriate field based on error
+                      if (validationError.message.includes("pago")) paymentButtons[0]?.focus();
+                      else if (validationError.message.includes("recibido")) cashReceivedInput.focus();
+                      else if (validationError.message.includes("Stock insuficiente")) searchInput.focus(); // Prompt user to maybe remove/adjust
+                      return; // Stop processing
+                 }
+
+                 // --- Prepare Sale Data ---
+                 const venta = {
+                     id: `VTA-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`, // More unique ID
+                     fecha: new Date().toISOString(),
+                     items: JSON.parse(JSON.stringify(currentCart)), // Deep copy of cart items at time of sale
+                     subtotal: parseFloat(cartSubtotalEl.textContent.replace(currency, '')) || 0,
+                     total: parseFloat(cartTotalEl.textContent.replace(currency, '')) || 0,
+                     metodoPago: selectedPaymentMethod,
+                     efectivoRecibido: selectedPaymentMethod === 'Efectivo' ? (parseFloat(cashReceivedInput.value) || 0) : null,
+                     cambioDado: selectedPaymentMethod === 'Efectivo' ? (parseFloat(changeDueEl.textContent.replace(currency, '')) || 0) : null,
+                     cajaAbierta: isCashRegisterOpen // Record if cash register was open at time of sale
+                 };
+
+                 // --- Save Sale & Update Stock (Simulated Async + localStorage) ---
+                 // Use setTimeout to allow the loading spinner to render properly
+                 setTimeout(() => {
+                     let productsUpdated = false;
+                     try {
+                         // 1. Update Inventory (in the in-memory 'availableProducts' array)
+                         console.log("Updating stock in memory...");
+                         venta.items.forEach(item => {
+                             const productIndex = availableProducts.findIndex(p => p.id === item.id);
+                             if (productIndex > -1 && availableProducts[productIndex].manageStock) {
+                                 const oldStock = availableProducts[productIndex].stock ?? 0;
+                                 availableProducts[productIndex].stock = oldStock - item.quantity;
+                                 productsUpdated = true;
+                                 console.log(`  - ${availableProducts[productIndex].name}: ${oldStock} -> ${availableProducts[productIndex].stock}`);
+                             }
+                         });
+
+                         // 2. Save Updated Product List back to localStorage
+                         if (productsUpdated) {
+                             localStorage.setItem('productos', JSON.stringify(availableProducts));
+                             console.log("Stock updates saved to localStorage.");
+                         } else {
+                             console.log("No stock updates needed for this sale.");
+                         }
+
+                         // 3. Save Sale Record to localStorage
+                         let ventasGuardadas = JSON.parse(localStorage.getItem('ventas') || '[]');
+                         ventasGuardadas.push(venta);
+                         localStorage.setItem('ventas', JSON.stringify(ventasGuardadas));
+                         console.log(`Sale ${venta.id} saved to localStorage.`);
+
+                         // 4. Success Feedback & Reset Interface
+                         alert(`Venta #${venta.id} registrada con éxito.`);
+                         resetPOS();
+
+                     } catch (error) {
+                         console.error("Error during save/stock update:", error);
+                         displayError('Error crítico al guardar la venta o actualizar stock. Verifica consola y almacenamiento.');
+                         // IMPORTANT: Attempt to rollback in-memory stock changes?
+                         // This is complex. For simplicity here, we might leave the in-memory
+                         // stock updated even if saving fails, but log the discrepancy.
+                         console.warn("Potential stock discrepancy: In-memory stock may have been updated but saving failed.");
+                     } finally {
+                         // Reset button regardless of success/failure of save operation
+                          clearLoading(finalizeButton, '<i class="fas fa-check-circle"></i> <span class="button-text">Finalizar Venta</span>');
+                          updateFinalizeButtonState(); // Ensure button state reflects the now empty/reset cart
+                     }
+                 }, 150); // Small delay for UI feedback
+             }
+            finalizeButton.addEventListener('click', finalizeSale);
+
+
+            // --- Reset POS Interface ---
+            function resetPOS() {
+                 currentCart = [];
+                 selectedPaymentMethod = null;
+
+                 // Reset UI elements
+                 paymentButtons.forEach(btn => btn.classList.remove('selected'));
+                 selectedPaymentMethodEl.textContent = ''; // Clear hint text
+                 cashDetails.classList.add('hidden');
+                 cashReceivedInput.value = '';
+                 changeDueEl.textContent = formatCurrency(0);
+                 searchInput.value = '';
+                 searchResults.innerHTML = '<p class="no-results"><small>Busca un producto...</small></p>';
+                 hideError(); // Clear any lingering errors
+
+                 renderCart(); // Clears visual cart and updates totals to 0.00
+                 console.log("POS interface reset.");
+             }
+
+
+            // --- Logout Logic (Consistent) ---
+            logoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                let allowLogout = true;
+
+                // Check 1: Cart not empty
+                if (currentCart.length > 0) {
+                    if (!confirm('Tienes productos en el carrito. ¿Seguro que quieres salir y descartar la venta actual?')) {
+                        allowLogout = false;
+                    }
+                }
+
+                // Check 2: Cash register open (only if cart check passed or cart was empty)
+                if (allowLogout && isCashRegisterOpen) {
+                    alert("¡Atención! La caja está abierta. Debes cerrarla desde la sección 'Caja' antes de salir.");
+                    allowLogout = false;
+                }
+
+                // Proceed if all checks pass
+                if (allowLogout) {
+                    if (confirm('¿Estás seguro de que quieres salir?')) {
+                        window.location.href = 'login.html';
+                    }
+                }
+            });
+
+
+            // --- Initial Load Execution ---
+            loadInitialData();
+
+        }); // --- END DOMContentLoaded ---
+    </script>
+
+</body>
+</html>

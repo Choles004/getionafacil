@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Mi App de Gestión</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <style>
+        /* Estilos básicos */
+        body { font-family: sans-serif; display: flex; margin: 0;}
+        .sidebar { width: 200px; background-color: #f4f4f4; padding: 15px; height: 100vh; box-sizing: border-box; overflow-y: auto;}
+        .sidebar h2 { margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li a { text-decoration: none; color: #333; display: block; padding: 8px 0; }
+        .sidebar ul li a.active { font-weight: bold; }
+        .content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .content header { margin-bottom: 20px; }
+        .filters { background-color: #f9f9f9; padding: 15px; border: 1px solid #eee; border-radius: 5px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;}
+        .filters label { font-weight: bold; }
+        .filters input[type="date"], .filters select { padding: 8px; border: 1px solid #ccc; border-radius: 3px;}
+        .filters button { padding: 8px 15px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; }
+        .report-section { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .report-section h2 { border-bottom: 2px solid #007bff; padding-bottom: 5px; display: inline-block; margin-bottom: 15px; }
+        .report-summary p { margin: 5px 0; font-size: 1.1em; }
+        .report-summary strong { font-size: 1.2em; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .export-button { float: right; padding: 5px 10px; font-size: 0.9em; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 10px;}
+        .hidden { display: none; }
+        .value-summary { font-weight: bold; margin-top: 10px; text-align: right;}
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <p><small id="business-name-sidebar">Nombre Negocio</small></p>
+        <ul>
+            <li><a href="dashboard.html">Inicio / Dashboard</a></li>
+            <li><a href="nueva_venta.html">Nueva Venta (POS)</a></li>
+            <li><a href="restaurante.html">Restaurante</a></li>
+            <li><a href="caja.html">Caja</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="inventario.html">Inventario</a></li>
+            <li><a href="proveedores.html">Proveedores</a></li>
+            <li><a href="clientes.html">Clientes</a></li>
+            <li><a href="gastos.html">Gastos / Pagos</a></li>
+            <li><a href="reportes.html" class="active">Reportes</a></li>
+            <li><a href="configuracion.html">Configuración</a></li>
+            <li><a href="login.html" id="logout-button">Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Reportes del Negocio</h1>
+            <p>Visualiza el rendimiento y estado de tu negocio.</p>
+        </header>
+
+        <section class="filters">
+            <label for="report-start-date">Desde:</label>
+            <input type="date" id="report-start-date">
+            <label for="report-end-date">Hasta:</label>
+            <input type="date" id="report-end-date">
+            <button id="generate-reports-button">Generar Reportes</button>
+        </section>
+
+        <!-- Sección Reporte de Ventas -->
+        <section class="report-section" id="sales-report">
+            <h2>
+                Reporte de Ventas
+                <button class="export-button" id="export-sales-csv">Exportar (CSV)</button>
+            </h2>
+            <div class="report-summary">
+                <p>Total Ventas: <strong id="sales-total">0.00</strong></p>
+                <p>Número de Transacciones: <strong id="sales-count">0</strong></p>
+                <p>Venta Promedio por Transacción: <strong id="sales-average">0.00</strong></p>
+                <!-- Aquí podría ir un gráfico simple -->
+            </div>
+            <table id="sales-by-category-table" class="hidden">
+                <caption>Ventas por Categoría (si aplica)</caption>
+                <thead><tr><th>Categoría</th><th>Total Vendido</th></tr></thead>
+                <tbody id="sales-by-category-body"></tbody>
+            </table>
+        </section>
+
+        <!-- Sección Reporte de Productos Más Vendidos -->
+        <section class="report-section" id="top-products-report">
+             <h2>
+                Productos Más Vendidos
+                 <button class="export-button" id="export-top-products-csv">Exportar (CSV)</button>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad Vendida</th>
+                        <th>Ingresos Generados</th>
+                    </tr>
+                </thead>
+                <tbody id="top-products-body">
+                    <!-- Filas se cargarán aquí -->
+                </tbody>
+            </table>
+            <p id="no-top-products" class="hidden">No hay datos de ventas de productos en el periodo seleccionado.</p>
+        </section>
+
+        <!-- Sección Reporte de Inventario -->
+        <section class="report-section" id="inventory-report">
+             <h2>
+                Reporte de Inventario (Estado Actual)
+                 <button class="export-button" id="export-inventory-csv">Exportar (CSV)</button>
+            </h2>
+            <table>
+                 <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Unidad</th>
+                        <th>Valor Costo Unit.</th>
+                        <th>Valor Venta Unit.</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body">
+                    <!-- Filas se cargarán aquí -->
+                </tbody>
+            </table>
+             <p id="no-inventory-report" class="hidden">No hay productos con inventario gestionado.</p>
+             <div class="value-summary">
+                 <p>Valor Total Inventario (al Costo): <strong id="inventory-total-cost-value">0.00</strong></p>
+                 <p>Valor Total Inventario (a la Venta): <strong id="inventory-total-sale-value">0.00</strong></p>
+            </div>
+        </section>
+
+        <!-- Sección Reporte de Gastos -->
+        <section class="report-section" id="expenses-report">
+            <h2>
+                Reporte de Gastos
+                 <button class="export-button" id="export-expenses-csv">Exportar (CSV)</button>
+            </h2>
+             <table>
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Total Gastado</th>
+                    </tr>
+                </thead>
+                <tbody id="expenses-by-category-body">
+                    <!-- Filas se cargarán aquí -->
+                </tbody>
+            </table>
+             <p id="no-expenses-report" class="hidden">No hay gastos registrados en el periodo seleccionado.</p>
+             <p class="value-summary">Total Gastos del Periodo: <strong id="expenses-total">0.00</strong></p>
+        </section>
+
+    </main>
+
+    <!-- <script src="js/app.js"></script> -->
+    <!-- <script src="js/reportes.js"></script> -->
+     <!-- Incluir librería para CSV (opcional, para exportación real) -->
+     <!-- <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script> -->
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+            document.getElementById('business-name-sidebar').textContent = businessName;
+            const currency = localStorage.getItem('currency') || '$';
+
+            // Elementos UI
+            const startDateInput = document.getElementById('report-start-date');
+            const endDateInput = document.getElementById('report-end-date');
+            const generateButton = document.getElementById('generate-reports-button');
+
+            // Sales Report Elements
+            const salesTotalEl = document.getElementById('sales-total');
+            const salesCountEl = document.getElementById('sales-count');
+            const salesAverageEl = document.getElementById('sales-average');
+            // const salesByCategoryTable = document.getElementById('sales-by-category-table');
+            // const salesByCategoryBody = document.getElementById('sales-by-category-body');
+
+            // Top Products Elements
+            const topProductsBody = document.getElementById('top-products-body');
+            const noTopProductsMsg = document.getElementById('no-top-products');
+
+            // Inventory Elements
+            const inventoryBody = document.getElementById('inventory-body');
+            const noInventoryReportMsg = document.getElementById('no-inventory-report');
+            const inventoryTotalCostEl = document.getElementById('inventory-total-cost-value');
+            const inventoryTotalSaleEl = document.getElementById('inventory-total-sale-value');
+
+             // Expenses Elements
+            const expensesByCategoryBody = document.getElementById('expenses-by-category-body');
+            const noExpensesReportMsg = document.getElementById('no-expenses-report');
+            const expensesTotalEl = document.getElementById('expenses-total');
+
+            // Export Buttons
+            const exportSalesBtn = document.getElementById('export-sales-csv');
+            const exportTopProductsBtn = document.getElementById('export-top-products-csv');
+            const exportInventoryBtn = document.getElementById('export-inventory-csv');
+            const exportExpensesBtn = document.getElementById('export-expenses-csv');
+
+            let loadedSales = [];
+            let loadedProducts = [];
+            let loadedExpenses = [];
+
+            // --- Carga Inicial ---
+            setDefaultDates(); // Poner fechas por defecto (ej: mes actual)
+            loadData(); // Cargar todos los datos necesarios al inicio
+            generateReports(); // Generar reportes con fechas por defecto
+
+            // --- Event Listeners ---
+            generateButton.addEventListener('click', generateReports);
+
+            // Export Listeners (Simulados por ahora)
+            exportSalesBtn.addEventListener('click', () => exportData('sales'));
+            exportTopProductsBtn.addEventListener('click', () => exportData('top-products'));
+            exportInventoryBtn.addEventListener('click', () => exportData('inventory'));
+            exportExpensesBtn.addEventListener('click', () => exportData('expenses'));
+
+             // --- Funciones ---
+             function setDefaultDates() {
+                 const today = new Date();
+                 const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                 const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]; // Día 0 del mes siguiente es el último del actual
+                 startDateInput.value = firstDayOfMonth;
+                 endDateInput.value = lastDayOfMonth;
+             }
+
+             function loadData() {
+                 try {
+                    loadedSales = JSON.parse(localStorage.getItem('ventas') || '[]');
+                    loadedProducts = JSON.parse(localStorage.getItem('productos') || '[]');
+                    loadedExpenses = JSON.parse(localStorage.getItem('gastos') || '[]');
+                    console.log("Datos cargados para reportes.");
+                 } catch (error) {
+                      console.error("Error cargando datos para reportes:", error);
+                 }
+             }
+
+             function generateReports() {
+                 console.log("Generando reportes...");
+                 const startDate = startDateInput.value;
+                 const endDate = endDateInput.value;
+
+                 // Filtrar datos por fecha
+                 const filteredSales = loadedSales.filter(sale => {
+                     const saleDate = sale.fecha.split('T')[0]; // Comparar solo YYYY-MM-DD
+                     return (!startDate || saleDate >= startDate) && (!endDate || saleDate <= endDate);
+                 });
+
+                 const filteredExpenses = loadedExpenses.filter(exp => {
+                     const expDate = exp.fecha;
+                     return (!startDate || expDate >= startDate) && (!endDate || expDate <= endDate);
+                 });
+
+                 // Generar cada reporte
+                 generateSalesReport(filteredSales);
+                 generateTopProductsReport(filteredSales);
+                 generateInventoryReport(); // Inventario es estado actual, no filtra por fecha
+                 generateExpensesReport(filteredExpenses);
+             }
+
+             // --- Report Generation Functions ---
+
+             function generateSalesReport(sales) {
+                 let totalSales = 0;
+                 sales.forEach(sale => totalSales += sale.total);
+                 const salesCount = sales.length;
+                 const averageSale = salesCount > 0 ? totalSales / salesCount : 0;
+
+                 salesTotalEl.textContent = currency + totalSales.toFixed(2);
+                 salesCountEl.textContent = salesCount;
+                 salesAverageEl.textContent = currency + averageSale.toFixed(2);
+
+                 // Lógica para ventas por categoría (más compleja, requiere info de categoría en productos/ventas)
+                 // salesByCategoryTable.classList.add('hidden'); // Ocultar por ahora
+             }
+
+             function generateTopProductsReport(sales) {
+                 topProductsBody.innerHTML = '';
+                 noTopProductsMsg.classList.add('hidden');
+
+                 if (sales.length === 0) {
+                    noTopProductsMsg.classList.remove('hidden');
+                    return;
+                 }
+
+                 const productSummary = {}; // { productId: { name: '...', qty: 0, revenue: 0 } }
+
+                 sales.forEach(sale => {
+                     sale.items.forEach(item => {
+                         const productId = item.id;
+                         if (!productSummary[productId]) {
+                             // Buscar nombre del producto
+                             const productInfo = loadedProducts.find(p => p.id === productId);
+                             productSummary[productId] = {
+                                 name: productInfo ? productInfo.name : `Producto ID ${productId}`,
+                                 qty: 0,
+                                 revenue: 0
+                             };
+                         }
+                         productSummary[productId].qty += item.quantity;
+                         productSummary[productId].revenue += item.price * item.quantity;
+                     });
+                 });
+
+                 // Convertir a array y ordenar (ej: por revenue descendente)
+                 const sortedProducts = Object.values(productSummary).sort((a, b) => b.revenue - a.revenue);
+
+                 if (sortedProducts.length === 0) {
+                      noTopProductsMsg.classList.remove('hidden');
+                 } else {
+                     sortedProducts.forEach(prod => {
+                         const row = topProductsBody.insertRow();
+                         row.innerHTML = `
+                             <td>${prod.name}</td>
+                             <td>${prod.qty % 1 === 0 ? prod.qty : prod.qty.toFixed(2)}</td> <!-- Mostrar decimales solo si es necesario -->
+                             <td>${currency}${prod.revenue.toFixed(2)}</td>
+                         `;
+                     });
+                 }
+             }
+
+             function generateInventoryReport() {
+                 inventoryBody.innerHTML = '';
+                 noInventoryReportMsg.classList.add('hidden');
+                 let totalCostValue = 0;
+                 let totalSaleValue = 0;
+
+                 const managedInventory = loadedProducts.filter(p => p.manageStock);
+
+                 if (managedInventory.length === 0) {
+                      noInventoryReportMsg.classList.remove('hidden');
+                 } else {
+                     managedInventory.forEach(product => {
+                         const row = inventoryBody.insertRow();
+                         const stock = product.stock ?? 0;
+                         const cost = product.cost ?? 0;
+                         const price = product.price ?? 0;
+
+                         row.innerHTML = `
+                             <td>${product.name}</td>
+                             <td>${stock}</td>
+                             <td>${product.minStock ?? 0}</td>
+                             <td>${product.unit}</td>
+                             <td>${cost > 0 ? currency + cost.toFixed(2) : '-'}</td>
+                             <td>${price > 0 ? currency + price.toFixed(2) : '-'}</td>
+                         `;
+                         totalCostValue += stock * cost;
+                         totalSaleValue += stock * price;
+                     });
+                 }
+                 inventoryTotalCostEl.textContent = currency + totalCostValue.toFixed(2);
+                 inventoryTotalSaleEl.textContent = currency + totalSaleValue.toFixed(2);
+             }
+
+             function generateExpensesReport(expenses) {
+                 expensesByCategoryBody.innerHTML = '';
+                 noExpensesReportMsg.classList.add('hidden');
+                 let totalExpenses = 0;
+
+                 if (expenses.length === 0) {
+                      noExpensesReportMsg.classList.remove('hidden');
+                      expensesTotalEl.textContent = currency + '0.00';
+                     return;
+                 }
+
+                 const expensesByCategory = {}; // { categoryName: totalAmount }
+                 expenses.forEach(exp => {
+                     const category = exp.categoria || 'Sin Categoría';
+                     if (!expensesByCategory[category]) {
+                         expensesByCategory[category] = 0;
+                     }
+                     expensesByCategory[category] += exp.monto;
+                     totalExpenses += exp.monto;
+                 });
+
+                 // Convertir a array y ordenar por categoría
+                 const sortedCategories = Object.entries(expensesByCategory).sort((a, b) => a[0].localeCompare(b[0]));
+
+                 sortedCategories.forEach(([category, amount]) => {
+                     const row = expensesByCategoryBody.insertRow();
+                     row.innerHTML = `
+                         <td>${category}</td>
+                         <td>${currency}${amount.toFixed(2)}</td>
+                     `;
+                 });
+                 expensesTotalEl.textContent = currency + totalExpenses.toFixed(2);
+             }
+
+             // --- Export Function (Simplified) ---
+             function exportData(reportType) {
+                 // En una implementación real, usarías PapaParse o similar para crear un CSV
+                 console.log(`Simulando exportación CSV para: ${reportType}`);
+                 alert(`Exportación para '${reportType}' iniciada (simulación). Revisa la consola para más detalles.\nEn una versión completa, esto descargaría un archivo CSV.`);
+
+                 // Ejemplo de cómo podrías empezar a generar el CSV (muy básico)
+                 let csvContent = "";
+                 let dataToExport = [];
+                 let headers = [];
+                 const startDate = startDateInput.value;
+                 const endDate = endDateInput.value;
+
+                 try {
+                    if (reportType === 'sales') {
+                        headers = ["ID Venta", "Fecha", "Total", "Metodo Pago", "Items JSON"];
+                        const filteredSales = loadedSales.filter(sale => { /* filtro fecha */
+                            const saleDate = sale.fecha.split('T')[0];
+                            return (!startDate || saleDate >= startDate) && (!endDate || saleDate <= endDate);
+                        });
+                         dataToExport = filteredSales.map(s => [s.id, s.fecha, s.total, s.metodoPago, JSON.stringify(s.items)]);
+                    } else if (reportType === 'inventory') {
+                         headers = ["ID Producto", "Nombre", "SKU", "Stock Actual", "Stock Minimo", "Unidad", "Costo", "Precio Venta", "Proveedor ID"];
+                         dataToExport = loadedProducts.filter(p=>p.manageStock).map(p=>[p.id, p.name, p.sku, p.stock, p.minStock, p.unit, p.cost, p.price, p.providerId]);
+                    } else if (reportType === 'expenses') {
+                         headers = ["ID Gasto", "Fecha", "Monto", "Tipo", "Beneficiario", "Categoria", "Metodo Pago", "Ref Banco", "Notas"];
+                          const filteredExpenses = loadedExpenses.filter(exp => { /* filtro fecha */
+                             const expDate = exp.fecha;
+                             return (!startDate || expDate >= startDate) && (!endDate || expDate <= endDate);
+                         });
+                         dataToExport = filteredExpenses.map(e=>[e.id, e.fecha, e.monto, e.tipo, e.beneficiario, e.categoria, e.metodoPago, e.referenciaBanco, e.notas]);
+                    }
+                    // ... Lógica similar para otros reportes
+
+                    if (headers.length > 0) {
+                        csvContent += headers.join(',') + '\n';
+                        dataToExport.forEach(row => {
+                             // Escapar comas y comillas dentro de los campos si es necesario
+                            const escapedRow = row.map(field => {
+                                const strField = String(field == null ? '' : field); // Convertir a string, manejar nulos
+                                // Si contiene coma, comillas o salto de línea, encerrar en comillas dobles y duplicar comillas internas
+                                if (strField.includes(',') || strField.includes('"') || strField.includes('\n')) {
+                                    return `"${strField.replace(/"/g, '""')}"`;
+                                }
+                                return strField;
+                            });
+                            csvContent += escapedRow.join(',') + '\n';
+                        });
+                        console.log("--- Contenido CSV Simulado ---");
+                        console.log(csvContent);
+                        // Aquí iría la lógica de descarga del archivo Blob como en configuracion.html
+                        // downloadCSV(csvContent, `reporte_${reportType}.csv`);
+                    } else {
+                         console.log("No hay datos para exportar para este reporte.");
+                    }
+
+                 } catch(e) {
+                     console.error("Error preparando datos para exportar:", e);
+                     alert("Error al preparar los datos para la exportación.");
+                 }
+             }
+
+            /* // Función auxiliar para descargar CSV (requiere implementación completa)
+              function downloadCSV(csvString, filename) {
+                 const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                 const link = document.createElement("a");
+                 if (link.download !== undefined) { // Feature detection
+                     const url = URL.createObjectURL(blob);
+                     link.setAttribute("href", url);
+                     link.setAttribute("download", filename);
+                     link.style.visibility = 'hidden';
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                 }
+             }
+            */
+
+
+             // Lógica botón Salir
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles - Consistent with previous files */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px;
+            --border-radius-md: 8px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables - Consistent */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --warning-hover-color: #f8d347;
+            --info-color: #3498db;
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1;
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.25);
+             select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+             .search-input { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%23adb5bd" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); }
+              th { background-color: rgba(255,255,255,0.05) !important; }
+              tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+              #no-providers-message { background-color: rgba(255,255,255,0.03); }
+              .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+             .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles (Consistent) */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i.fa-fw { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i.fa-fw { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i.fa-fw { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i.fa-fw { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i.fa-fw { color: var(--danger-hover-color); }
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); box-shadow: var(--box-shadow); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; }
+
+        /* Controls Section */
+        .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .action-button { padding: 10px 18px; font-size: 0.95em; font-weight: 500; cursor: pointer; border: none; border-radius: var(--border-radius-md); transition: all 0.2s ease-out; display: inline-flex; align-items: center; gap: 8px; line-height: 1.5; }
+        .action-button .spinner { font-size: 0.9em; }
+        .add-button { background-color: var(--primary-color); color: white; }
+        .add-button:hover:not(:disabled) { background-color: var(--primary-hover-color); transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+        .download-button { background-color: var(--info-color); color: white; }
+        .download-button:hover:not(:disabled) { background-color: var(--info-hover-color); transform: translateY(-2px); box-shadow: var(--box-shadow-hover); }
+         .action-button:disabled { background-color: var(--secondary-color) !important; opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+        .search-input { padding: 9px 15px 9px 35px; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); font-size: 0.95em; width: 100%; max-width: 350px; background-color: var(--input-bg-color); color: var(--text-color); background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%236c757d" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>'); background-repeat: no-repeat; background-position: left 12px center; background-size: 14px 14px; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; height: 40px; }
+         .search-input:focus { outline: none; border-color: var(--input-focus-border-color); box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+
+        /* Table Styles */
+        .table-container { /* Use card styles */ overflow: hidden; padding: 0; margin-bottom: 25px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 0; min-width: 700px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9em; white-space: nowrap; }
+        th { background-color: rgba(0,0,0,0.02); font-weight: 600; font-size: 0.85em; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.7px; position: sticky; top: 0; z-index: 1; }
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(0, 123, 255, 0.03); }
+         tbody tr:last-child td { border-bottom: none; }
+        td.actions { text-align: center; width: 100px; }
+        .actions button { margin-right: 5px; padding: 5px 8px; cursor: pointer; background: none; border: 1px solid transparent; border-radius: var(--border-radius-md); font-size: 0.9em; transition: all 0.15s ease; line-height: 1; }
+        .actions .edit-btn { color: var(--primary-color); }
+        .actions .edit-btn:hover { background-color: rgba(0, 123, 255, 0.1); }
+        .actions .delete-btn { color: var(--danger-color); }
+        .actions .delete-btn:hover { background-color: rgba(220, 53, 69, 0.1); }
+        .actions button i { pointer-events: none; }
+
+        /* Form Styles */
+        .data-form { /* Use card styles */ padding: 25px 30px; margin-top: 20px; transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin-top 0.4s ease-out, padding 0.4s ease-out, border 0.4s ease-out; max-height: 0; opacity: 0; overflow: hidden; border: none; }
+         .data-form.visible { max-height: 1000px; opacity: 1; margin-bottom: 25px; border: 1px solid var(--border-color); }
+        .data-form h3 { margin-top: 0; margin-bottom: 25px; font-weight: 600; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px 25px; }
+        .form-group { margin-bottom: 0; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+         .input-group { position: relative; }
+         .input-group i.fa-fw { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); transition: color var(--transition-speed) ease; font-size: 0.95em; pointer-events: none; width: 1.2em; text-align: center; }
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group textarea { width: 100%; padding: 11px 15px 11px 45px; box-sizing: border-box; border: 1px solid var(--input-border-color); border-radius: var(--border-radius-md); background-color: var(--input-bg-color); color: var(--text-color); font-size: 1rem; transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+         .form-group textarea { padding: 11px 15px; min-height: 60px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--input-focus-border-color); outline: none; box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+         .form-group input:focus ~ i.fa-fw { color: var(--primary-color); }
+         .form-group.full-width { grid-column: 1 / -1; }
+
+        .form-actions { grid-column: 1 / -1; margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; }
+         .form-actions button { padding: 10px 20px; }
+         .form-actions .save-button { background-color: var(--success-color); color: white; }
+         .form-actions .save-button:hover:not(:disabled) { background-color: var(--success-hover-color); }
+         .form-actions .cancel-button { background-color: var(--secondary-color); color: white; }
+         .form-actions .cancel-button:hover:not(:disabled) { background-color: var(--secondary-hover-color); }
+
+        /* Error & Messages */
+        .message { font-size: 0.9em; margin-top: 10px; padding: 10px 15px; border-radius: var(--border-radius-md); border: 1px solid transparent; text-align: left; display: flex; align-items: center; gap: 8px; }
+        .message.error { color: var(--danger-color); background-color: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.15); grid-column: 1 / -1; }
+         .message.error i { font-size: 1.1em; }
+         #no-providers-message { text-align: center; padding: 20px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); margin-top: 10px; }
+        .hidden { display: none !important; }
+
+         /* Theme Toggle Button (Consistent) */
+         .theme-toggle { position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030; }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments (Consistent) */
+         @media (max-width: 992px) { /* Tablet */
+             :root { --sidebar-width: 70px; }
+              .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i.fa-fw { font-size: 1.4em; width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+             .form-grid { grid-template-columns: 1fr; } /* Stack form fields earlier */
+         }
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; }
+              body { flex-direction: column; }
+             .sidebar { width: 100%; height: auto; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); justify-content: space-between; white-space: nowrap; }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; }
+             .sidebar ul li { flex-shrink: 0; }
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i.fa-fw { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i.fa-fw { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+             .controls-section { flex-direction: column; align-items: stretch; }
+             .search-input { max-width: none; }
+             .table-wrapper { overflow-x: auto; } /* Ensure scroll on mobile */
+             .data-form { padding: 20px; }
+              .form-grid { grid-template-columns: 1fr; }
+              .form-group.full-width { grid-column: auto; }
+             .form-actions { flex-direction: column; gap: 8px; }
+             .form-actions button { width: 100%; }
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+         <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html" class="active"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Proveedores</h1>
+            <p>Administra la información de contacto de tus proveedores.</p>
+        </header>
+
+        <div class="controls-section">
+             <button id="show-add-form-button" class="action-button add-button">
+                 <i class="fas fa-plus"></i> <span>Agregar Proveedor</span>
+             </button>
+             <input type="search" id="provider-search-table" class="search-input" placeholder="Buscar proveedor...">
+        </div>
+
+        <!-- Formulario para Agregar/Editar Proveedor -->
+        <section id="provider-form-section" class="data-form card"> <!-- Start hidden, use card -->
+            <h3 id="form-title">Agregar Nuevo Proveedor</h3>
+            <form id="provider-form" novalidate>
+                <input type="hidden" id="provider-id">
+                 <div class="form-grid">
+                    <div class="form-group">
+                        <label for="provider-name">Nombre del Proveedor/Empresa:</label>
+                        <div class="input-group">
+                            <input type="text" id="provider-name" required>
+                            <i class="fas fa-building fa-fw"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="provider-contact">Persona de Contacto (Opcional):</label>
+                        <div class="input-group">
+                            <input type="text" id="provider-contact">
+                             <i class="fas fa-user-tie fa-fw"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="provider-phone">Teléfono (Opcional):</label>
+                         <div class="input-group">
+                            <input type="tel" id="provider-phone">
+                             <i class="fas fa-phone fa-fw"></i>
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label for="provider-email">Correo Electrónico (Opcional):</label>
+                         <div class="input-group">
+                            <input type="email" id="provider-email">
+                             <i class="fas fa-envelope fa-fw"></i>
+                        </div>
+                     </div>
+                     <div class="form-group full-width">
+                        <label for="provider-address">Dirección (Opcional):</label>
+                        <textarea id="provider-address" rows="2"></textarea>
+                    </div>
+                     <div class="form-group full-width">
+                        <label for="provider-notes">Notas Adicionales (Opcional):</label>
+                        <textarea id="provider-notes" rows="3"></textarea>
+                    </div>
+                 </div><!-- end form-grid -->
+
+                 <p id="provider-form-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                 <div class="form-actions">
+                     <button type="submit" id="save-provider-button" class="action-button save-button">
+                         <i class="fas fa-save"></i> <span class="button-text">Guardar Proveedor</span>
+                     </button>
+                     <button type="button" id="cancel-edit-button" class="action-button cancel-button">
+                         <i class="fas fa-times"></i> <span class="button-text">Cancelar</span>
+                     </button>
+                 </div>
+            </form>
+        </section>
+
+        <h2>Listado de Proveedores</h2>
+         <div class="table-container card">
+             <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Contacto</th>
+                            <th scope="col">Teléfono</th>
+                            <th scope="col">Email</th>
+                            <th scope="col" style="width: 100px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="provider-table-body">
+                        <!-- Rows loaded by JS -->
+                    </tbody>
+                </table>
+             </div>
+        </div>
+         <p id="no-providers-message" class="hidden">No tienes proveedores registrados todavía.</p>
+
+         <button id="download-providers-csv" class="action-button download-button" style="margin-top: 15px;">
+             <i class="fas fa-download"></i> <span class="button-text">Descargar Lista (CSV)</span>
+         </button>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Theme Management (Consistent) ---
+            const themeToggleButton = document.getElementById('theme-toggle-button'); const body = document.body; const themeIcon = themeToggleButton.querySelector('i'); const sunIcon = 'fa-sun'; const moonIcon = 'fa-moon'; function applyTheme(theme) { body.classList.remove('dark-theme', 'light-theme'); if (theme === 'dark') { body.classList.add('dark-theme'); themeIcon.classList.remove(sunIcon); themeIcon.classList.add(moonIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro'); } else { body.classList.add('light-theme'); themeIcon.classList.remove(moonIcon); themeIcon.classList.add(sunIcon); themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro'); } localStorage.setItem('theme', theme); } function toggleTheme() { const currentTheme = localStorage.getItem('theme') || getDefaultTheme(); const newTheme = currentTheme === 'light' ? 'dark' : 'light'; themeToggleButton.classList.add('changing'); themeIcon.style.transform = 'scale(0)'; applyTheme(newTheme); setTimeout(() => { themeToggleButton.classList.remove('changing'); themeIcon.style.transform = ''; }, 400); } function getDefaultTheme() { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; } return 'light'; } const savedTheme = localStorage.getItem('theme') || getDefaultTheme(); applyTheme(savedTheme); themeToggleButton.addEventListener('click', toggleTheme); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Elements & Config ---
+             const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            const showProviderFormButton = document.getElementById('show-add-form-button');
+            const providerFormSection = document.getElementById('provider-form-section');
+            const providerForm = document.getElementById('provider-form');
+            const providerFormTitle = document.getElementById('form-title');
+            const saveProviderButton = document.getElementById('save-provider-button');
+            const cancelProviderEditButton = document.getElementById('cancel-edit-button');
+            const providerTableBody = document.getElementById('provider-table-body');
+            const noProvidersMessage = document.getElementById('no-providers-message');
+            const providerSearchTable = document.getElementById('provider-search-table');
+            const providerIdField = document.getElementById('provider-id');
+            const providerNameInput = document.getElementById('provider-name');
+            const providerContactInput = document.getElementById('provider-contact');
+            const providerPhoneInput = document.getElementById('provider-phone');
+            const providerEmailInput = document.getElementById('provider-email');
+            const providerAddressInput = document.getElementById('provider-address');
+            const providerNotesInput = document.getElementById('provider-notes');
+            const providerFormError = document.getElementById('provider-form-error');
+            const providerFormErrorSpan = providerFormError.querySelector('span');
+            const downloadProvidersButton = document.getElementById('download-providers-csv');
+
+            let allProviders = [];
+             let allProducts = []; // Need products to check for usage
+
+            // --- Utility Functions ---
+             const showError = (message) => { providerFormErrorSpan.textContent = message; providerFormError.classList.remove('hidden'); };
+             const hideError = () => providerFormError.classList.add('hidden');
+             const setLoading = (button, text = "Guardando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} <span class="button-text">${text}</span>`; };
+             const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+             const escapeCsvValue = (value) => { if (value == null) return ''; const stringValue = String(value); if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) { return `"${stringValue.replace(/"/g, '""')}"`; } return stringValue; };
+
+            // --- Initial Load ---
+            function loadInitialConfig() {
+                try {
+                    const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    document.getElementById('business-name-sidebar').textContent = businessName;
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                    document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch(e) { console.error("Error loading config:", e); }
+            }
+
+            function loadData() { // Load both providers and products
+                 try {
+                    allProviders = JSON.parse(localStorage.getItem('proveedores') || '[]');
+                    allProducts = JSON.parse(localStorage.getItem('productos') || '[]'); // Load products for deletion check
+                    renderProviderTable();
+                } catch (error) {
+                    console.error("Error cargando datos:", error);
+                    allProviders = []; allProducts = [];
+                    renderProviderTable();
+                    noProvidersMessage.textContent = "Error al cargar los proveedores.";
+                    noProvidersMessage.classList.remove('hidden');
+                }
+            }
+
+            // --- Table Rendering & Filtering ---
+            function renderProviderTable() {
+                providerTableBody.innerHTML = '';
+                const searchTerm = providerSearchTable.value.trim().toLowerCase();
+                const filteredProviders = searchTerm
+                    ? allProviders.filter(p =>
+                        (p.nombre || '').toLowerCase().includes(searchTerm) ||
+                        (p.contacto || '').toLowerCase().includes(searchTerm) ||
+                        (p.telefono || '').toLowerCase().includes(searchTerm) ||
+                        (p.email || '').toLowerCase().includes(searchTerm)
+                      )
+                    : allProviders;
+
+                noProvidersMessage.classList.toggle('hidden', filteredProviders.length > 0 || allProviders.length === 0);
+                noProvidersMessage.textContent = (allProviders.length === 0) ? 'No tienes proveedores registrados todavía.' : 'No se encontraron proveedores que coincidan con la búsqueda.';
+                downloadProvidersButton.disabled = allProviders.length === 0;
+
+                if (filteredProviders.length > 0) {
+                    filteredProviders.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                    filteredProviders.forEach(provider => {
+                        const row = providerTableBody.insertRow();
+                        row.insertCell().textContent = provider.nombre || 'N/A';
+                        row.insertCell().textContent = provider.contacto || '-';
+                        row.insertCell().textContent = provider.telefono || '-';
+                        row.insertCell().textContent = provider.email || '-';
+                        const actionsCell = row.insertCell();
+                        actionsCell.className = 'actions';
+                        actionsCell.innerHTML = `
+                            <button class="edit-btn" data-id="${provider.id}" title="Editar Proveedor"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${provider.id}" title="Eliminar Proveedor"><i class="fas fa-trash-alt"></i></button>
+                        `;
+                    });
+                }
+            }
+            providerSearchTable.addEventListener('input', renderProviderTable);
+
+            // --- Form Visibility ---
+            function showForm() {
+                providerFormSection.classList.add('visible');
+                showProviderFormButton.style.display = 'none';
+                providerFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            function hideForm() {
+                providerFormSection.classList.remove('visible');
+                showProviderFormButton.style.display = 'inline-flex';
+                 resetProviderForm();
+            }
+            showProviderFormButton.addEventListener('click', () => { resetProviderForm(); providerFormTitle.textContent = 'Agregar Nuevo Proveedor'; showForm(); providerNameInput.focus(); });
+            cancelProviderEditButton.addEventListener('click', hideForm);
+
+            // --- Form Handling & Validation ---
+            function handleProviderFormSubmit(event) {
+                event.preventDefault();
+                hideError();
+                const button = saveProviderButton;
+                const originalHTML = button.innerHTML;
+                setLoading(button);
+
+                setTimeout(() => { // Simulate async
+                    try {
+                        const providerData = {
+                            id: providerIdField.value || `p_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+                            nombre: providerNameInput.value.trim(),
+                            contacto: providerContactInput.value.trim() || null,
+                            telefono: providerPhoneInput.value.trim() || null,
+                            email: providerEmailInput.value.trim().toLowerCase() || null,
+                            direccion: providerAddressInput.value.trim() || null,
+                            notas: providerNotesInput.value.trim() || null,
+                        };
+
+                        if (!providerData.nombre) throw new Error('El Nombre del Proveedor es obligatorio.');
+                        if (providerData.email && !/\S+@\S+\.\S+/.test(providerData.email)) throw new Error('El formato del Correo Electrónico no es válido.');
+
+                        if (saveProvider(providerData)) {
+                            hideForm();
+                            renderProviderTable(); // Render immediately with updated in-memory data
+                             providerSearchTable.value = ''; // Clear search to ensure visibility
+                             filterTable();
+                             alert(`Proveedor "${providerData.nombre}" ${providerIdField.value ? 'actualizado' : 'guardado'} con éxito.`);
+                        }
+                        // If saveProvider throws, the catch block handles it
+
+                    } catch (error) {
+                         console.error("Error procesando formulario:", error);
+                         showError(error.message || "Error desconocido.");
+                          if (error.message.includes('Nombre')) providerNameInput.focus();
+                          else if (error.message.includes('Correo')) providerEmailInput.focus();
+                    } finally {
+                         clearLoading(button, originalHTML);
+                    }
+                }, 50);
+            }
+            providerForm.addEventListener('submit', handleProviderFormSubmit);
+
+            function saveProvider(providerData) {
+                 try {
+                    const index = allProviders.findIndex(p => p.id === providerData.id);
+                    if (index > -1) allProviders[index] = providerData; else allProviders.push(providerData);
+                    allProviders.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                    localStorage.setItem('proveedores', JSON.stringify(allProviders));
+                     return true;
+                } catch (error) {
+                    console.error("Error guardando proveedor en localStorage:", error);
+                    throw new Error("Error al guardar en almacenamiento. ¿Espacio lleno?");
+                }
+            }
+
+            function editProvider(providerId) {
+                const provider = allProviders.find(p => p.id === providerId);
+                if (provider) {
+                    resetProviderForm();
+                    providerIdField.value = provider.id;
+                    providerNameInput.value = provider.nombre || '';
+                    providerContactInput.value = provider.contacto || '';
+                    providerPhoneInput.value = provider.telefono || '';
+                    providerEmailInput.value = provider.email || '';
+                    providerAddressInput.value = provider.direccion || '';
+                    providerNotesInput.value = provider.notas || '';
+                    providerFormTitle.textContent = 'Editar Proveedor';
+                    showForm();
+                     providerNameInput.focus();
+                } else { console.error("Proveedor no encontrado para editar:", providerId); }
+            }
+
+            function deleteProvider(providerId) {
+                 try {
+                     // Check usage in products
+                     const isUsed = allProducts.some(prod => prod.providerId === providerId);
+                     if (isUsed) {
+                         alert('Este proveedor no se puede eliminar porque está asignado como proveedor principal a uno o más productos. Edita los productos correspondientes primero.');
+                         return;
+                     }
+
+                     const providerIndex = allProviders.findIndex(p => p.id === providerId);
+                     if (providerIndex === -1) throw new Error("Proveedor no encontrado.");
+                     const provider = allProviders[providerIndex];
+                     if (confirm(`¿Eliminar al proveedor "${provider.nombre || 'N/A'}"? Esta acción no se puede deshacer.`)) {
+                        allProviders.splice(providerIndex, 1);
+                        localStorage.setItem('proveedores', JSON.stringify(allProviders));
+                        console.log("Proveedor eliminado:", providerId);
+                         if(providerIdField.value === providerId) hideForm(); // Close form if deleting the edited item
+                        renderProviderTable();
+                    }
+                 } catch (error) {
+                      console.error("Error eliminando proveedor:", error);
+                      alert(`Error al eliminar: ${error.message}`);
+                 }
+            }
+
+            function resetProviderForm() {
+                providerForm.reset();
+                providerIdField.value = '';
+                providerFormTitle.textContent = 'Agregar Nuevo Proveedor';
+                clearLoading(saveProviderButton, '<i class="fas fa-save"></i> <span class="button-text">Guardar Proveedor</span>');
+                hideError();
+            }
+
+             // --- Download CSV ---
+              function downloadProvidersCSV() {
+                  if (allProviders.length === 0) { alert("No hay proveedores para descargar."); return; }
+                  console.log("Preparando descarga CSV de proveedores...");
+                  const headers = ["ID", "Nombre", "Contacto", "Telefono", "Email", "Direccion", "Notas"];
+                  const rows = allProviders.map(p => [
+                      escapeCsvValue(p.id), escapeCsvValue(p.nombre), escapeCsvValue(p.contacto),
+                      escapeCsvValue(p.telefono), escapeCsvValue(p.email),
+                      escapeCsvValue(p.direccion), escapeCsvValue(p.notas)
+                  ]);
+                  let csvContent = headers.join(',') + '\r\n';
+                  rows.forEach(rowArray => { csvContent += rowArray.join(',') + '\r\n'; });
+                  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                  const link = document.createElement("a"); const url = URL.createObjectURL(blob);
+                  link.setAttribute("href", url); const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+                  link.setAttribute("download", `proveedores_export_${dateStr}.csv`);
+                  link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+                  console.log("Descarga iniciada.");
+              }
+
+            // --- Event Listeners Setup ---
+            providerTableBody.addEventListener('click', (event) => { const target = event.target.closest('button'); if (!target) return; if (target.classList.contains('edit-btn')) editProvider(target.dataset.id); else if (target.classList.contains('delete-btn')) deleteProvider(target.dataset.id); });
+            downloadProvidersButton.addEventListener('click', downloadProvidersCSV);
+
+            // --- Logout Logic (Consistent) ---
+            document.getElementById('logout-button')?.addEventListener('click', (e) => { e.preventDefault(); let canLogout = true; try { const cashStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}'); if (cashStatus.isOpen) { alert("¡Atención! La caja está abierta. Debes cerrarla antes de salir."); canLogout = false; } } catch(err) { console.error("Error checking cash status on logout", err); } if (canLogout && confirm('¿Estás seguro de que quieres salir?')) { window.location.href = 'login.html'; } });
+
+            // --- Initial Load Execution ---
+            loadInitialConfig();
+            loadData(); // Load providers and products
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

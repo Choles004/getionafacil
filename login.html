@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #666666;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --danger-color: #dc3545;
+            --danger-bg-color: rgba(220, 53, 69, 0.08);
+            --danger-border-color: rgba(220, 53, 69, 0.2);
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e0e0e0;
+            --border-radius-lg: 16px; /* Consistent with index.html */
+            --border-radius-md: 8px;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); /* Consistent */
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        color var(--transition-speed) var(--transition-easing);
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Fade-in Animation (Consistent with index.html) */
+        @keyframes fadeInScaleUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .login-container {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 30px 35px; /* Adjusted padding */
+            width: 100%;
+            max-width: 420px; /* Slightly adjusted max-width */
+            box-shadow: var(--box-shadow);
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        border-color var(--transition-speed) var(--transition-easing);
+            animation: fadeInScaleUp 0.6s var(--transition-easing) forwards;
+            opacity: 0; /* Start hidden for animation */
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 25px; /* Reduced margin */
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 8px; /* Increased space */
+            font-weight: 600;
+            font-size: 1.9rem;
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        header p {
+            color: var(--text-muted-color);
+            font-size: 0.95rem;
+            margin: 0;
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        .form-section h2 {
+            font-size: 1.4rem; /* Slightly smaller */
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        .form-group {
+            margin-bottom: 18px; /* Slightly reduced margin */
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px; /* Slightly reduced margin */
+            font-weight: 500;
+            font-size: 0.88rem; /* Slightly smaller */
+            color: var(--text-muted-color);
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+        /* Optional: Add visual cue for required fields */
+        label[for]:after {
+           content: " *"; /* Add asterisk after required labels */
+           color: var(--danger-color);
+           font-weight: bold;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i.fa-fw { /* Ensure fixed width for icons */
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted-color);
+            transition: color var(--transition-speed) ease;
+            font-size: 0.95em;
+            width: 1em; /* Ensure icon takes consistent space */
+            text-align: center;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 11px 15px 11px 45px; /* Adjusted padding for fixed width icon */
+            box-sizing: border-box;
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md);
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            font-size: 0.95rem; /* Slightly smaller font */
+            transition: border-color var(--transition-speed) ease,
+                        box-shadow var(--transition-speed) ease,
+                        background-color var(--transition-speed) ease,
+                        color var(--transition-speed) ease;
+        }
+
+        /* Remove icon padding for select, use background arrow */
+        select {
+            padding-left: 15px;
+            padding-right: 40px; /* Space for custom arrow */
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23666" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px 12px;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: var(--input-focus-border-color);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--input-focus-shadow-color);
+        }
+         input[type="text"]:focus ~ i.fa-fw, /* Use sibling selector */
+         input[type="password"]:focus ~ i.fa-fw {
+             color: var(--primary-color);
+         }
+
+
+        /* Button styling */
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px 20px; /* Adjusted padding */
+            font-size: 1rem; /* Adjusted font size */
+            font-weight: 500;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            margin-top: 15px; /* Space above button */
+            transition: background-color var(--transition-speed) ease,
+                        transform 0.2s ease-out, /* Faster transform */
+                        box-shadow 0.2s ease-out,
+                        opacity var(--transition-speed) ease;
+            position: relative; /* For potential loading spinner inside */
+            overflow: hidden; /* Hide spinner parts if needed */
+        }
+
+        button[type="submit"]:hover:not(:disabled) {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+         button[type="submit"]:active:not(:disabled) {
+             transform: translateY(0px);
+             box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15);
+         }
+        button[type="submit"]:disabled {
+             background-color: #cccccc;
+             cursor: not-allowed;
+             transform: none;
+             box-shadow: none;
+             opacity: 0.7;
+        }
+         button[type="submit"] .spinner {
+             margin-right: 8px;
+             font-size: 0.9em;
+         }
+
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: var(--danger-color);
+            font-size: 0.85em;
+            margin-top: 12px; /* More space */
+            text-align: center;
+            background-color: var(--danger-bg-color);
+            border: 1px solid var(--danger-border-color);
+            padding: 10px; /* More padding */
+            border-radius: var(--border-radius-md);
+            opacity: 0; /* Start hidden for transition */
+            max-height: 0; /* Collapse when hidden */
+            overflow: hidden;
+            transition: opacity var(--transition-speed) ease,
+                        max-height var(--transition-speed) ease,
+                        margin-top var(--transition-speed) ease,
+                        padding var(--transition-speed) ease;
+        }
+        .error:not(.hidden) {
+             opacity: 1;
+             max-height: 100px; /* Allow space to expand */
+        }
+
+
+        footer {
+            margin-top: 25px; /* Reduced margin */
+            font-size: 0.8rem; /* Smaller text */
+            color: var(--text-muted-color);
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+         /* Dark Theme Styles */
+        body.dark-theme {
+            --bg-color: #121212;
+            --card-bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted-color: #a0a0a0;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --danger-color: #e74c3c;
+            --danger-bg-color: rgba(231, 76, 60, 0.1);
+            --danger-border-color: rgba(231, 76, 60, 0.3);
+            --input-bg-color: #2a2a2a; /* Darker input */
+            --input-border-color: #444444;
+            --input-focus-border-color: #3498db;
+             --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #333333;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Darker shadow */
+
+             /* Update select arrow color for dark theme */
+            select {
+                 background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+            }
+             button[type="submit"]:disabled {
+                 background-color: #555;
+                 opacity: 0.6;
+             }
+             label[for]:after {
+                 color: var(--danger-color); /* Ensure asterisk color matches */
+             }
+        }
+
+        /* Theme Toggle Button (Consistent with index.html) */
+        .theme-toggle {
+           position: fixed;
+           top: 15px;
+           right: 15px;
+           background-color: var(--card-bg-color);
+           border: 1px solid var(--border-color);
+           border-radius: 50%;
+           width: 45px;
+           height: 45px;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           cursor: pointer;
+           box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+           color: var(--text-color);
+           font-size: 1.3em;
+           transition: all var(--transition-speed) var(--transition-easing);
+           z-index: 1000;
+        }
+        .theme-toggle:hover {
+           transform: scale(1.1) rotate(15deg);
+           box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+           border-color: var(--primary-color);
+           color: var(--primary-color);
+        }
+         .theme-toggle:active {
+           transform: scale(1.05) rotate(5deg);
+         }
+        .theme-toggle i {
+            transition: transform 0.4s ease-in-out;
+        }
+       .theme-toggle.changing i {
+           transform: scale(0);
+       }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+             body {
+                padding: 15px;
+                align-items: flex-start; /* Align card to top */
+                padding-top: 80px; /* Space below fixed theme toggle */
+            }
+            .login-container {
+                padding: 25px 20px;
+                max-width: 100%;
+            }
+             header h1 {
+                font-size: 1.7rem;
+            }
+             .form-section h2 {
+                font-size: 1.3rem;
+            }
+            input[type="text"],
+            input[type="password"],
+            select,
+            button[type="submit"] {
+                font-size: 1rem; /* Keep inputs readable */
+            }
+             button[type="submit"] {
+                padding: 13px 20px;
+            }
+
+            footer {
+                font-size: 0.75rem;
+            }
+             .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+             }
+        }
+         @media (max-width: 400px) {
+             header h1 {
+                 font-size: 1.5rem;
+             }
+             .form-section h2 {
+                font-size: 1.2rem;
+             }
+              header p {
+                font-size: 0.9rem;
+            }
+         }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <div class="login-container">
+        <header>
+            <h1>Gestiona Fácil</h1>
+            <p>Tu ayudante simple para ventas y negocio.</p>
+        </header>
+
+        <main>
+            <!-- Sección de Login -->
+            <section id="login-form" class="form-section hidden">
+                <h2>Ingresar a tu Negocio</h2>
+                <form id="do-login" novalidate> <!-- Disable browser validation, we handle it -->
+                    <div class="form-group">
+                        <label for="login-password">Contraseña Maestra:</label>
+                        <div class="input-group">
+                           <input type="password" id="login-password" required autocomplete="current-password">
+                           <i class="fas fa-lock fa-fw"></i>
+                        </div>
+                    </div>
+                    <p id="login-error" class="error hidden" aria-live="polite"></p> <!-- Error Message Area -->
+                    <button type="submit" id="login-button">Ingresar</button>
+                </form>
+            </section>
+
+            <!-- Sección de Configuración Inicial -->
+            <section id="setup-form" class="form-section hidden">
+                <h2>¡Bienvenido! Configura tu Negocio</h2>
+                <p style="text-align: left; font-size: 0.9em; color: var(--text-muted-color); margin-bottom: 20px;">Completa estos datos básicos para empezar:</p>
+                <form id="do-setup" novalidate>
+                    <div class="form-group">
+                        <label for="business-name">Nombre de tu Negocio:</label>
+                         <div class="input-group">
+                            <input type="text" id="business-name" required autocomplete="organization">
+                             <i class="fas fa-store fa-fw"></i>
+                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="currency">Moneda Principal:</label>
+                         <div class="input-group">
+                            <select id="currency" required>
+                                <option value="$">Dólar ($)</option>
+                                <option value="€">Euro (€)</option>
+                                <option value="Bs.">Bolívares (Bs.)</option>
+                                <option value="COP">Peso Colombiano (COP)</option>
+                                <option value="PEN">Sol Peruano (PEN)</option>
+                                <!-- Add more as needed -->
+                            </select>
+                            <!-- No icon needed inside select -->
+                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-password">Crea tu Contraseña Maestra (mín. 4 caracteres):</label>
+                        <div class="input-group">
+                            <input type="password" id="setup-password" required autocomplete="new-password" minlength="4">
+                             <i class="fas fa-key fa-fw"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirma la Contraseña:</label>
+                        <div class="input-group">
+                            <input type="password" id="confirm-password" required autocomplete="new-password" minlength="4">
+                             <i class="fas fa-check-circle fa-fw"></i>
+                        </div>
+                    </div>
+                    <p id="setup-error" class="error hidden" aria-live="polite"></p> <!-- Error Message Area -->
+                    <button type="submit" id="setup-button">Guardar y Empezar</button>
+                </form>
+            </section>
+        </main>
+
+        <footer>
+            <p><small>© 2024 Gestiona Fácil</small></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginFormSection = document.getElementById('login-form');
+            const setupFormSection = document.getElementById('setup-form');
+            const loginForm = document.getElementById('do-login');
+            const setupForm = document.getElementById('do-setup');
+            const loginError = document.getElementById('login-error');
+            const setupError = document.getElementById('setup-error');
+            const loginButton = document.getElementById('login-button');
+            const setupButton = document.getElementById('setup-button');
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+
+            const sunIcon = 'fa-sun';
+            const moonIcon = 'fa-moon';
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+
+            // --- Utility Functions ---
+            const showLoginError = (message) => {
+                loginError.textContent = message;
+                loginError.classList.remove('hidden');
+            };
+            const hideLoginError = () => loginError.classList.add('hidden');
+
+            const showSetupError = (message) => {
+                setupError.textContent = message;
+                setupError.classList.remove('hidden');
+            };
+            const hideSetupError = () => setupError.classList.add('hidden');
+
+            const disableButton = (button, text = "Procesando...") => {
+                button.disabled = true;
+                button.innerHTML = `${spinnerIcon} ${text}`;
+            };
+
+            const enableButton = (button, originalText) => {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            };
+
+
+            // --- Theme Management (Consistent with index.html) ---
+            function applyTheme(theme) {
+                body.classList.remove('dark-theme', 'light-theme'); // Clear existing
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                    themeIcon.classList.remove(sunIcon);
+                    themeIcon.classList.add(moonIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro');
+                } else {
+                    body.classList.add('light-theme');
+                    themeIcon.classList.remove(moonIcon);
+                    themeIcon.classList.add(sunIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro');
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            function toggleTheme() {
+                 const currentTheme = localStorage.getItem('theme') || getDefaultTheme();
+                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                 themeToggleButton.classList.add('changing');
+                 themeIcon.style.transform = 'scale(0)';
+                 applyTheme(newTheme);
+                 setTimeout(() => {
+                     themeToggleButton.classList.remove('changing');
+                     themeIcon.style.transform = '';
+                 }, 400);
+             }
+
+            function getDefaultTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            }
+
+            // Initialize theme
+            const savedTheme = localStorage.getItem('theme');
+            const initialTheme = savedTheme || getDefaultTheme();
+            applyTheme(initialTheme);
+
+            // Listen for OS changes only if no theme saved
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(event.matches ? 'dark' : 'light');
+                }
+             });
+
+            themeToggleButton.addEventListener('click', toggleTheme);
+
+
+            // --- Initial Form Display Logic ---
+            try {
+                const negocioGuardado = localStorage.getItem('businessName');
+                const masterPasswordExists = localStorage.getItem('masterPassword');
+
+                if (negocioGuardado && masterPasswordExists) {
+                    loginFormSection.classList.remove('hidden');
+                } else {
+                    if (negocioGuardado && !masterPasswordExists) {
+                        console.warn("Nombre de negocio encontrado pero sin contraseña. Forzando configuración.");
+                        // Optional: localStorage.removeItem('businessName'); // To force re-entry
+                    }
+                    setupFormSection.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error("Error accessing localStorage:", e);
+                setupFormSection.classList.remove('hidden'); // Fallback to setup
+                showSetupError("Error al acceder al almacenamiento. La app podría no funcionar.");
+            }
+
+
+            // --- Login Form Submission ---
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                hideLoginError();
+                const originalButtonText = 'Ingresar';
+                disableButton(loginButton, 'Ingresando...');
+
+                const passwordInput = document.getElementById('login-password');
+                const password = passwordInput.value;
+
+                // Basic check
+                if (!password) {
+                    showLoginError('Por favor, ingresa la contraseña.');
+                    enableButton(loginButton, originalButtonText);
+                    passwordInput.focus();
+                    return;
+                }
+
+                // Simulate check (replace with actual async if needed)
+                setTimeout(() => {
+                    try {
+                        const storedPassword = localStorage.getItem('masterPassword');
+
+                        if (password === storedPassword) {
+                            // Success - Redirect
+                            window.location.href = 'dashboard.html';
+                            // No need to re-enable button on success redirect
+                        } else {
+                            showLoginError('Contraseña incorrecta.');
+                            enableButton(loginButton, originalButtonText);
+                            passwordInput.focus(); // Focus password field on error
+                            passwordInput.select(); // Select text for easy re-entry
+                        }
+                    } catch(error) {
+                        showLoginError('Error al verificar la contraseña.');
+                        console.error("Login check error:", error);
+                        enableButton(loginButton, originalButtonText);
+                    }
+                }, 250); // Short delay for visual feedback
+            });
+
+
+            // --- Setup Form Submission ---
+            setupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                hideSetupError();
+
+                const businessNameInput = document.getElementById('business-name');
+                const currencyInput = document.getElementById('currency');
+                const passwordInput = document.getElementById('setup-password');
+                const confirmPasswordInput = document.getElementById('confirm-password');
+
+                const businessName = businessNameInput.value.trim();
+                const currency = currencyInput.value;
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                // --- Immediate Validations ---
+                if (!businessName) {
+                    showSetupError('El nombre del negocio es obligatorio.');
+                    businessNameInput.focus();
+                    return;
+                }
+                if (!currency) {
+                    showSetupError('Debes seleccionar una moneda.');
+                     currencyInput.focus();
+                    return;
+                }
+                if (password.length < 4) {
+                     showSetupError('La contraseña debe tener al menos 4 caracteres.');
+                     passwordInput.focus();
+                     return;
+                 }
+                if (password !== confirmPassword) {
+                    showSetupError('Las contraseñas no coinciden.');
+                    confirmPasswordInput.focus();
+                     confirmPasswordInput.value = ''; // Clear confirm field
+                    return;
+                }
+
+                // If validations pass, proceed
+                const originalButtonText = 'Guardar y Empezar';
+                disableButton(setupButton, 'Guardando...');
+
+                // Simulate saving (replace with actual async if needed)
+                setTimeout(() => {
+                    try {
+                        // Save to LocalStorage
+                        localStorage.setItem('businessName', businessName);
+                        localStorage.setItem('currency', currency);
+                        localStorage.setItem('masterPassword', password); // WARNING: Stored in plain text
+                        localStorage.setItem('businessType', 'store'); // Default type
+
+                        // Initialize empty structures for other app parts
+                        const initialData = JSON.stringify([]);
+                        localStorage.setItem('productos', initialData);
+                        localStorage.setItem('proveedores', initialData);
+                        localStorage.setItem('clientes', initialData);
+                        localStorage.setItem('ventas', initialData);
+                        localStorage.setItem('gastos', initialData);
+                        localStorage.setItem('cashRegisterStatus', '{}');
+                        localStorage.setItem('cashHistory', initialData);
+                        localStorage.setItem('restaurantTables', initialData);
+
+                        // Redirect on Success
+                        window.location.href = 'dashboard.html';
+                        // No need to re-enable button on success redirect
+
+                    } catch (error) {
+                         showSetupError('Error al guardar la configuración. ¿Almacenamiento lleno?');
+                         console.error("Setup save error:", error);
+                         enableButton(setupButton, originalButtonText); // Re-enable on error
+                    }
+                }, 300); // Simulate save delay
+            });
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

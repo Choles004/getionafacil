@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastos y Pagos - Mi App de Gestión</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+     <style>
+        /* Estilos básicos */
+        body { font-family: sans-serif; display: flex; margin: 0;}
+        .sidebar { width: 200px; background-color: #f4f4f4; padding: 15px; height: 100vh; box-sizing: border-box; overflow-y: auto;}
+        .sidebar h2 { margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li a { text-decoration: none; color: #333; display: block; padding: 8px 0; }
+        .sidebar ul li a.active { font-weight: bold; }
+        .content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .content header { margin-bottom: 20px; }
+        .expense-form { border: 1px solid #ccc; padding: 20px; margin-bottom: 30px; background-color: #f9f9f9; border-radius: 5px; }
+        .expense-form h2 { margin-top: 0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { margin-bottom: 0; } /* Reset margin, gap handles spacing */
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold;}
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;}
+        .form-actions { grid-column: 1 / -1; margin-top: 15px; } /* Span all columns */
+        .form-actions button { padding: 10px 15px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px;}
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .filters { margin-bottom: 15px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;}
+        .filters label { font-weight: bold; }
+        .filters input, .filters select { padding: 8px; border: 1px solid #ccc; border-radius: 3px;}
+        .hidden { display: none; }
+        .error { color: red; font-size: 0.9em; }
+        .total-expenses { margin-top: 10px; font-weight: bold; text-align: right; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+         <h2>Gestiona Fácil</h2>
+         <p><small id="business-name-sidebar">Nombre Negocio</small></p>
+        <ul>
+            <li><a href="dashboard.html">Inicio / Dashboard</a></li>
+            <li><a href="nueva_venta.html">Nueva Venta (POS)</a></li>
+            <li><a href="restaurante.html">Restaurante</a></li>
+            <li><a href="caja.html">Caja</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="inventario.html">Inventario</a></li>
+            <li><a href="proveedores.html">Proveedores</a></li>
+            <li><a href="clientes.html">Clientes</a></li>
+            <li><a href="gastos.html" class="active">Gastos / Pagos</a></li>
+            <li><a href="reportes.html">Reportes</a></li>
+            <li><a href="configuracion.html">Configuración</a></li>
+            <li><a href="login.html" id="logout-button">Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Registro de Gastos y Pagos</h1>
+            <p>Anota aquí todas las salidas de dinero de tu negocio.</p>
+        </header>
+
+        <section class="expense-form">
+            <h2>Registrar Nuevo Gasto/Pago</h2>
+            <form id="expense-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="expense-date">Fecha:</label>
+                        <input type="date" id="expense-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-amount">Monto:</label>
+                        <input type="number" id="expense-amount" step="0.01" min="0" required>
+                         <span class="currency-symbol"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-type">Tipo:</label>
+                        <select id="expense-type" required>
+                            <option value="Gasto General">Gasto General</option>
+                            <option value="Pago Proveedor">Pago a Proveedor</option>
+                            <option value="Pago Empleado">Pago a Empleado</option>
+                            <!-- Añadir más si es necesario -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-beneficiary">Beneficiario/Descripción:</label>
+                        <!-- Cambiar a Select si el tipo es Proveedor/Empleado -->
+                        <input type="text" id="expense-beneficiary" list="beneficiary-list" required placeholder="Ej: Proveedor XYZ, Alquiler Local, Juan P.">
+                        <datalist id="beneficiary-list">
+                            <!-- Opciones se cargarán aquí si es Proveedor/Empleado -->
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-category">Categoría:</label>
+                        <select id="expense-category" required>
+                            <option value="Compra Mercancía">Compra Mercancía</option>
+                            <option value="Sueldos y Salarios">Sueldos y Salarios</option>
+                            <option value="Alquiler">Alquiler</option>
+                            <option value="Servicios Públicos">Servicios Públicos (Luz, Agua, etc.)</option>
+                            <option value="Marketing y Publicidad">Marketing y Publicidad</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Mantenimiento y Reparaciones">Mantenimiento y Reparaciones</option>
+                            <option value="Impuestos">Impuestos</option>
+                             <option value="Gastos Bancarios">Gastos Bancarios</option>
+                            <option value="Otros Gastos">Otros Gastos</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="expense-payment-method">Método de Pago:</label>
+                        <select id="expense-payment-method" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                             <option value="Tarjeta Débito/Crédito">Tarjeta Débito/Crédito</option>
+                             <!-- Opciones de bancos propios podrían cargarse aquí -->
+                        </select>
+                        <!-- Campo opcional para referencia de banco si es Transferencia -->
+                        <input type="text" id="expense-bank-ref" class="hidden" placeholder="Referencia/Banco (Opcional)" style="margin-top: 5px;">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;"> <!-- Span all columns -->
+                        <label for="expense-notes">Notas (Opcional):</label>
+                        <textarea id="expense-notes" rows="2"></textarea>
+                    </div>
+                </div>
+                 <p id="expense-form-error" class="error hidden"></p>
+                <div class="form-actions">
+                    <button type="submit">Guardar Gasto</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="expense-history">
+            <h2>Historial de Gastos</h2>
+            <div class="filters">
+                 <label for="filter-start-date">Desde:</label>
+                 <input type="date" id="filter-start-date">
+                 <label for="filter-end-date">Hasta:</label>
+                 <input type="date" id="filter-end-date">
+                 <label for="filter-category">Categoría:</label>
+                 <select id="filter-category">
+                     <option value="">Todas</option>
+                     <!-- Categorías se cargan aquí -->
+                 </select>
+                 <button id="filter-button" style="margin-left: 10px;">Filtrar</button>
+                 <button id="reset-filter-button" type="button">Limpiar Filtros</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Tipo</th>
+                        <th>Beneficiario/Descripción</th>
+                        <th>Categoría</th>
+                        <th>Método Pago</th>
+                        <th>Acciones</th> <!-- Opcional: Editar/Eliminar -->
+                    </tr>
+                </thead>
+                <tbody id="expense-table-body">
+                    <!-- Las filas de gastos se cargarán aquí -->
+                </tbody>
+            </table>
+            <p id="no-expenses-message" class="hidden">No hay gastos registrados que coincidan con los filtros.</p>
+             <p class="total-expenses">Total Gastos Filtrados: <span id="total-filtered-expenses">0.00</span></p>
+        </section>
+    </main>
+
+    <!-- <script src="js/app.js"></script> -->
+    <!-- <script src="js/gastos.js"></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+            document.getElementById('business-name-sidebar').textContent = businessName;
+            const currency = localStorage.getItem('currency') || '$';
+            document.querySelectorAll('.currency-symbol').forEach(el => el.textContent = currency);
+
+            // Elementos UI Gastos
+            const expenseForm = document.getElementById('expense-form');
+            const expenseDateInput = document.getElementById('expense-date');
+            const expenseAmountInput = document.getElementById('expense-amount');
+            const expenseTypeSelect = document.getElementById('expense-type');
+            const expenseBeneficiaryInput = document.getElementById('expense-beneficiary');
+            const beneficiaryDatalist = document.getElementById('beneficiary-list');
+            const expenseCategorySelect = document.getElementById('expense-category');
+            const expensePaymentMethodSelect = document.getElementById('expense-payment-method');
+            const expenseBankRefInput = document.getElementById('expense-bank-ref');
+            const expenseNotesInput = document.getElementById('expense-notes');
+            const expenseFormError = document.getElementById('expense-form-error');
+            const expenseTableBody = document.getElementById('expense-table-body');
+            const noExpensesMessage = document.getElementById('no-expenses-message');
+            const filterStartDate = document.getElementById('filter-start-date');
+            const filterEndDate = document.getElementById('filter-end-date');
+            const filterCategory = document.getElementById('filter-category');
+            const filterButton = document.getElementById('filter-button');
+            const resetFilterButton = document.getElementById('reset-filter-button');
+            const totalFilteredExpensesEl = document.getElementById('total-filtered-expenses');
+
+
+            let allExpenses = [];
+            let allProviders = [];
+            // let allEmployees = []; // Si se implementa lista simple de empleados
+            // let allBanks = []; // Si se implementan bancos propios
+
+            // --- Carga Inicial ---
+            setDefaultDate();
+            loadAuxiliaryData(); // Cargar proveedores, etc.
+            loadExpenses(); // Cargar gastos existentes
+            populateCategoryFilter(); // Llenar filtro de categorías
+
+            // --- Event Listeners ---
+            expenseForm.addEventListener('submit', handleExpenseFormSubmit);
+
+            expenseTypeSelect.addEventListener('change', updateBeneficiaryInput);
+            expensePaymentMethodSelect.addEventListener('change', toggleBankRefInput);
+
+            filterButton.addEventListener('click', renderExpenseTable);
+            resetFilterButton.addEventListener('click', () => {
+                 filterStartDate.value = '';
+                 filterEndDate.value = '';
+                 filterCategory.value = '';
+                 renderExpenseTable(); // Volver a renderizar sin filtros
+            });
+
+            // Listener para eliminar (opcional)
+            expenseTableBody.addEventListener('click', (event) => {
+                 if (event.target.classList.contains('delete-expense-btn')) {
+                     const expenseId = event.target.dataset.id;
+                     deleteExpense(expenseId);
+                 }
+            });
+
+
+            // --- Funciones ---
+            function setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                expenseDateInput.value = today;
+            }
+
+            function loadAuxiliaryData() {
+                 try {
+                    allProviders = JSON.parse(localStorage.getItem('proveedores') || '[]');
+                    // allEmployees = JSON.parse(localStorage.getItem('config_empleados') || '[]');
+                    // allBanks = JSON.parse(localStorage.getItem('config_bancos') || '[]');
+                } catch (error) {
+                    console.error("Error cargando datos auxiliares:", error);
+                }
+                 updateBeneficiaryInput(); // Actualizar datalist inicial
+                 // Podrías poblar el select de método de pago con bancos aquí si existieran
+            }
+
+             function loadExpenses() {
+                try {
+                    allExpenses = JSON.parse(localStorage.getItem('gastos') || '[]');
+                    renderExpenseTable(); // Renderizar tabla inicial
+                } catch (error) {
+                    console.error("Error cargando gastos:", error);
+                    allExpenses = [];
+                }
+            }
+
+            function populateCategoryFilter() {
+                 // Obtener categorías únicas de los gastos existentes y las opciones por defecto
+                 const defaultCategories = Array.from(expenseCategorySelect.options).map(opt => opt.value);
+                 const expenseCategories = allExpenses.map(exp => exp.categoria);
+                 const uniqueCategories = [...new Set([...defaultCategories, ...expenseCategories])].sort();
+
+                 filterCategory.innerHTML = '<option value="">Todas</option>'; // Resetear
+                 uniqueCategories.forEach(cat => {
+                     if (cat) { // Evitar vacíos
+                         const option = document.createElement('option');
+                         option.value = cat;
+                         option.textContent = cat;
+                         filterCategory.appendChild(option);
+                     }
+                 });
+             }
+
+
+            function updateBeneficiaryInput() {
+                const type = expenseTypeSelect.value;
+                beneficiaryDatalist.innerHTML = ''; // Limpiar
+
+                if (type === 'Pago Proveedor') {
+                    expenseBeneficiaryInput.placeholder = "Selecciona o escribe proveedor";
+                    allProviders.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.nombre;
+                         // Podrías añadir data-* attributes si necesitas el ID
+                        beneficiaryDatalist.appendChild(option);
+                    });
+                } else if (type === 'Pago Empleado') {
+                     expenseBeneficiaryInput.placeholder = "Selecciona o escribe empleado";
+                    // Similar a proveedores, si tienes lista de empleados
+                    // allEmployees.forEach(e => ...);
+                } else { // Gasto General u otro
+                     expenseBeneficiaryInput.placeholder = "Ej: Alquiler Local, Compra Papelería";
+                }
+            }
+
+             function toggleBankRefInput() {
+                 const isTransfer = expensePaymentMethodSelect.value === 'Transferencia';
+                 expenseBankRefInput.classList.toggle('hidden', !isTransfer);
+                 if (!isTransfer) {
+                     expenseBankRefInput.value = ''; // Limpiar si se oculta
+                 }
+             }
+
+            function handleExpenseFormSubmit(event) {
+                event.preventDefault();
+                expenseFormError.classList.add('hidden');
+
+                const expenseData = {
+                    id: `g${Date.now()}`, // ID simple: g + timestamp
+                    fecha: expenseDateInput.value,
+                    monto: parseFloat(expenseAmountInput.value),
+                    tipo: expenseTypeSelect.value,
+                    beneficiario: expenseBeneficiaryInput.value.trim(),
+                    categoria: expenseCategorySelect.value,
+                    metodoPago: expensePaymentMethodSelect.value,
+                    referenciaBanco: expensePaymentMethodSelect.value === 'Transferencia' ? expenseBankRefInput.value.trim() : null,
+                    notas: expenseNotesInput.value.trim() || null,
+                };
+
+                // Validaciones
+                if (!expenseData.fecha || isNaN(expenseData.monto) || expenseData.monto <= 0 || !expenseData.beneficiario) {
+                     expenseFormError.textContent = 'Fecha, Monto (mayor a 0) y Beneficiario/Descripción son obligatorios.';
+                     expenseFormError.classList.remove('hidden');
+                     return;
+                }
+
+                saveExpense(expenseData);
+                expenseForm.reset(); // Limpiar formulario
+                setDefaultDate(); // Poner fecha de hoy de nuevo
+                updateBeneficiaryInput(); // Resetear placeholder/datalist
+                toggleBankRefInput(); // Ocultar ref bancaria si aplica
+                loadExpenses(); // Recargar y renderizar tabla
+                populateCategoryFilter(); // Actualizar filtro de categorías por si hay nueva
+            }
+
+            function saveExpense(expenseData) {
+                try {
+                    allExpenses.push(expenseData);
+                    // Ordenar por fecha descendente al guardar? Opcional
+                    // allExpenses.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                    localStorage.setItem('gastos', JSON.stringify(allExpenses));
+                    console.log("Gasto guardado:", expenseData);
+                } catch (error) {
+                    console.error("Error guardando gasto:", error);
+                    alert("Hubo un error al guardar el gasto.");
+                     // Sacar el último elemento si falló?
+                     allExpenses.pop();
+                }
+            }
+
+            function renderExpenseTable() {
+                expenseTableBody.innerHTML = '';
+                const startDate = filterStartDate.value;
+                const endDate = filterEndDate.value;
+                const category = filterCategory.value;
+                let totalFiltered = 0;
+
+                 // Ordenar por fecha más reciente primero para visualización
+                 const sortedExpenses = [...allExpenses].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+
+                const filteredExpenses = sortedExpenses.filter(exp => {
+                    const expenseDate = exp.fecha;
+                    // Filtrar por fecha
+                    if (startDate && expenseDate < startDate) return false;
+                    if (endDate && expenseDate > endDate) return false;
+                    // Filtrar por categoría
+                    if (category && exp.categoria !== category) return false;
+                    return true;
+                });
+
+                 if (filteredExpenses.length === 0) {
+                    noExpensesMessage.classList.remove('hidden');
+                    totalFilteredExpensesEl.textContent = currency + '0.00';
+                } else {
+                    noExpensesMessage.classList.add('hidden');
+                    filteredExpenses.forEach(exp => {
+                        const row = expenseTableBody.insertRow();
+                         row.innerHTML = `
+                            <td>${new Date(exp.fecha + 'T00:00:00').toLocaleDateString()}</td> <!-- Asegurar que se interprete como local -->
+                            <td>${currency}${exp.monto.toFixed(2)}</td>
+                            <td>${exp.tipo}</td>
+                            <td>${exp.beneficiario}</td>
+                            <td>${exp.categoria}</td>
+                            <td>${exp.metodoPago}${exp.referenciaBanco ? ` (${exp.referenciaBanco})` : ''}</td>
+                            <td class="actions">
+                                <button class="delete-expense-btn" data-id="${exp.id}" title="Eliminar Gasto">🗑️</button>
+                                <!-- Podría añadirse botón de editar -->
+                            </td>
+                        `;
+                         totalFiltered += exp.monto;
+                    });
+                     totalFilteredExpensesEl.textContent = currency + totalFiltered.toFixed(2);
+                }
+            }
+
+             function deleteExpense(expenseId) {
+                 const expense = allExpenses.find(e => e.id == expenseId);
+                 if (expense && confirm(`¿Estás seguro de que quieres eliminar el gasto de ${currency}${expense.monto.toFixed(2)} para "${expense.beneficiario}" del ${new Date(expense.fecha + 'T00:00:00').toLocaleDateString()}?`)) {
+                    try {
+                        allExpenses = allExpenses.filter(e => e.id != expenseId);
+                        localStorage.setItem('gastos', JSON.stringify(allExpenses));
+                        console.log("Gasto eliminado:", expenseId);
+                        renderExpenseTable(); // Actualizar la tabla
+                        populateCategoryFilter(); // Actualizar filtro por si se eliminó la última de una categoría
+                    } catch (error) {
+                         console.error("Error eliminando gasto:", error);
+                         alert("Hubo un error al eliminar el gasto.");
+                    }
+                 }
+             }
+
+
+             // Lógica botón Salir
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

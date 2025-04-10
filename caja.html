@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Caja - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Reuse common styles */
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #ffffff;
+            --content-bg: #f0f2f5; /* Can be same as body or different */
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #1e7e34;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --info-hover-color: #117a8b;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3; /* Adjusted hover color */
+            --input-bg-color: #ffffff;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #80bdff;
+            --input-focus-shadow-color: rgba(0, 123, 255, 0.15);
+            --border-color: #e9ecef;
+            --border-radius-lg: 16px; /* Consistent */
+            --border-radius-md: 8px;  /* Consistent */
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07); /* Adjusted shadow */
+            --sidebar-width: 240px;
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        /* Dark Theme Variables */
+        body.dark-theme {
+            --bg-color: #121212;
+            --sidebar-bg: #1e1e1e;
+            --content-bg: #121212;
+            --card-bg-color: #2a2a2a; /* Slightly lighter card */
+            --text-color: #e0e0e0;
+            --text-muted-color: #adb5bd;
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --secondary-color: #adb5bd;
+            --secondary-hover-color: #ced4da;
+            --success-color: #20c997;
+            --success-hover-color: #1aab88;
+            --danger-color: #e74c3c;
+            --danger-hover-color: #ff6b6b;
+            --warning-color: #fdc107;
+            --info-color: #3498db;
+            --info-hover-color: #5dade2;
+            --link-color: #3498db;
+            --link-hover-color: #7cc4f1; /* Lighter hover */
+            --input-bg-color: #3a3f44;
+            --input-border-color: #555555;
+            --input-focus-border-color: #3498db;
+            --input-focus-shadow-color: rgba(52, 152, 219, 0.2);
+            --border-color: #3a3f44;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow */
+            select { background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%23aaa" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>') !important; }
+            .cash-status, .cash-actions > div, .cash-history .table-container { background-color: var(--card-bg-color); }
+            .summary-section { border-color: var(--border-color); }
+            #history-table th { background-color: rgba(255,255,255,0.05); }
+            .input-with-suffix span { background-color: #495057; border-color: var(--input-border-color); }
+            #no-history-message { background-color: rgba(255,255,255,0.03); }
+            .sidebar ul li a:hover { background-color: rgba(52, 152, 219, 0.1); }
+            .sidebar .logout-link a:hover { background-color: rgba(231, 76, 60, 0.15); }
+        }
+
+         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color var(--transition-speed) var(--transition-easing), color var(--transition-speed) var(--transition-easing); font-size: 15px; line-height: 1.6; }
+
+        /* Sidebar Styles */
+         .sidebar { width: var(--sidebar-width); background-color: var(--sidebar-bg); padding: 20px 15px; height: 100vh; position: fixed; top: 0; left: 0; border-right: 1px solid var(--border-color); box-shadow: 3px 0 8px rgba(0,0,0,0.04); transition: background-color var(--transition-speed) var(--transition-easing), border-color var(--transition-speed) var(--transition-easing), width 0.3s ease; display: flex; flex-direction: column; z-index: 100; }
+         .sidebar h2 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.6em; text-align: center; font-weight: 600; transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar .business-info { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+          .sidebar .business-info small { font-size: 0.9em; color: var(--text-muted-color); transition: color var(--transition-speed) var(--transition-easing); }
+         .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; /* Allows scrolling if many items */ }
+        .sidebar ul li a { text-decoration: none; color: var(--text-muted-color); display: flex; align-items: center; gap: 12px; /* Increased gap */ padding: 11px 15px; /* Adjusted padding */ margin-bottom: 6px; border-radius: var(--border-radius-md); transition: background-color 0.2s ease, color 0.2s ease; font-weight: 500; }
+        .sidebar ul li a i { width: 20px; text-align: center; font-size: 1.1em; color: var(--text-muted-color); transition: color 0.2s ease; }
+        .sidebar ul li a:hover { background-color: rgba(0, 123, 255, 0.08); color: var(--link-hover-color); }
+        .sidebar ul li a:hover i { color: var(--link-hover-color); }
+        .sidebar ul li a.active { background-color: var(--primary-color); color: #ffffff; font-weight: 600; }
+         .sidebar ul li a.active i { color: #ffffff; }
+         .sidebar .logout-link { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .sidebar .logout-link a { color: var(--danger-color); }
+         .sidebar .logout-link a i { color: var(--danger-color); }
+        .sidebar .logout-link a:hover { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-hover-color); }
+         .sidebar .logout-link a:hover i { color: var(--danger-hover-color); }
+
+
+        /* Content Area */
+        .content { flex-grow: 1; padding: 25px 30px; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left 0.3s ease; }
+        .content header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) var(--transition-easing); }
+         .content header h1 { margin: 0 0 5px 0; font-size: 1.9em; font-weight: 600; }
+         .content header p { margin: 0; color: var(--text-muted-color); font-size: 1rem; }
+
+        /* General Card Styling */
+         .card {
+             border: 1px solid var(--border-color);
+             padding: 25px 30px;
+             margin-bottom: 30px;
+             background-color: var(--card-bg-color);
+             border-radius: var(--border-radius-lg);
+             box-shadow: var(--box-shadow);
+             transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+         }
+         .card h2, .card h3 {
+             margin-top: 0;
+             margin-bottom: 20px; /* Consistent spacing */
+             font-weight: 600;
+             display: flex;
+             align-items: center;
+             gap: 10px;
+         }
+         .card h2 { font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+         .card h3 { font-size: 1.3em; }
+         .card h2 i, .card h3 i { font-size: 1.1em; } /* Slightly larger icons */
+
+
+        /* Cash Status Section */
+         .cash-status { /* Use card styles */ }
+         .cash-status-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+             gap: 20px; /* Increased gap */
+             margin-top: 15px; /* Space below header */
+         }
+        .status-item { display: flex; flex-direction: column; }
+         .status-item strong { font-size: 0.85em; /* Smaller label */ color: var(--text-muted-color); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+         .status-item span { font-size: 1.25em; /* Larger value */ font-weight: 500; }
+         #status-text.open { color: var(--success-color); font-weight: bold; }
+         #status-text.closed { color: var(--danger-color); font-weight: bold; }
+
+        /* Cash Actions (Open/Close Forms) */
+         .cash-actions > div { /* Use card styles */ }
+         #open-cash-section h3 i { color: var(--success-color); }
+         #close-cash-section h3 i { color: var(--danger-color); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted-color); }
+         .input-with-suffix { display: flex; align-items: center; max-width: 300px; /* Limit width on desktop */ }
+         .input-with-suffix input { flex-grow: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+         .input-with-suffix span { padding: 11px 15px; /* Match input padding */ background-color: var(--bg-color); border: 1px solid var(--input-border-color); border-left: none; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; font-size: 1rem; color: var(--text-muted-color); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+        .form-group input[type="number"] {
+            padding: 11px 15px; /* Adjusted padding */
+            box-sizing: border-box;
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius-md);
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+         .form-group input[type="number"]:focus { border-color: var(--input-focus-border-color); outline: none; box-shadow: 0 0 0 3px var(--input-focus-shadow-color); }
+
+         .action-button {
+            padding: 11px 22px; /* Slightly adjusted */
+            font-size: 1rem; /* Consistent font size */
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease-out; /* Faster transition */
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+            line-height: 1.5; /* Ensure text vertical alignment */
+         }
+          .action-button .spinner { font-size: 0.9em; }
+          .open-cash { background-color: var(--success-color); color: white; }
+          .open-cash:hover:not(:disabled) { background-color: var(--success-hover-color); transform: translateY(-2px); box-shadow: 0 3px 6px rgba(40, 167, 69, 0.2); }
+          .close-cash { background-color: var(--danger-color); color: white; }
+          .close-cash:hover:not(:disabled) { background-color: var(--danger-hover-color); transform: translateY(-2px); box-shadow: 0 3px 6px rgba(220, 53, 69, 0.2); }
+           .download-summary { background-color: var(--info-color); color: white; }
+          .download-summary:hover:not(:disabled) { background-color: var(--info-hover-color); transform: translateY(-2px); box-shadow: 0 3px 6px rgba(23, 162, 184, 0.2); }
+           .action-button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+           .action-button:disabled { background-color: var(--secondary-color); opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+
+         /* Summary Section within Close Form */
+        .summary-section { margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; transition: border-color var(--transition-speed) ease; }
+        .summary-section h4 { margin-top: 0; margin-bottom: 15px; font-weight: 600; color: var(--text-muted-color); text-transform: uppercase; font-size: 0.9em; letter-spacing: 0.5px; }
+        .summary-section p { margin: 6px 0; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
+         .summary-section .label { color: var(--text-muted-color); min-width: 180px; font-size: 0.95em; } /* For alignment */
+         .summary-section .value { font-weight: 500; text-align: right; }
+         #summary-expected { font-size: 1.15em; color: var(--primary-color); font-weight: bold; }
+         .difference { font-weight: bold; font-size: 1.1em; }
+         .difference.positive { color: var(--success-color); }
+         .difference.negative { color: var(--danger-color); }
+         .summary-section hr { border: none; border-top: 1px dashed var(--border-color); margin: 12px 0; }
+
+        /* History Section */
+        .cash-history { /* Use card styles */ }
+        .table-container { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); /* Match other elements */ overflow: auto; /* Enable scroll */ box-shadow: var(--box-shadow); margin-bottom: 25px; transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+        #history-table { width: 100%; border-collapse: collapse; margin: 0; min-width: 900px; /* Ensure minimum width for horizontal scroll */ }
+        #history-table th, #history-table td { padding: 12px 15px; /* Increased padding */ text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9em; white-space: nowrap; /* Prevent wrapping */ transition: border-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+        #history-table th { background-color: rgba(0,0,0,0.02); body.dark-theme & { background-color: rgba(255,255,255,0.03); } font-weight: 600; color: var(--text-muted-color); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; /* Make header sticky during scroll */ z-index: 1; }
+        #history-table tbody tr:hover { background-color: rgba(0, 0, 0, 0.02); body.dark-theme & { background-color: rgba(255, 255, 255, 0.04); } }
+        #history-table tbody tr:last-child td { border-bottom: none; }
+         #history-table td.positive { color: var(--success-color); font-weight: 500; }
+         #history-table td.negative { color: var(--danger-color); font-weight: 500; }
+         #history-table td:nth-child(4), /* Align currency columns right */
+         #history-table td:nth-child(5),
+         #history-table td:nth-child(6),
+         #history-table td:nth-child(7),
+         #history-table td:nth-child(8),
+         #history-table td:nth-child(9) { text-align: right; }
+         #history-table th:nth-child(4), /* Align headers too */
+         #history-table th:nth-child(5),
+         #history-table th:nth-child(6),
+         #history-table th:nth-child(7),
+         #history-table th:nth-child(8),
+         #history-table th:nth-child(9) { text-align: right; }
+
+        /* Error & Messages */
+        .error { color: var(--danger-color); font-size: 0.88em; margin-top: 15px; background-color: rgba(220, 53, 69, 0.08); border: 1px solid rgba(220, 53, 69, 0.15); padding: 10px 15px; border-radius: var(--border-radius-md); text-align: left; transition: all var(--transition-speed) ease; display: flex; align-items: center; gap: 8px; }
+        .error i { font-size: 1.1em; }
+        .error.hidden { display: none; opacity: 0; }
+        .error:not(.hidden) { opacity: 1; }
+        #no-history-message { text-align: center; padding: 25px; color: var(--text-muted-color); background-color: rgba(0,0,0,0.015); border-radius: var(--border-radius-md); }
+
+         /* Theme Toggle Button (Consistent Style) */
+         .theme-toggle { position: fixed; top: 15px; right: 15px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--text-color); font-size: 1.2em; transition: all var(--transition-speed) ease; z-index: 1030; /* High z-index */ }
+         .theme-toggle:hover { transform: scale(1.1) rotate(10deg); }
+         .theme-toggle i { transition: transform 0.4s ease-in-out; }
+         .theme-toggle.changing i { transform: scale(0); }
+
+         /* Responsive Adjustments */
+         @media (max-width: 992px) { /* Tablet and below */
+            :root { --sidebar-width: 70px; /* Collapsed sidebar width */ }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; }
+             .sidebar { padding: 15px 10px; }
+             .sidebar ul li a { justify-content: center; padding: 12px 10px; }
+             .sidebar ul li a i { font-size: 1.4em; /* Larger icons */ width: auto; }
+              .sidebar .logout-link { border-top: none; padding-top: 0; }
+             .sidebar .logout-link a { justify-content: center; padding: 12px 10px; }
+             .content { margin-left: var(--sidebar-width); }
+         }
+
+         @media (max-width: 768px) { /* Mobile */
+             :root { --sidebar-width: 0; /* Sidebar fully hidden */ }
+              body { flex-direction: column; } /* Stack sidebar and content */
+             .sidebar {
+                 width: 100%; height: auto; position: sticky; top: 0; /* Stick to top */
+                 border-right: none; border-bottom: 1px solid var(--border-color);
+                 flex-direction: row; overflow-x: auto; overflow-y: hidden;
+                 padding: 8px 10px; /* Reduced padding */
+                 box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                 justify-content: space-between; /* Space out items */
+                 white-space: nowrap; /* Prevent wrapping inside */
+             }
+             .sidebar h2, .sidebar .business-info, .sidebar ul li a span, .sidebar .logout-link span { display: none; } /* Ensure still hidden */
+             .sidebar ul { display: flex; flex-direction: row; flex-grow: 0; flex-wrap: nowrap; gap: 5px; /* Add gap between items */ }
+             .sidebar ul li { flex-shrink: 0; } /* Prevent items shrinking */
+             .sidebar ul li a { padding: 8px 10px; margin-bottom: 0; margin-right: 0; justify-content: center; }
+             .sidebar ul li a i { font-size: 1.3em; margin: 0; }
+             .sidebar ul li a.active { background-color: transparent; }
+             .sidebar ul li a.active i { color: var(--primary-color); }
+             .sidebar .logout-link { margin-top: 0; padding-top: 0; border-top: none; margin-left: auto; align-self: center; }
+             .sidebar .logout-link a { padding: 8px 10px; }
+
+             .content { margin-left: 0; padding: 20px 15px; }
+             .content header h1 { font-size: 1.6em; }
+             .content header p { font-size: 0.95rem; }
+
+             .card { padding: 20px; } /* Reduce card padding */
+             .card h2 { font-size: 1.3em; padding-bottom: 8px; }
+             .card h3 { font-size: 1.2em; }
+
+             .cash-status-grid { grid-template-columns: 1fr 1fr; gap: 15px; } /* Stack status better */
+             .status-item span { font-size: 1.15em; }
+             .input-with-suffix { max-width: none; } /* Allow full width */
+             .summary-section p { flex-direction: column; align-items: flex-start; gap: 3px; }
+             .summary-section .label { min-width: 0; font-size: 0.9em; }
+              .summary-section .value { text-align: left; font-size: 1em; }
+              .summary-section hr { margin: 10px 0; }
+
+             .action-button { width: 100%; margin-bottom: 10px; margin-right: 0; justify-content: center; } /* Stack buttons */
+             .cash-actions .action-button + .action-button { margin-top: 10px; } /* Space between stacked buttons */
+
+             .table-container { margin-left: -15px; margin-right: -15px; border-radius: 0; border-left: none; border-right: none; } /* Full width table container */
+             #history-table th, #history-table td { padding: 10px 12px; font-size: 0.85em; }
+             #history-table { min-width: 800px; } /* Adjust min-width if needed */
+
+             .theme-toggle { top: auto; bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 1.3em; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+         }
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+     <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+         <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" id="restaurant-link" class="hidden"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html" class="active"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Gestión de Caja</h1>
+            <p>Abre la caja al iniciar el día y ciérrala al terminar.</p>
+        </header>
+
+        <section class="cash-status card">
+            <h2><i class="fas fa-info-circle" style="color: var(--info-color);"></i> Estado Actual</h2>
+            <div class="cash-status-grid">
+                <div class="status-item">
+                    <strong>Estado:</strong>
+                    <span id="status-text" class="closed">Cerrada</span>
+                </div>
+                <div class="status-item">
+                    <strong>Abierta desde:</strong>
+                    <span id="open-time-text">-</span>
+                </div>
+                <div class="status-item">
+                    <strong>Fondo Inicial:</strong>
+                    <span id="initial-fund-text">-</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cash-actions">
+             <!-- Formulario para Abrir Caja -->
+            <div id="open-cash-section" class="card">
+                <h3><i class="fas fa-door-open"></i> Abrir Caja</h3>
+                <form id="open-cash-form" novalidate>
+                    <div class="form-group">
+                        <label for="initial-fund">Fondo Inicial (Efectivo):</label>
+                         <div class="input-with-suffix">
+                            <input type="number" id="initial-fund" step="0.01" min="0" required placeholder="0.00">
+                            <span class="currency-symbol">$</span>
+                         </div>
+                    </div>
+                    <p id="open-error" class="error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                    <button type="submit" id="open-cash-button" class="action-button open-cash">
+                        <i class="fas fa-play-circle"></i> <span class="button-text">Abrir Caja Ahora</span>
+                    </button>
+                </form>
+            </div>
+
+             <!-- Formulario para Cerrar Caja -->
+             <div id="close-cash-section" class="card hidden">
+                 <h3><i class="fas fa-door-closed"></i> Cerrar Caja</h3>
+                 <form id="close-cash-form" novalidate>
+                     <div class="summary-section">
+                         <h4>Resumen Calculado</h4>
+                         <p><span class="label">Fondo Inicial:</span> <span class="value" id="summary-initial">0.00</span></p>
+                         <p><span class="label">(+) Ventas Efectivo:</span> <span class="value" id="summary-cash-sales">0.00</span></p>
+                         <p><span class="label">(-) Gastos Efectivo:</span> <span class="value" id="summary-cash-expenses">0.00</span></p>
+                         <hr>
+                         <p><span class="label">(=) Efectivo Esperado:</span> <strong class="value" id="summary-expected">0.00</strong></p>
+                     </div>
+
+                     <div class="form-group" style="margin-top: 25px;">
+                         <label for="actual-cash">Conteo Real de Efectivo en Caja:</label>
+                         <div class="input-with-suffix">
+                            <input type="number" id="actual-cash" step="0.01" min="0" required placeholder="0.00">
+                            <span class="currency-symbol">$</span>
+                         </div>
+                     </div>
+
+                      <div class="summary-section">
+                         <h4>Resultado del Cierre</h4>
+                         <p><span class="label">Efectivo Contado:</span> <span class="value" id="summary-counted">0.00</span></p>
+                         <p><span class="label">Diferencia (Sobrante/Faltante):</span> <span id="summary-difference" class="value difference">0.00</span></p>
+                         <hr>
+                         <p><span class="label">Ventas Tarjeta:</span> <span class="value" id="summary-card-sales">0.00</span></p>
+                         <p><span class="label">Ventas Transferencia:</span> <span class="value" id="summary-transfer-sales">0.00</span></p>
+                     </div>
+
+                     <p id="close-error" class="error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                     <div style="margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px;">
+                        <button type="submit" id="close-cash-button" class="action-button close-cash">
+                            <i class="fas fa-stop-circle"></i> <span class="button-text">Confirmar Cierre</span>
+                        </button>
+                        <button type="button" id="download-summary-button" class="action-button download-summary hidden">
+                            <i class="fas fa-download"></i> <span class="button-text">Descargar Resumen</span>
+                        </button>
+                     </div>
+                 </form>
+             </div>
+        </section>
+
+        <section class="cash-history card">
+            <h2><i class="fas fa-history" style="color: var(--secondary-color);"></i> Historial de Cierres de Caja</h2>
+             <div class="table-container">
+                 <table id="history-table">
+                     <thead>
+                         <tr>
+                             <th scope="col">Fecha Cierre</th>
+                             <th scope="col">Hora Apertura</th>
+                             <th scope="col">Hora Cierre</th>
+                             <th scope="col">Fondo Inicial</th>
+                             <th scope="col">Efectivo Esperado</th>
+                             <th scope="col">Efectivo Contado</th>
+                             <th scope="col">Diferencia</th>
+                             <th scope="col">Ventas Tarjeta</th>
+                             <th scope="col">Ventas Transf.</th>
+                         </tr>
+                     </thead>
+                     <tbody id="history-table-body">
+                         <!-- Rows loaded by JS -->
+                     </tbody>
+                 </table>
+             </div>
+             <p id="no-history-message" class="hidden">Aún no hay cierres de caja registrados.</p>
+        </section>
+
+    </main>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Management ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const sunIcon = 'fa-sun';
+            const moonIcon = 'fa-moon';
+
+            function applyTheme(theme) {
+                body.classList.remove('dark-theme', 'light-theme');
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                    themeIcon.classList.remove(sunIcon);
+                    themeIcon.classList.add(moonIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro');
+                } else {
+                    body.classList.add('light-theme');
+                    themeIcon.classList.remove(moonIcon);
+                    themeIcon.classList.add(sunIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro');
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            function toggleTheme() {
+                 const currentTheme = localStorage.getItem('theme') || getDefaultTheme();
+                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                 themeToggleButton.classList.add('changing');
+                 themeIcon.style.transform = 'scale(0)';
+                 applyTheme(newTheme);
+                 setTimeout(() => {
+                     themeToggleButton.classList.remove('changing');
+                     themeIcon.style.transform = '';
+                 }, 400);
+             }
+
+            function getDefaultTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { return 'dark'; }
+                return 'light';
+            }
+            const savedTheme = localStorage.getItem('theme') || getDefaultTheme();
+            applyTheme(savedTheme);
+            themeToggleButton.addEventListener('click', toggleTheme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem('theme')) { applyTheme(e.matches ? 'dark' : 'light'); } });
+
+            // --- Config & Elements ---
+            let currency = '$';
+            const spinnerIcon = '<i class="fas fa-spinner fa-spin spinner"></i>';
+
+            // UI Elements
+            const statusText = document.getElementById('status-text');
+            const openTimeText = document.getElementById('open-time-text');
+            const initialFundText = document.getElementById('initial-fund-text');
+            const openCashSection = document.getElementById('open-cash-section');
+            const closeCashSection = document.getElementById('close-cash-section');
+            const openCashForm = document.getElementById('open-cash-form');
+            const closeCashForm = document.getElementById('close-cash-form');
+            const initialFundInput = document.getElementById('initial-fund');
+            const actualCashInput = document.getElementById('actual-cash');
+            const openCashButton = document.getElementById('open-cash-button');
+            const closeCashButton = document.getElementById('close-cash-button');
+            const downloadButton = document.getElementById('download-summary-button');
+            const historyTableBody = document.getElementById('history-table-body');
+            const noHistoryMessage = document.getElementById('no-history-message');
+            const openError = document.getElementById('open-error');
+            const closeError = document.getElementById('close-error');
+            const summaryInitial = document.getElementById('summary-initial');
+            const summaryCashSales = document.getElementById('summary-cash-sales');
+            const summaryCashExpenses = document.getElementById('summary-cash-expenses');
+            const summaryExpected = document.getElementById('summary-expected');
+            const summaryCounted = document.getElementById('summary-counted');
+            const summaryDifference = document.getElementById('summary-difference');
+            const summaryCardSales = document.getElementById('summary-card-sales');
+            const summaryTransferSales = document.getElementById('summary-transfer-sales');
+
+            // State Variables
+            let cashRegisterStatus = {};
+            let cashHistory = [];
+
+            // --- Utility Functions ---
+             const formatCurrency = (amount) => `${currency}${typeof amount === 'number' ? amount.toFixed(2) : '0.00'}`;
+             const showError = (el, message) => { el.querySelector('span').textContent = message; el.classList.remove('hidden'); };
+             const hideError = (el) => el.classList.add('hidden');
+             const setLoading = (button, text = "Procesando...") => { button.disabled = true; button.innerHTML = `${spinnerIcon} ${text}`; };
+             const clearLoading = (button, originalHTML) => { button.disabled = false; button.innerHTML = originalHTML; };
+
+            // --- Load Initial Data ---
+             function loadInitialConfig() {
+                try {
+                    const businessName = localStorage.getItem('businessName') || 'Mi Negocio';
+                    document.getElementById('business-name-sidebar').textContent = businessName;
+                    currency = localStorage.getItem('currency') || '$';
+                    document.querySelectorAll('.currency-symbol').forEach(el => el.textContent = currency);
+                    const isRestaurant = localStorage.getItem('businessType') === 'restaurant';
+                    document.getElementById('restaurant-link').classList.toggle('hidden', !isRestaurant);
+                } catch(e) {
+                    console.error("Error loading config:", e);
+                    showError(openError, "Error al cargar configuración inicial."); // Show error somewhere
+                 }
+            }
+
+            function loadCashRegisterState() {
+                 try {
+                     cashRegisterStatus = JSON.parse(localStorage.getItem('cashRegisterStatus') || '{}');
+                 } catch (e) {
+                     console.error("Error cargando estado de caja:", e);
+                     cashRegisterStatus = {};
+                     showError(openError, "Error al cargar estado de la caja.");
+                 }
+            }
+
+            function saveCashRegisterState() {
+                 try {
+                     localStorage.setItem('cashRegisterStatus', JSON.stringify(cashRegisterStatus));
+                 } catch (e) {
+                      console.error("Error guardando estado de caja:", e);
+                      const errorEl = cashRegisterStatus.isOpen ? closeError : openError;
+                      showError(errorEl, "Error al guardar el estado de la caja. ¿Almacenamiento lleno?");
+                      return false; // Indicate failure
+                 }
+                 return true; // Indicate success
+            }
+
+             function loadCashHistory() {
+                try {
+                    cashHistory = JSON.parse(localStorage.getItem('cashHistory') || '[]');
+                } catch (e) {
+                    console.error("Error cargando historial de caja:", e);
+                    cashHistory = [];
+                    showError(openError, "Error al cargar el historial de caja.");
+                }
+                renderHistoryTable(); // Render even if empty or error
+            }
+
+             function saveCashHistory() {
+                try {
+                    localStorage.setItem('cashHistory', JSON.stringify(cashHistory));
+                } catch (e) {
+                    console.error("Error guardando historial de caja:", e);
+                    showError(closeError, "Error al guardar el historial de caja. ¿Almacenamiento lleno?");
+                     return false;
+                }
+                 return true;
+            }
+
+            // --- Core Logic ---
+            function updateUI() {
+                 hideError(openError); // Hide errors on state change
+                 hideError(closeError);
+
+                if (cashRegisterStatus.isOpen) {
+                    statusText.textContent = 'Abierta';
+                    statusText.className = 'open';
+                    openTimeText.textContent = new Date(cashRegisterStatus.openTime).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                    initialFundText.textContent = formatCurrency(cashRegisterStatus.initialFund);
+
+                    openCashSection.classList.add('hidden');
+                    closeCashSection.classList.remove('hidden');
+
+                    calculateAndDisplaySummary(); // Calculate summary for closing
+                    downloadButton.classList.add('hidden'); // Hide download until closed
+                    actualCashInput.value = '';
+                    setTimeout(() => actualCashInput.focus(), 100); // Focus after UI update
+
+                } else {
+                    statusText.textContent = 'Cerrada';
+                    statusText.className = 'closed';
+                    openTimeText.textContent = '-';
+                    initialFundText.textContent = '-';
+
+                    openCashSection.classList.remove('hidden');
+                    closeCashSection.classList.add('hidden');
+                    openCashForm.reset();
+                    setTimeout(() => initialFundInput.focus(), 100);
+                }
+                renderHistoryTable();
+            }
+
+            function openCashRegister(initialFund) {
+                const originalButtonHTML = openCashButton.innerHTML;
+                setLoading(openCashButton, 'Abriendo...');
+
+                // Simulate async operation
+                setTimeout(() => {
+                    cashRegisterStatus = {
+                        isOpen: true,
+                        openTime: new Date().toISOString(),
+                        initialFund: initialFund
+                    };
+                    if (saveCashRegisterState()) {
+                        console.log("Caja abierta:", cashRegisterStatus);
+                        updateUI(); // Update UI after successful save
+                    } else {
+                        // Error already shown by saveCashRegisterState
+                        clearLoading(openCashButton, originalButtonHTML);
+                    }
+                }, 200); // Short delay for visual feedback
+            }
+
+             function calculateAndDisplaySummary() {
+                 const openTimestamp = cashRegisterStatus.isOpen ? new Date(cashRegisterStatus.openTime).getTime() : 0;
+                 let allSales = [], allExpenses = [];
+                 let errorReading = false;
+
+                 try { allSales = JSON.parse(localStorage.getItem('ventas') || '[]'); }
+                 catch(e) { console.error("Error reading sales", e); showError(closeError, "Error al leer ventas."); errorReading = true; }
+                 try { allExpenses = JSON.parse(localStorage.getItem('gastos') || '[]'); }
+                 catch(e) { console.error("Error reading expenses", e); showError(closeError, "Error al leer gastos."); errorReading = true; }
+
+                 if (errorReading) { return null; } // Stop calculation if data is corrupted/unreadable
+
+                 const salesSinceOpen = allSales.filter(sale => new Date(sale.fecha).getTime() >= openTimestamp);
+                 const expensesSinceOpen = allExpenses.filter(exp => new Date(exp.fecha).getTime() >= openTimestamp);
+
+                 let cashSalesTotal = 0, cardSalesTotal = 0, transferSalesTotal = 0;
+                 salesSinceOpen.forEach(sale => {
+                     const method = (sale.metodoPago || 'desconocido').toLowerCase();
+                     const total = sale.total || 0;
+                     if (method.includes('efectivo')) cashSalesTotal += total;
+                     else if (method.includes('tarjeta')) cardSalesTotal += total;
+                     else if (method.includes('transferencia')) transferSalesTotal += total;
+                     // Add handling for other methods if needed
+                 });
+
+                 let cashExpensesTotal = 0;
+                 expensesSinceOpen.forEach(exp => {
+                      const method = (exp.metodoPagoId || exp.metodoPago || 'desconocido').toLowerCase();
+                      const monto = exp.monto || 0;
+                     if (method.includes('efectivo')) cashExpensesTotal += monto;
+                 });
+
+                 const initialFund = cashRegisterStatus.initialFund || 0;
+                 const expectedCash = initialFund + cashSalesTotal - cashExpensesTotal;
+                 const actualCash = parseFloat(actualCashInput.value) || 0;
+                 const difference = actualCash - expectedCash;
+
+                 // Update UI elements
+                 summaryInitial.textContent = formatCurrency(initialFund);
+                 summaryCashSales.textContent = formatCurrency(cashSalesTotal);
+                 summaryCashExpenses.textContent = formatCurrency(cashExpensesTotal);
+                 summaryExpected.textContent = formatCurrency(expectedCash);
+                 summaryCardSales.textContent = formatCurrency(cardSalesTotal);
+                 summaryTransferSales.textContent = formatCurrency(transferSalesTotal);
+                 summaryCounted.textContent = formatCurrency(actualCash);
+                 summaryDifference.textContent = formatCurrency(difference);
+                 summaryDifference.className = 'value difference'; // Reset classes
+                 if (difference > 0.005) summaryDifference.classList.add('positive'); // Use small tolerance for floating point
+                 if (difference < -0.005) summaryDifference.classList.add('negative');
+
+                 return { initialFund, cashSalesTotal, cashExpensesTotal, expectedCash, cardSalesTotal, transferSalesTotal, difference, actualCash };
+            }
+
+            function closeCashRegister(actualCash) {
+                 if (!cashRegisterStatus.isOpen) {
+                     showError(closeError, "La caja ya está cerrada.");
+                     return;
+                 }
+
+                 const summaryData = calculateAndDisplaySummary(); // Recalculate final summary
+                 if (!summaryData) {
+                     showError(closeError, "No se pudo calcular el resumen final debido a errores previos.");
+                     return; // Stop if calculation failed
+                 }
+
+                 const originalButtonHTML = closeCashButton.innerHTML;
+                 setLoading(closeCashButton, 'Cerrando...');
+
+                 // Simulate async
+                 setTimeout(() => {
+                     const closeTime = new Date().toISOString();
+                     const closingRecord = {
+                         id: `cierre_${Date.now()}`,
+                         openTime: cashRegisterStatus.openTime,
+                         closeTime: closeTime,
+                         initialFund: summaryData.initialFund,
+                         cashSales: summaryData.cashSalesTotal,
+                         cashExpenses: summaryData.cashExpensesTotal,
+                         expectedCash: summaryData.expectedCash,
+                         countedCash: actualCash, // Use the validated actualCash
+                         difference: summaryData.difference, // Use the recalculated difference
+                         cardSales: summaryData.cardSalesTotal,
+                         transferSales: summaryData.transferSalesTotal,
+                     };
+
+                     cashHistory.push(closingRecord);
+
+                     if (saveCashHistory()) {
+                         cashRegisterStatus = { isOpen: false };
+                         if (saveCashRegisterState()) {
+                             console.log("Caja cerrada. Registro:", closingRecord);
+                             alert("Caja cerrada exitosamente.");
+                             updateUI(); // Update UI to reflect closed state
+                             downloadButton.classList.remove('hidden'); // Show download button
+                             // No need to clear loading, button section will be hidden
+                         } else {
+                              // Error saving state, revert history save (optional, could leave history inconsistent)
+                              cashHistory.pop(); // Remove the record we just added
+                              saveCashHistory(); // Try to save the reverted history
+                              clearLoading(closeCashButton, originalButtonHTML);
+                         }
+                     } else {
+                         // Error saving history
+                         clearLoading(closeCashButton, originalButtonHTML);
+                     }
+                 }, 200);
+            }
+
+             function renderHistoryTable() {
+                 historyTableBody.innerHTML = '';
+                 noHistoryMessage.classList.toggle('hidden', cashHistory.length > 0);
+
+                 if (cashHistory.length > 0) {
+                     // Sort by closeTime descending (most recent first)
+                     const sortedHistory = [...cashHistory].sort((a, b) => new Date(b.closeTime) - new Date(a.closeTime));
+
+                     sortedHistory.forEach(record => {
+                         const row = historyTableBody.insertRow();
+                         const diff = record.difference;
+                         const diffClass = diff > 0.005 ? 'positive' : (diff < -0.005 ? 'negative' : '');
+                         const formatTime = (isoString) => isoString ? new Date(isoString).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' }) : '-';
+                         const formatDate = (isoString) => isoString ? new Date(isoString).toLocaleDateString('es-ES') : '-';
+
+                         row.innerHTML = `
+                             <td>${formatDate(record.closeTime)}</td>
+                             <td>${formatTime(record.openTime)}</td>
+                             <td>${formatTime(record.closeTime)}</td>
+                             <td>${formatCurrency(record.initialFund)}</td>
+                             <td>${formatCurrency(record.expectedCash)}</td>
+                             <td>${formatCurrency(record.countedCash)}</td>
+                             <td class="${diffClass}">${formatCurrency(diff)}</td>
+                             <td>${formatCurrency(record.cardSales)}</td>
+                             <td>${formatCurrency(record.transferSales)}</td>
+                         `;
+                     });
+                 }
+             }
+
+             function downloadSummary() {
+                 // Find the most recently closed record (last one after sorting)
+                 if (cashHistory.length === 0) {
+                     alert("No hay historial de cierres para descargar."); return;
+                 }
+                  const sortedHistory = [...cashHistory].sort((a, b) => new Date(b.closeTime) - new Date(a.closeTime));
+                  const lastClosing = sortedHistory[0];
+
+                  if (!lastClosing || !lastClosing.closeTime) {
+                     alert("No se encontró el último registro de cierre válido."); return;
+                 }
+
+                 const formatDateTime = (isoString) => isoString ? new Date(isoString).toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short'}) : '-';
+                 const diffText = lastClosing.difference > 0.005 ? 'SOBRANTE' : lastClosing.difference < -0.005 ? 'FALTANTE' : 'EXACTO';
+
+                 let summaryContent = `Resumen de Caja - Cierre ${formatDateTime(lastClosing.closeTime)}\n`;
+                 summaryContent += "=================================================\n";
+                 summaryContent += ` Apertura:          ${formatDateTime(lastClosing.openTime)}\n`;
+                 summaryContent += ` Cierre:            ${formatDateTime(lastClosing.closeTime)}\n`;
+                 summaryContent += "-------------------- EFECTIVO -------------------\n";
+                 summaryContent += ` Fondo Inicial:       ${formatCurrency(lastClosing.initialFund)}\n`;
+                 summaryContent += ` (+) Ventas Efectivo: ${formatCurrency(lastClosing.cashSales)}\n`;
+                 summaryContent += ` (-) Gastos Efectivo: ${formatCurrency(lastClosing.cashExpenses)}\n`;
+                 summaryContent += ` (=) Efectivo Esperado:${formatCurrency(lastClosing.expectedCash)}\n`;
+                 summaryContent += "-------------------- CIERRE ---------------------\n";
+                 summaryContent += ` Efectivo Contado:    ${formatCurrency(lastClosing.countedCash)}\n`;
+                 summaryContent += ` Diferencia:          ${formatCurrency(lastClosing.difference)} (${diffText})\n`;
+                 summaryContent += "----------------- OTROS METODOS -----------------\n";
+                 summaryContent += ` Ventas Tarjeta:      ${formatCurrency(lastClosing.cardSales)}\n`;
+                 summaryContent += ` Ventas Transferencia:${formatCurrency(lastClosing.transferSales)}\n`;
+                 summaryContent += "=================================================\n";
+
+                 const blob = new Blob([summaryContent], { type: 'text/plain;charset=utf-8' });
+                 const link = document.createElement('a');
+                 link.href = URL.createObjectURL(blob);
+                 const dateStr = new Date(lastClosing.closeTime).toISOString().split('T')[0].replace(/-/g,'');
+                 link.download = `cierre_caja_${dateStr}.txt`;
+
+                 document.body.appendChild(link);
+                 link.click();
+                 document.body.removeChild(link);
+                 URL.revokeObjectURL(link.href); // Clean up blob URL
+
+                 console.log("Resumen de cierre descargado.");
+             }
+
+            // --- Event Listeners ---
+            openCashForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                hideError(openError);
+                const initialFund = parseFloat(initialFundInput.value);
+
+                if (isNaN(initialFund) || initialFund < 0) {
+                     showError(openError, 'El fondo inicial debe ser un número válido y no negativo.');
+                     initialFundInput.focus();
+                     return;
+                }
+                openCashRegister(initialFund);
+            });
+
+            closeCashForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 hideError(closeError);
+                 const actualCash = parseFloat(actualCashInput.value);
+
+                 if (isNaN(actualCash) || actualCash < 0) {
+                     showError(closeError, 'El conteo real de efectivo debe ser un número válido y no negativo.');
+                     actualCashInput.focus();
+                     return;
+                 }
+
+                 // Confirmation before closing
+                 const diff = (calculateAndDisplaySummary()?.difference ?? 0); // Recalculate difference for confirm message
+                 const diffMsg = diff > 0.005 ? ` Hay un SOBRANTE de ${formatCurrency(diff)}.` : diff < -0.005 ? ` Hay un FALTANTE de ${formatCurrency(Math.abs(diff))}.` : ' El conteo es EXACTO.';
+                 if (confirm(`¿Cerrar la caja con ${formatCurrency(actualCash)} contado?${diffMsg}\n\n¡Esta acción no se puede deshacer!`)) {
+                     closeCashRegister(actualCash);
+                 }
+            });
+
+             downloadButton.addEventListener('click', downloadSummary);
+
+             actualCashInput.addEventListener('input', () => {
+                if (cashRegisterStatus.isOpen) {
+                    calculateAndDisplaySummary(); // Recalculate summary including difference dynamically
+                }
+            });
+
+            document.getElementById('logout-button')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (cashRegisterStatus.isOpen) {
+                    alert("¡Atención! La caja está abierta.\nDebes cerrarla antes de salir para asegurar la consistencia de los datos.");
+                } else if (confirm('¿Estás seguro de que quieres salir?')) {
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // --- Initial Load ---
+            loadInitialConfig();
+            loadCashRegisterState();
+            loadCashHistory();
+            updateUI(); // Initial UI setup based on loaded state
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

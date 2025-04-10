@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a Gestiona Fácil (Beta)</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333333;
+            --text-light-color: #555555; /* Slightly lighter text for paragraphs */
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-color: #e0e0e0;
+            --border-radius-lg: 16px; /* Slightly less extreme radius */
+            --border-radius-md: 8px;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); /* Softer shadow */
+            --transition-speed: 0.3s;
+            --transition-easing: ease-in-out;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px; /* Add padding to body for spacing on small screens */
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        color var(--transition-speed) var(--transition-easing);
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Smooth Fade-in & Subtle Up Animation */
+        @keyframes fadeInScaleUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Icon Pop Animation */
+        @keyframes iconPop {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .beta-card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 30px 35px; /* Adjusted padding */
+            width: 100%; /* Take full width within padding */
+            max-width: 600px; /* Slightly smaller max-width */
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        border-color var(--transition-speed) var(--transition-easing);
+            animation: fadeInScaleUp 0.6s var(--transition-easing) forwards;
+            opacity: 0; /* Start hidden for animation */
+        }
+
+        .beta-card h1 {
+            color: var(--primary-color);
+            margin: 0 0 15px 0; /* Adjusted margin */
+            font-weight: 600;
+            font-size: 1.8rem; /* Responsive font size unit */
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        .beta-card p {
+            line-height: 1.7; /* Increased line height for readability */
+            margin-bottom: 18px;
+            font-size: 1rem;
+            color: var(--text-light-color); /* Lighter text for paragraphs */
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+        .beta-card p:last-of-type {
+             margin-bottom: 25px; /* More space before button */
+        }
+
+        .beta-card strong {
+            color: var(--danger-color);
+            font-weight: 600;
+            transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        .beta-card .icon-container {
+             margin-bottom: 20px;
+             animation: iconPop 0.5s ease-out 0.3s backwards; /* Delay icon pop slightly */
+        }
+
+        .beta-card .icon-container i {
+            font-size: 3.2rem; /* Slightly smaller icon */
+            color: var(--warning-color);
+            display: inline-block; /* Needed for transform */
+             transition: color var(--transition-speed) var(--transition-easing);
+        }
+
+        .beta-card .accept-button {
+            padding: 12px 28px; /* Adjusted padding */
+            font-size: 1.05rem; /* Adjusted font size */
+            font-weight: 500;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-lg); /* Match card rounding */
+            margin-top: 15px; /* Adjusted margin */
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        transform 0.2s ease-out, /* Faster transform */
+                        box-shadow 0.2s ease-out;
+            display: inline-block; /* Ensure margin-top works correctly */
+        }
+
+        .beta-card .accept-button:hover,
+        .beta-card .accept-button:focus {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-3px); /* Slightly more lift */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Add subtle glow */
+            outline: none; /* Remove focus outline if custom style is present */
+        }
+         .beta-card .accept-button:active {
+             transform: translateY(-1px); /* Press down effect */
+             box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+         }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            --bg-color: #121212; /* Darker background */
+            --card-bg-color: #1e1e1e; /* Slightly lighter card */
+            --text-color: #e0e0e0;
+            --text-light-color: #b0b0b0; /* Lighter grey for paragraphs */
+            --primary-color: #3498db;
+            --primary-hover-color: #5dade2;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --border-color: #333333; /* Darker border */
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Darker shadow */
+        }
+
+         /* Theme Toggle Button */
+         .theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 45px; /* Slightly larger */
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            color: var(--text-color);
+            font-size: 1.3em;
+            transition: all var(--transition-speed) var(--transition-easing); /* Transition all properties */
+            z-index: 1000; /* Ensure it's above other elements */
+         }
+         .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg); /* Add rotation on hover */
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+            border-color: var(--primary-color); /* Highlight border on hover */
+            color: var(--primary-color);
+         }
+          .theme-toggle:active {
+            transform: scale(1.05) rotate(5deg); /* Press effect */
+          }
+
+         .theme-toggle i {
+             transition: transform 0.4s ease-in-out; /* Animate icon change */
+         }
+        .theme-toggle .fa-moon {
+            transform: rotate(0deg);
+        }
+        .theme-toggle .fa-sun {
+             transform: rotate(0deg);
+        }
+        /* Hide icon briefly during swap animation */
+        .theme-toggle.changing i {
+            transform: scale(0);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px; /* Reduce body padding */
+                align-items: flex-start; /* Align card to top on mobile */
+                padding-top: 80px; /* Ensure space below fixed theme toggle */
+            }
+            .beta-card {
+                padding: 25px 20px; /* Reduce card padding */
+                max-width: 100%; /* Allow card to fill width */
+                margin-top: 0; /* Remove potential top margin */
+            }
+            .beta-card h1 {
+                font-size: 1.6rem; /* Slightly smaller heading */
+            }
+            .beta-card p {
+                font-size: 0.95rem; /* Slightly smaller text */
+                line-height: 1.6;
+            }
+            .beta-card .icon-container i {
+                font-size: 2.8rem; /* Smaller icon */
+            }
+            .beta-card .accept-button {
+                padding: 12px 24px;
+                font-size: 1rem;
+                width: 100%; /* Make button full width */
+                max-width: 300px; /* But limit its max width */
+                margin-top: 20px;
+            }
+             .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+             }
+        }
+
+    </style>
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+    <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <div class="beta-card">
+        <div class="icon-container">
+             <i class="fas fa-exclamation-triangle"></i> <!-- Font Awesome Icon -->
+        </div>
+        <h1>¡Bienvenido a Gestiona Fácil (Beta)!</h1>
+        <p>Gracias por probar nuestra aplicación de gestión simplificada para pequeños negocios.</p>
+        <p>
+            Esta versión es una <strong>BETA</strong> y se encuentra en constante desarrollo y actualización.
+        </p>
+        <p>
+            <strong>Importante:</strong> Esta aplicación utiliza el <strong>almacenamiento local de tu navegador</strong>
+            para guardar todos los datos de tu negocio (productos, ventas, gastos, etc.).
+        </p>
+        <p>
+            Esto significa que los datos <strong>solo existen en ESTA computadora y ESTE navegador</strong>. Si limpias la
+            caché del navegador, cambias de computadora o tu disco duro falla, <strong>¡podrías PERDER TODOS TUS DATOS!</strong>
+        </p>
+        <p>
+            Te recomendamos <strong>encarecidamente</strong> que utilices la función de <strong>"Exportar Datos (Backup)"</strong>
+            en la sección de Configuración <strong>REGULARMENTE</strong> (¡idealmente todos los días!) y guardes ese archivo
+            en un lugar seguro (un pendrive, la nube, otro disco).
+        </p>
+        <button id="accept-button" class="accept-button">Entendido, continuar</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const acceptButton = document.getElementById('accept-button');
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const themeIcon = themeToggleButton.querySelector('i');
+
+            const sunIcon = 'fa-sun';
+            const moonIcon = 'fa-moon';
+
+            // Function to apply the theme
+            function applyTheme(theme) {
+                body.classList.remove('dark-theme', 'light-theme'); // Clear existing theme classes
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                    themeIcon.classList.remove(sunIcon);
+                    themeIcon.classList.add(moonIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema claro');
+                } else {
+                    body.classList.add('light-theme'); // Explicitly add light-theme if needed for styles
+                    themeIcon.classList.remove(moonIcon);
+                    themeIcon.classList.add(sunIcon);
+                    themeToggleButton.setAttribute('aria-label', 'Cambiar a tema oscuro');
+                }
+                // Store the preference
+                localStorage.setItem('theme', theme);
+            }
+
+            // Function to toggle theme
+            function toggleTheme() {
+                 const currentTheme = localStorage.getItem('theme') || getDefaultTheme();
+                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+                 // Add class for transition effect
+                 themeToggleButton.classList.add('changing');
+                 themeIcon.style.transform = 'scale(0)'; // Scale down icon
+
+                 applyTheme(newTheme);
+
+                 // Remove transition class after animation
+                 setTimeout(() => {
+                     themeToggleButton.classList.remove('changing');
+                      themeIcon.style.transform = ''; // Reset transform
+                 }, 400); // Match CSS transition duration
+             }
+
+            // Function to get default theme (OS preference or fallback)
+            function getDefaultTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light'; // Default to light
+            }
+
+            // Initialize theme on load
+            const savedTheme = localStorage.getItem('theme');
+            const initialTheme = savedTheme || getDefaultTheme();
+            applyTheme(initialTheme);
+
+             // Check for changes in OS preference
+             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                // Only change if no theme is explicitly saved by the user
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(event.matches ? 'dark' : 'light');
+                }
+             });
+
+
+            // Add event listener for theme toggle button
+            themeToggleButton.addEventListener('click', toggleTheme);
+
+            // Redirect logic for the accept button
+            acceptButton.addEventListener('click', () => {
+                // Optional: Add a small visual feedback before redirecting
+                acceptButton.style.opacity = '0.8';
+                acceptButton.textContent = 'Redirigiendo...';
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 150); // Short delay
+            });
+        });
+    </script>
+
+</body>
+</html>

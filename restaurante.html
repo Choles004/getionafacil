@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante - Gestiona Fácil</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="restaurante.css">
+</head>
+<body class=""> <!-- Theme class added by JS -->
+
+     <!-- Theme toggle button -->
+    <button id="theme-toggle-button" class="theme-toggle" title="Cambiar Tema" aria-label="Cambiar entre tema claro y oscuro">
+        <i class="fas fa-sun"></i> <!-- Initial icon state -->
+    </button>
+
+    <nav class="sidebar">
+        <h2>Gestiona Fácil</h2>
+        <div class="business-info">
+            <small id="business-name-sidebar">Cargando...</small>
+         </div>
+        <ul>
+            <!-- Added fa-fw -->
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt fa-fw"></i> <span>Dashboard</span></a></li>
+            <li><a href="nueva_venta.html"><i class="fas fa-cash-register fa-fw"></i> <span>Nueva Venta</span></a></li>
+            <li><a href="restaurante.html" class="active" id="restaurant-link"><i class="fas fa-utensils fa-fw"></i> <span>Restaurante</span></a></li>
+            <li><a href="caja.html"><i class="fas fa-cash-register fa-fw"></i> <span>Caja</span></a></li>
+            <li><a href="productos.html"><i class="fas fa-box-open fa-fw"></i> <span>Productos</span></a></li>
+            <li><a href="inventario.html"><i class="fas fa-clipboard-list fa-fw"></i> <span>Inventario</span></a></li>
+            <li><a href="proveedores.html"><i class="fas fa-truck fa-fw"></i> <span>Proveedores</span></a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> <span>Clientes</span></a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> <span>Gastos</span></a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> <span>Reportes</span></a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cog fa-fw"></i> <span>Configuración</span></a></li>
+        </ul>
+         <div class="logout-link">
+             <a href="login.html" id="logout-button"><i class="fas fa-sign-out-alt fa-fw"></i> <span>Salir</span></a>
+         </div>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1><i class="fas fa-utensils"></i> Gestión de Mesas y Pedidos</h1>
+             <div class="header-controls">
+                 <button id="manage-menu-button" class="action-button" style="background-color: var(--secondary-color); color: white;">
+                     <i class="fas fa-book-open"></i> Administrar Menú
+                 </button>
+                 <button id="manage-tables-button" class="action-button" style="background-color: var(--secondary-color); color: white;">
+                     <i class="fas fa-chair"></i> Administrar Mesas
+                 </button>
+                 <!-- Delivery Button -->
+                 <button id="manage-delivery-button" class="action-button" style="background-color: var(--info-color); color: white;">
+                     <i class="fas fa-motorcycle"></i> Domicilios
+                 </button>
+             </div>
+        </header>
+
+        <div class="restaurant-layout">
+            <section class="tables-view">
+                <h2><i class="fas fa-th"></i> Vista de Mesas</h2>
+                 <p id="no-tables-view-msg" class="report-message hidden">No hay mesas configuradas. Ve a "Administrar Mesas".</p>
+                <div class="tables-grid" id="tables-grid-container">
+                    <!-- Tables loaded by JS -->
+                </div>
+            </section>
+
+            <section class="table-order-details hidden" id="order-details-section">
+                 <div class="details-header">
+                    <h3 id="details-order-title">Selecciona Mesa/Pedido</h3>
+                     <small id="details-order-status">Estado: -</small>
+                 </div>
+
+                 <!-- Delivery Info Block (Initially Hidden) -->
+                 <div class="delivery-info-block hidden" id="details-delivery-info">
+                     <p><strong>Cliente:</strong> <span id="details-delivery-customer">N/A</span></p>
+                     <p><strong>Teléfono:</strong> <span id="details-delivery-phone">N/A</span></p>
+                     <p><strong>Dirección:</strong> <span id="details-delivery-address">N/A</span></p>
+                      <p><strong>Notas:</strong> <span id="details-delivery-notes">N/A</span></p>
+                 </div>
+
+                 <div class="details-content">
+                     <!-- Order taking section -->
+                      <div id="order-taking-section">
+                         <h4>Añadir al Pedido</h4>
+                         <div style="position: relative;"> <!-- Wrapper for search results positioning -->
+                            <input type="search" id="order-product-search" placeholder="Buscar producto/plato...">
+                            <div id="order-search-results" style="position: absolute; top: 100%; left:0; right: 0; z-index: 5; max-height: 200px;"></div>
+                         </div>
+                      </div>
+
+                     <!-- Current Order -->
+                      <div style="margin-top: 20px; flex-grow: 1; display: flex; flex-direction: column;">
+                         <h4>Pedido Actual</h4>
+                         <ul id="order-items">
+                              <p id="order-empty-msg" class="no-results" style="padding: 15px;">No hay items en este pedido.</p>
+                              <!-- Items loaded by JS -->
+                         </ul>
+                          <div id="order-timestamps">
+                              <!-- Timestamps loaded/updated by JS -->
+                          </div>
+                      </div>
+                 </div>
+                 <div class="details-footer">
+                      <div class="totals">
+                         <p><span>Subtotal:</span> <span id="order-subtotal">--.--</span></p>
+                         <p><strong><span>Total:</span> <strong id="order-total">--.--</strong></strong></p>
+                     </div>
+                     <div class="payment">
+                         <h4>Método de Pago</h4>
+                         <div class="payment-methods">
+                             <button class="payment-method action-button" data-method="Efectivo"><i class="fas fa-money-bill-wave"></i> Efectivo</button>
+                             <button class="payment-method action-button" data-method="Tarjeta"><i class="fas fa-credit-card"></i> Tarjeta</button>
+                             <button class="payment-method action-button" data-method="Transferencia"><i class="fas fa-exchange-alt"></i> Transferencia</button>
+                              <!-- Pay on Delivery Option (Contextual) -->
+                              <button class="payment-method action-button hidden" data-method="PagoEntrega"><i class="fas fa-hand-holding-usd"></i> Pago en Entrega</button>
+                         </div>
+                         <span id="order-selected-payment-method"></span>
+
+                         <div id="order-cash-details" class="cash-details hidden">
+                             <label for="order-cash-received">Efectivo Recibido:</label>
+                             <input type="number" id="order-cash-received" step="0.01" min="0" placeholder="0.00">
+                             <p>Cambio: <strong id="order-change-due">--.--</strong></p>
+                         </div>
+                     </div>
+                      <p id="order-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                      <!-- Button text will change based on context -->
+                     <button id="pay-button" class="action-button save-button" style="width: 100%; margin-top: 15px;" disabled>
+                         <i class="fas fa-check-circle"></i> <span class="button-text">Cobrar y Cerrar Cuenta</span>
+                     </button>
+                      <!-- Button text will change based on context -->
+                      <button id="release-table-button" class="action-button cancel-button" style="background-color: var(--secondary-color); color: white; width: 100%; margin-top: 10px;" disabled>
+                          <i class="fas fa-undo"></i> <span class="button-text">Liberar Mesa (Sin Cobrar)</span>
+                     </button>
+                      <!-- Print Buttons (Initially Hidden/Disabled) -->
+                      <div id="print-buttons-container" style="margin-top: 10px; display: flex; gap: 10px;" class="hidden">
+                          <button id="print-kitchen-button" class="action-button" style="background-color: var(--secondary-color); color:white; flex-grow: 1;">
+                              <i class="fas fa-print"></i> Cocina
+                          </button>
+                          <button id="print-delivery-button" class="action-button" style="background-color: var(--secondary-color); color:white; flex-grow: 1;">
+                              <i class="fas fa-receipt"></i> Domicilio
+                           </button>
+                      </div>
+                 </div>
+            </section>
+        </div> <!-- Fin restaurant-layout -->
+
+        <!-- Menu Management Modal -->
+        <div id="menu-modal" class="modal">
+            <div class="modal-content">
+                 <span class="modal-close" onclick="hideModal('menu-modal')">&times;</span>
+                 <div class="modal-header">
+                    <h3><i class="fas fa-book-open"></i> Administrar Menú (Productos)</h3>
+                 </div>
+                 <div class="modal-body">
+                    <p><small>Agrega, edita o elimina los productos/platos disponibles para la venta. Esto usa la misma lista de Productos de la aplicación.</small></p>
+                    <button class="action-button add-product-button" style="background-color: var(--primary-color); color: white; margin-bottom: 15px;" onclick="window.location.href='productos.html#add'"><i class="fas fa-plus"></i> Ir a Agregar Producto</button>
+                     <div class="table-container">
+                         <div class="table-wrapper">
+                             <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Precio</th>
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menu-items-table-body">
+                                    <!-- Menu items (products) loaded by JS -->
+                                </tbody>
+                             </table>
+                         </div>
+                     </div>
+                     <p id="no-menu-items-msg" class="report-message hidden">No hay productos registrados.</p>
+                </div>
+                 <!-- No specific footer actions needed here -->
+            </div>
+        </div>
+
+        <!-- Table Management Modal -->
+         <div id="table-modal" class="modal">
+            <div class="modal-content">
+                 <span class="modal-close" onclick="hideModal('table-modal')">&times;</span>
+                 <div class="modal-header">
+                    <h3 id="table-form-title"><i class="fas fa-chair"></i> Administrar Mesas</h3>
+                 </div>
+                 <div class="modal-body">
+                     <form id="table-form" novalidate>
+                         <input type="hidden" id="table-id">
+                         <div class="form-group">
+                             <label for="table-name">Nombre/Número de Mesa:</label>
+                             <div class="input-group">
+                                 <i class="fas fa-tag fa-fw"></i>
+                                 <input type="text" id="table-name" required placeholder="Ej: Mesa 5, Barra 1">
+                             </div>
+                         </div>
+                         <!-- Add more fields like capacity if needed -->
+                          <p id="table-form-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                         <div class="form-actions">
+                            <button type="submit" id="save-table-button" class="action-button save-button">
+                                 <i class="fas fa-save"></i> <span class="button-text">Guardar Mesa</span>
+                            </button>
+                             <button type="button" onclick="resetTableForm()" class="action-button cancel-button">
+                                  <i class="fas fa-times"></i> <span class="button-text">Cancelar</span>
+                             </button>
+                        </div>
+                     </form>
+                     <hr style="margin: 25px 0; border-top: 1px dashed var(--border-color);">
+                     <h4>Mesas Existentes</h4>
+                     <div class="table-container">
+                         <div class="table-wrapper">
+                             <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre/Número</th>
+                                        <th scope="col" style="width: 100px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tables-list-body">
+                                    <!-- Tables loaded by JS -->
+                                </tbody>
+                            </table>
+                         </div>
+                    </div>
+                     <p id="no-tables-msg" class="report-message hidden">No hay mesas creadas.</p>
+                 </div>
+                 <!-- No specific footer actions needed here -->
+            </div>
+        </div>
+
+         <!-- Delivery Management Modal -->
+         <div id="delivery-modal" class="modal">
+            <div class="modal-content" style="max-width: 800px;"> <!-- Wider modal for deliveries -->
+                 <span class="modal-close" onclick="hideModal('delivery-modal')">&times;</span>
+                 <div class="modal-header">
+                    <h3><i class="fas fa-motorcycle"></i> Gestión de Domicilios</h3>
+                    <button id="new-delivery-order-button" class="action-button" style="background-color: var(--primary-color); color: white;">
+                        <i class="fas fa-plus"></i> Nuevo Pedido Domicilio
+                    </button>
+                 </div>
+                 <div class="modal-body">
+                     <!-- Add filters/search later if needed -->
+                     <div id="delivery-orders-list">
+                         <!-- Delivery orders loaded by JS -->
+                         <p id="no-delivery-orders-msg" class="report-message">No hay pedidos de domicilio activos.</p>
+                     </div>
+                 </div>
+            </div>
+         </div>
+
+         <!-- New Delivery Order Modal -->
+         <div id="new-delivery-order-modal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="modal-close" onclick="hideModal('new-delivery-order-modal')">&times;</span>
+                <div class="modal-header">
+                    <h3 id="new-delivery-form-title"><i class="fas fa-plus-circle"></i> Nuevo Pedido a Domicilio</h3>
+                </div>
+                <form id="new-delivery-form" novalidate>
+                    <div class="modal-body">
+                        <input type="hidden" id="delivery-order-id"> <!-- For potential editing later -->
+                        <h4>Datos del Cliente</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="delivery-customer-name">Nombre Cliente:</label>
+                                <div class="input-group">
+                                    <i class="fas fa-user fa-fw"></i>
+                                    <input type="text" id="delivery-customer-name" required placeholder="Nombre completo">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="delivery-customer-phone">Teléfono:</label>
+                                <div class="input-group">
+                                    <i class="fas fa-phone fa-fw"></i>
+                                    <input type="tel" id="delivery-customer-phone" required placeholder="Número de contacto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="delivery-customer-address">Dirección de Entrega:</label>
+                            <div class="input-group">
+                                <i class="fas fa-map-marker-alt fa-fw"></i>
+                                <input type="text" id="delivery-customer-address" required placeholder="Calle, Número, Colonia, Referencia">
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="delivery-notes">Notas Adicionales:</label>
+                             <textarea id="delivery-notes" rows="2" placeholder="Ej: Timbre no funciona, Casa azul, Pagar con $500"></textarea>
+                        </div>
+
+                        <h4>Pago</h4>
+                         <div class="form-group">
+                             <label>Método de Pago Inicial:</label>
+                             <select id="delivery-initial-payment-method">
+                                 <option value="PagoEntregaEfectivo">Pago en Entrega (Efectivo)</option>
+                                 <option value="PagoEntregaTarjeta">Pago en Entrega (Tarjeta)</option>
+                                 <option value="Transferencia">Transferencia (Ya pagado)</option>
+                                  <!-- Add other pre-paid methods if needed -->
+                             </select>
+                         </div>
+
+                        <p id="new-delivery-form-error" class="message error hidden" aria-live="polite"><i class="fas fa-exclamation-circle"></i> <span></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="save-delivery-order-button" class="action-button save-button">
+                            <i class="fas fa-save"></i> <span class="button-text">Crear Pedido</span>
+                        </button>
+                        <button type="button" onclick="hideModal('new-delivery-order-modal'); resetNewDeliveryForm();" class="action-button cancel-button">
+                             <i class="fas fa-times"></i> <span class="button-text">Cancelar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+         </div>
+
+    </main>
+
+    <!-- Link to External JS -->
+    <script src="restaurante.js"></script>
+
+</body>
+</html>
