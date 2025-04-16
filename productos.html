@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Productos</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa; /* Bootstrap light grey */
+            --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef;
+            --sidebar-link-active-bg-light: #0d6efd; /* Bootstrap primary */
+            --sidebar-link-active-color-light: #ffffff;
+
+            --sidebar-bg-dark: #212529; /* Bootstrap dark */
+            --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40;
+            --sidebar-link-active-bg-dark: #0d6efd; /* Bootstrap primary */
+            --sidebar-link-active-color-dark: #ffffff;
+        }
+
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        .sidebar {
+            width: var(--sidebar-width); flex-shrink: 0;
+            background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex; flex-direction: column; height: 100vh;
+            position: sticky; top: 0; border-right: 1px solid var(--bs-border-color);
+        }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Productos */
+        #product-form-container { display: none; } /* Oculto por defecto */
+        .table th, .table td { vertical-align: middle; }
+        .table .action-buttons a, .table .action-buttons button {
+            margin-right: 5px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        /* Ocultar campos condicionales por defecto */
+        #container-fields, #stock-fields { display: none; }
+
+        /* Estilo para unidades con detalle */
+        .unit-display .unit-container-details {
+            font-size: 0.8em;
+            color: var(--bs-secondary-color);
+            display: block; /* Nueva línea */
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+         }
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link active" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a>
+             <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+            <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Gestión de Productos y Servicios</h1>
+
+            <!-- Barra de Acciones -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <button id="add-product-button" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
+                </button>
+                <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="search-input" class="form-control" placeholder="Buscar producto...">
+                </div>
+                 <button id="download-csv-button" class="btn btn-outline-secondary">
+                    <i class="fas fa-download me-1"></i> Descargar CSV
+                </button>
+            </div>
+
+            <!-- Formulario Agregar/Editar Producto (Oculto por defecto) -->
+            <div class="card mb-3 shadow-sm" id="product-form-container">
+                <div class="card-header">
+                    <h5 class="mb-0" id="form-title">Agregar Nuevo Producto/Servicio</h5>
+                </div>
+                <div class="card-body">
+                    <form id="product-form" novalidate>
+                        <input type="hidden" id="product-id"> <!-- Para modo edición -->
+                        <div id="form-error-message" class="alert alert-danger d-none" role="alert"></div>
+
+                        <div class="row g-3">
+                            <!-- Columna Izquierda -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="product-name" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="product-name" required>
+                                    <div class="invalid-feedback">El nombre es obligatorio.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product-sku" class="form-label">SKU / Código de Barras (Opcional)</label>
+                                    <input type="text" class="form-control" id="product-sku">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product-unit" class="form-label">Unidad de Venta <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="product-unit" required>
+                                        <option value="" disabled selected>Seleccionar...</option>
+                                        <option value="Unidad">Unidad (Und)</option>
+                                        <option value="Paquete">Paquete (Paq)</option>
+                                        <option value="Caja">Caja (Cj)</option>
+                                        <option value="Kg">Kilogramo (Kg)</option>
+                                        <option value="Gr">Gramo (Gr)</option>
+                                        <option value="Litro">Litro (Lt)</option>
+                                        <option value="Ml">Mililitro (Ml)</option>
+                                        <option value="Metro">Metro (M)</option>
+                                        <option value="Cm">Centímetro (Cm)</option>
+                                        <option value="Servicio">Servicio</option>
+                                        <!-- Se pueden añadir más unidades -->
+                                    </select>
+                                    <div class="invalid-feedback">Debe seleccionar una unidad.</div>
+                                </div>
+                                <!-- Campos Condicionales para Contenedores -->
+                                <div id="container-fields" class="border p-2 rounded mb-3 bg-light">
+                                    <div class="mb-2">
+                                         <label for="product-units-per-container" class="form-label"><small>Unidades Individuales por <span class="container-unit-name">[Unidad]</span> <span class="text-danger">*</span></small></label>
+                                        <input type="number" step="1" min="1" class="form-control form-control-sm" id="product-units-per-container">
+                                         <div class="invalid-feedback">Indique cuántas unidades contiene.</div>
+                                    </div>
+                                    <div>
+                                         <label for="product-individual-unit-name" class="form-label"><small>Nombre de la Unidad Individual <span class="text-danger">*</span></small></label>
+                                         <input type="text" class="form-control form-control-sm" id="product-individual-unit-name" placeholder="Ej: Botella, Pieza, Sobre">
+                                         <div class="invalid-feedback">Indique el nombre de la unidad individual.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna Derecha -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                     <label for="product-sale-price" class="form-label">Precio Venta (<span id="sale-price-unit-label">por Unidad</span>) <span class="text-danger">*</span></label>
+                                     <div class="input-group">
+                                         <span class="input-group-text" id="currency-symbol-sale">$</span>
+                                         <input type="number" step="any" min="0" class="form-control" id="product-sale-price" required>
+                                         <div class="invalid-feedback">El precio de venta es obligatorio y debe ser >= 0.</div>
+                                     </div>
+                                     <div id="individual-price-display" class="form-text text-muted" style="display: none;"></div>
+                                </div>
+                                <div class="mb-3">
+                                     <label for="product-cost-price" class="form-label">Precio Costo (<span id="cost-price-unit-label">por Unidad</span>) (Opcional)</label>
+                                      <div class="input-group">
+                                         <span class="input-group-text" id="currency-symbol-cost">$</span>
+                                        <input type="number" step="any" min="0" class="form-control" id="product-cost-price">
+                                         <div class="invalid-feedback">El precio de costo debe ser >= 0.</div>
+                                      </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product-provider" class="form-label">Proveedor (Opcional)</label>
+                                    <select class="form-select" id="product-provider">
+                                        <option value="">Ninguno</option>
+                                        <!-- Opciones de proveedores se cargarán aquí -->
+                                    </select>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="manage-stock-checkbox">
+                                    <label class="form-check-label" for="manage-stock-checkbox">Gestionar Inventario</label>
+                                </div>
+                                <!-- Campos Condicionales para Inventario -->
+                                <div id="stock-fields" class="row g-2 border p-2 rounded bg-light">
+                                    <div class="col-6">
+                                        <label for="product-stock" class="form-label"><small>Stock Actual <span class="text-danger">*</span></small></label>
+                                        <input type="number" step="any" class="form-control form-control-sm" id="product-stock" value="0">
+                                        <div class="invalid-feedback">El stock es obligatorio.</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="product-minimum-stock" class="form-label"><small>Stock Mínimo</small></label>
+                                        <input type="number" step="any" min="0" class="form-control form-control-sm" id="product-minimum-stock" value="0">
+                                        <div class="invalid-feedback">El stock mínimo debe ser >= 0.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex justify-content-end">
+                             <button type="button" id="cancel-button" class="btn btn-secondary me-2">Cancelar</button>
+                             <button type="submit" id="save-button" class="btn btn-success">
+                                 <i class="fas fa-save me-1"></i> Guardar
+                             </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de Productos -->
+            <div class="card shadow-sm">
+                 <div class="card-header">
+                    <h5 class="mb-0">Listado de Productos y Servicios</h5>
+                 </div>
+                <div class="card-body p-0"> <!-- padding 0 para tabla full width -->
+                     <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0" id="product-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>SKU</th>
+                                    <th>Precio Venta</th>
+                                    <th>Unidad</th>
+                                    <th>Stock Actual</th>
+                                    <th>Proveedor</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Las filas se cargarán aquí -->
+                                <tr>
+                                    <td colspan="7" class="text-center p-4">
+                                        <div id="loading-message">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            Cargando productos...
+                                         </div>
+                                         <div id="empty-message" class="d-none text-muted">
+                                             No se encontraron productos. ¡Empieza agregando uno!
+                                         </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                     </div> <!-- /.table-responsive -->
+                </div>
+            </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const themeText = themeToggleButton.querySelector('span');
+            const logoutButton = document.getElementById('logout-button');
+            const sidebarBusinessName = document.getElementById('sidebar-business-name');
+            const restaurantLink = document.getElementById('restaurant-link');
+            const addProductButton = document.getElementById('add-product-button');
+            const productFormContainer = document.getElementById('product-form-container');
+            const productForm = document.getElementById('product-form');
+            const formTitle = document.getElementById('form-title');
+            const productIdInput = document.getElementById('product-id');
+            const productNameInput = document.getElementById('product-name');
+            const productSkuInput = document.getElementById('product-sku');
+            const productUnitSelect = document.getElementById('product-unit');
+            const containerFieldsDiv = document.getElementById('container-fields');
+            const unitsPerContainerInput = document.getElementById('product-units-per-container');
+            const individualUnitNameInput = document.getElementById('product-individual-unit-name');
+            const containerUnitNameSpan = document.querySelector('.container-unit-name'); // Para label dinámico
+            const productSalePriceInput = document.getElementById('product-sale-price');
+            const productCostPriceInput = document.getElementById('product-cost-price');
+            const salePriceUnitLabel = document.getElementById('sale-price-unit-label');
+            const costPriceUnitLabel = document.getElementById('cost-price-unit-label');
+            const individualPriceDisplay = document.getElementById('individual-price-display');
+            const currencySymbolSale = document.getElementById('currency-symbol-sale');
+            const currencySymbolCost = document.getElementById('currency-symbol-cost');
+            const productProviderSelect = document.getElementById('product-provider');
+            const manageStockCheckbox = document.getElementById('manage-stock-checkbox');
+            const stockFieldsDiv = document.getElementById('stock-fields');
+            const productStockInput = document.getElementById('product-stock');
+            const productMinimumStockInput = document.getElementById('product-minimum-stock');
+            const cancelButton = document.getElementById('cancel-button');
+            const saveButton = document.getElementById('save-button');
+            const formErrorMessage = document.getElementById('form-error-message');
+            const productTableBody = document.querySelector('#product-table tbody');
+            const searchInput = document.getElementById('search-input');
+            const downloadCsvButton = document.getElementById('download-csv-button');
+            const loadingMessage = document.getElementById('loading-message');
+            const emptyMessage = document.getElementById('empty-message');
+
+            let allProducts = []; // Caché local de productos
+            let allProviders = []; // Caché local de proveedores
+            let currencyConfig = {}; // Configuración de moneda
+
+            // --- Lógica del Tema y Sidebar (Copiar/Adaptar) ---
+             const applyTheme = (theme) => { /* ... (igual que en dashboard) ... */
+                 htmlElement.setAttribute('data-bs-theme', theme);
+                if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; themeToggleButton.setAttribute('title', 'Cambiar a Tema Claro'); }
+                else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; themeToggleButton.setAttribute('title', 'Cambiar a Tema Oscuro'); }
+                try { localStorage.setItem('preferredTheme', theme); } catch (e) { console.warn("LS Error (Theme):", e); }
+             };
+            const loadTheme = () => { /* ... (igual que en dashboard) ... */
+                let preferredTheme = null;
+                try { preferredTheme = localStorage.getItem('preferredTheme'); } catch (e) { console.warn("LS Error (Theme):", e); }
+                if (preferredTheme) { applyTheme(preferredTheme); }
+                else { const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(prefersDark ? 'dark' : 'light'); }
+            };
+            themeToggleButton.addEventListener('click', () => { const currentTheme = htmlElement.getAttribute('data-bs-theme'); applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); });
+            loadTheme();
+            logoutButton.addEventListener('click', () => { if (confirm('¿Estás seguro?')) window.location.href = 'login.html'; });
+
+            // --- Funciones Auxiliares ---
+            function loadData(key, defaultValue = null) { /* ... (igual que en dashboard) ... */
+                 try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultValue; }
+                 catch (e) { console.error(`LS Error Load (${key}):`, e); alert(`Error al cargar ${key}. Datos corruptos?`); return defaultValue; }
+            }
+            function saveData(key, data) { /* ... (igual que en dashboard, con alerta de error) ... */
+                 try { localStorage.setItem(key, JSON.stringify(data)); return true; }
+                 catch (e) { console.error(`LS Error Save (${key}):`, e); alert(`Error al guardar ${key}. ¿Almacenamiento lleno?`); return false; }
+            }
+             function getLocaleForCurrency(currencyCode) { /* ... (igual que en dashboard) ... */
+                  const map = { 'USD': 'en-US', 'EUR': 'de-DE', 'COP': 'es-CO', 'MXN': 'es-MX', 'ARS': 'es-AR', 'PEN': 'es-PE', 'CLP': 'es-CL', 'GBP': 'en-GB' }; return map[currencyCode];
+             }
+             function formatCurrency(amount, config) { /* ... (igual que en dashboard) ... */
+                  if (amount === null || amount === undefined || isNaN(Number(amount))) { amount = 0; }
+                 if (!config || !config.code || config.decimals === undefined) { console.error("Invalid currencyConfig:", config); return Number(amount).toLocaleString('es-ES'); }
+                 try {
+                     const formatter = new Intl.NumberFormat(getLocaleForCurrency(config.code) || 'es-ES', { style: 'decimal', minimumFractionDigits: config.decimals, maximumFractionDigits: config.decimals });
+                     const formatted = formatter.format(amount);
+                     const symbol = config.symbol || config.code;
+                      if (['USD', 'EUR', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'PEN'].includes(config.code)) return `${symbol}${formatted}`;
+                      else return `${formatted} ${symbol}`;
+                 } catch (e) { console.error("Format Currency Error:", e); return `${config.symbol || ''}${Number(amount).toFixed(config.decimals || 2)}`; }
+             }
+             function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); } // Simple ID único
+
+             // --- Autenticación y Configuración Inicial ---
+             const config = loadData('gestionaFacilConfig');
+             if (!config || !config.masterPassword) { window.location.href = 'login.html'; return; }
+             currencyConfig = config.currency || { code: 'USD', symbol: '$', decimals: 2 }; // Fallback
+             currencySymbolSale.textContent = currencyConfig.symbol || '$';
+             currencySymbolCost.textContent = currencyConfig.symbol || '$';
+             if (config.businessName) sidebarBusinessName.textContent = config.businessName;
+             if (config.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+
+            // --- Lógica del Formulario ---
+
+            function resetForm() {
+                productForm.reset(); // Resetea valores nativos
+                productIdInput.value = '';
+                formTitle.textContent = 'Agregar Nuevo Producto/Servicio';
+                saveButton.textContent = 'Guardar';
+                saveButton.classList.replace('btn-warning', 'btn-success');
+                formErrorMessage.classList.add('d-none');
+                productForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                // Resetear visibilidad condicional
+                containerFieldsDiv.style.display = 'none';
+                stockFieldsDiv.style.display = 'none';
+                individualPriceDisplay.style.display = 'none';
+                unitsPerContainerInput.required = false; // Quitar required si está oculto
+                individualUnitNameInput.required = false;
+                productStockInput.required = false;
+                 // Asegurarse que los checkboxes estén en su estado por defecto
+                manageStockCheckbox.checked = false;
+                 handleUnitChange(); // Actualizar etiquetas de precio
+                 handleManageStockChange(); // Actualizar visibilidad stock
+            }
+
+            function toggleForm(show = true, productIdToEdit = null) {
+                if (show) {
+                    resetForm();
+                    if (productIdToEdit) {
+                        const product = allProducts.find(p => p.id === productIdToEdit);
+                        if (product) {
+                            formTitle.textContent = 'Editar Producto/Servicio';
+                            saveButton.textContent = 'Actualizar';
+                            saveButton.classList.replace('btn-success', 'btn-warning');
+                            productIdInput.value = product.id;
+                            productNameInput.value = product.name || '';
+                            productSkuInput.value = product.sku || '';
+                            productUnitSelect.value = product.unit || '';
+                            productSalePriceInput.value = product.salePrice !== undefined ? product.salePrice : '';
+                            productCostPriceInput.value = product.costPrice !== undefined ? product.costPrice : '';
+                            productProviderSelect.value = product.providerId || '';
+                            manageStockCheckbox.checked = product.manageStock || false;
+                            unitsPerContainerInput.value = product.unitsPerContainer || '';
+                            individualUnitNameInput.value = product.individualUnitName || '';
+                            productStockInput.value = product.stock !== undefined ? product.stock : '';
+                            productMinimumStockInput.value = product.minimumStock !== undefined ? product.minimumStock : '';
+
+                             handleUnitChange(); // Actualizar campos de unidad y etiquetas de precio
+                             handleManageStockChange(); // Actualizar campos de stock
+                        } else {
+                            console.error("Producto a editar no encontrado:", productIdToEdit);
+                             alert("Error: No se encontró el producto para editar.");
+                            return; // No mostrar el form si hay error
+                        }
+                    }
+                    productFormContainer.style.display = 'block';
+                    productNameInput.focus(); // Enfocar primer campo
+                } else {
+                    productFormContainer.style.display = 'none';
+                }
+            }
+
+             function handleUnitChange() {
+                 const selectedUnit = productUnitSelect.value;
+                 const isContainer = ['Caja', 'Paquete'].includes(selectedUnit); // Añadir más si es necesario
+                 const isService = selectedUnit === 'Servicio';
+
+                 containerFieldsDiv.style.display = isContainer ? 'block' : 'none';
+                 unitsPerContainerInput.required = isContainer;
+                 individualUnitNameInput.required = isContainer;
+
+                 if (isContainer && containerUnitNameSpan) {
+                     containerUnitNameSpan.textContent = selectedUnit; // Actualizar label
+                 }
+
+                 // Actualizar etiquetas de precios
+                 const unitLabel = selectedUnit ? `por ${selectedUnit}` : 'por Unidad';
+                 salePriceUnitLabel.textContent = unitLabel;
+                 costPriceUnitLabel.textContent = unitLabel;
+
+                 // Mostrar/Ocultar precio individual calculado
+                 if (isContainer) {
+                     const salePrice = parseFloat(productSalePriceInput.value);
+                     const units = parseInt(unitsPerContainerInput.value, 10);
+                     if (!isNaN(salePrice) && !isNaN(units) && units > 0) {
+                         const individualPrice = salePrice / units;
+                         individualPriceDisplay.textContent = `(${formatCurrency(individualPrice, currencyConfig)} / ${individualUnitNameInput.value || 'unidad individual'})`;
+                         individualPriceDisplay.style.display = 'block';
+                     } else {
+                         individualPriceDisplay.style.display = 'none';
+                     }
+                 } else {
+                      individualPriceDisplay.style.display = 'none';
+                 }
+
+                 // Deshabilitar gestión de inventario para servicios
+                  if (isService) {
+                     manageStockCheckbox.checked = false;
+                     manageStockCheckbox.disabled = true;
+                 } else {
+                     manageStockCheckbox.disabled = false;
+                 }
+                 handleManageStockChange(); // Actualizar visibilidad stock
+             }
+
+             function handleManageStockChange() {
+                 const manage = manageStockCheckbox.checked && !manageStockCheckbox.disabled;
+                 stockFieldsDiv.style.display = manage ? 'flex' : 'none'; // Usar flex si es row
+                 productStockInput.required = manage;
+                 // Stock Mínimo no es requerido, pero sí el stock actual si se gestiona
+
+                 // Validar tipo de número para stock
+                 const selectedUnit = productUnitSelect.value;
+                 const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(selectedUnit);
+                 productStockInput.step = allowDecimalStock ? 'any' : '1';
+                 productMinimumStockInput.step = allowDecimalStock ? 'any' : '1';
+             }
+
+              // Actualizar precio individual dinámicamente
+             productSalePriceInput.addEventListener('input', handleUnitChange);
+             unitsPerContainerInput.addEventListener('input', handleUnitChange);
+             individualUnitNameInput.addEventListener('input', handleUnitChange);
+
+
+            // --- Lógica de la Tabla ---
+            function renderTable(productsToRender) {
+                productTableBody.innerHTML = ''; // Limpiar tabla
+                 loadingMessage.classList.add('d-none'); // Ocultar carga
+
+                if (!productsToRender || productsToRender.length === 0) {
+                     emptyMessage.classList.remove('d-none'); // Mostrar mensaje vacío
+                    productTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted p-4">No se encontraron productos que coincidan con la búsqueda.</td></tr>`;
+                    return;
+                }
+                 emptyMessage.classList.add('d-none'); // Ocultar mensaje vacío
+
+                productsToRender.forEach(product => {
+                    const provider = allProviders.find(p => p.id === product.providerId);
+                    const tr = document.createElement('tr');
+
+                     // Destacar filas con bajo stock
+                     if (product.manageStock && typeof product.stock === 'number' && typeof product.minimumStock === 'number' && product.stock < product.minimumStock) {
+                         tr.classList.add('table-warning');
+                     }
+                     if (product.manageStock && typeof product.stock === 'number' && product.stock <= 0) {
+                         tr.classList.add('table-danger');
+                     }
+
+                    // Unidad con detalles
+                    let unitDisplay = product.unit || 'N/A';
+                     if (product.unitsPerContainer && product.individualUnitName) {
+                         unitDisplay = `<span class="unit-display">${product.unit}<span class="unit-container-details">( ${product.unitsPerContainer} ${product.individualUnitName}/ ${product.unit})</span></span>`;
+                     }
+
+                    tr.innerHTML = `
+                        <td>${product.name || 'N/A'}</td>
+                        <td>${product.sku || '-'}</td>
+                        <td>${formatCurrency(product.salePrice, currencyConfig)}</td>
+                        <td>${unitDisplay}</td>
+                        <td>${product.manageStock ? (product.stock ?? 'N/A') : 'No gestionado'}</td>
+                        <td>${provider ? provider.name : '-'}</td>
+                        <td class="text-end action-buttons">
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${product.id}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${product.id}" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    productTableBody.appendChild(tr);
+                });
+            }
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                if (!searchTerm) {
+                    renderTable(allProducts);
+                    return;
+                }
+                const filteredProducts = allProducts.filter(product => {
+                    const provider = allProviders.find(p => p.id === product.providerId);
+                    return (
+                        (product.name && product.name.toLowerCase().includes(searchTerm)) ||
+                        (product.sku && product.sku.toLowerCase().includes(searchTerm)) ||
+                        (provider && provider.name.toLowerCase().includes(searchTerm))
+                    );
+                });
+                renderTable(filteredProducts);
+            }
+
+             function deleteProduct(productId) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product) return;
+
+                 if (confirm(`¿Estás seguro de eliminar el producto "${product.name}"? Esta acción no se puede deshacer.`)) {
+                     allProducts = allProducts.filter(p => p.id !== productId);
+                     if (saveData('productos', allProducts)) {
+                         console.log('Producto eliminado:', productId);
+                         filterTable(); // Re-renderizar la tabla filtrada actual
+                     } else {
+                         // Si falla el guardado, recargar los productos originales para evitar inconsistencia
+                         allProducts = loadData('productos', []);
+                         alert("Error al guardar la eliminación del producto.");
+                     }
+                 }
+             }
+
+             function validateForm() {
+                 let isValid = true;
+                 formErrorMessage.classList.add('d-none');
+                 formErrorMessage.innerHTML = '';
+                 productForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                 // Nombre
+                 if (!productNameInput.value.trim()) {
+                     productNameInput.classList.add('is-invalid');
+                     isValid = false;
+                 }
+                 // Unidad
+                 if (!productUnitSelect.value) {
+                     productUnitSelect.classList.add('is-invalid');
+                     isValid = false;
+                 }
+                 // Precio Venta
+                 const salePrice = parseFloat(productSalePriceInput.value);
+                 if (isNaN(salePrice) || salePrice < 0) {
+                      productSalePriceInput.classList.add('is-invalid');
+                      isValid = false;
+                 }
+                 // Precio Costo (opcional pero >= 0 si se ingresa)
+                 const costPriceRaw = productCostPriceInput.value.trim();
+                 if (costPriceRaw !== '') {
+                     const costPrice = parseFloat(costPriceRaw);
+                     if (isNaN(costPrice) || costPrice < 0) {
+                         productCostPriceInput.classList.add('is-invalid');
+                         isValid = false;
+                     }
+                 }
+
+                 // Campos de Contenedor (si es visible)
+                 if (containerFieldsDiv.style.display === 'block') {
+                     const units = parseInt(unitsPerContainerInput.value, 10);
+                     if (isNaN(units) || units <= 0) {
+                         unitsPerContainerInput.classList.add('is-invalid');
+                         isValid = false;
+                     }
+                     if (!individualUnitNameInput.value.trim()) {
+                         individualUnitNameInput.classList.add('is-invalid');
+                         isValid = false;
+                     }
+                 }
+
+                 // Campos de Stock (si es visible)
+                  if (stockFieldsDiv.style.display === 'flex') { // Check flex display
+                     const stock = parseFloat(productStockInput.value);
+                     const minStockRaw = productMinimumStockInput.value.trim();
+                     let minStock = 0;
+                     if (minStockRaw !== '') minStock = parseFloat(minStockRaw);
+
+                     if (isNaN(stock)) {
+                         productStockInput.classList.add('is-invalid');
+                         isValid = false;
+                     } else {
+                          // Validar entero si no es unidad decimal
+                           const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(productUnitSelect.value);
+                           if (!allowDecimalStock && !Number.isInteger(stock)) {
+                              productStockInput.classList.add('is-invalid');
+                              productStockInput.nextElementSibling.textContent = 'El stock debe ser un número entero para esta unidad.';
+                              isValid = false;
+                           } else {
+                               productStockInput.nextElementSibling.textContent = 'El stock es obligatorio.'; // Mensaje por defecto
+                           }
+                     }
+
+                     if (minStockRaw !== '' && (isNaN(minStock) || minStock < 0)) {
+                         productMinimumStockInput.classList.add('is-invalid');
+                         isValid = false;
+                     } else if (minStockRaw !== '' && !isNaN(minStock)) {
+                         const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(productUnitSelect.value);
+                         if (!allowDecimalStock && !Number.isInteger(minStock)) {
+                             productMinimumStockInput.classList.add('is-invalid');
+                             productMinimumStockInput.nextElementSibling.textContent = 'El stock mínimo debe ser un número entero.';
+                             isValid = false;
+                         } else {
+                              productMinimumStockInput.nextElementSibling.textContent = 'El stock mínimo debe ser >= 0.';
+                         }
+                     } else {
+                          productMinimumStockInput.nextElementSibling.textContent = 'El stock mínimo debe ser >= 0.';
+                     }
+                 }
+
+
+                 if (!isValid) {
+                    formErrorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> Por favor, corrige los campos marcados.';
+                    formErrorMessage.classList.remove('d-none');
+                    const firstInvalid = productForm.querySelector('.is-invalid');
+                    if (firstInvalid) firstInvalid.focus();
+                 }
+                 return isValid;
+             }
+
+            function handleFormSubmit(event) {
+                 event.preventDefault();
+                 event.stopPropagation();
+
+                 if (!validateForm()) {
+                     return;
+                 }
+
+                 const productId = productIdInput.value;
+                 const isEditing = !!productId;
+
+                 const manageStock = manageStockCheckbox.checked && !manageStockCheckbox.disabled;
+                 const selectedUnit = productUnitSelect.value;
+                 const isContainer = ['Caja', 'Paquete'].includes(selectedUnit);
+                 const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(selectedUnit);
+
+                 const productData = {
+                     id: isEditing ? productId : generateId(),
+                     name: productNameInput.value.trim(),
+                     sku: productSkuInput.value.trim() || null, // Guardar null si está vacío
+                     unit: selectedUnit,
+                     salePrice: parseFloat(productSalePriceInput.value),
+                     costPrice: productCostPriceInput.value.trim() !== '' ? parseFloat(productCostPriceInput.value) : null,
+                     providerId: productProviderSelect.value || null,
+                     manageStock: manageStock,
+                     // Campos condicionales
+                     stock: manageStock ? (allowDecimalStock ? parseFloat(productStockInput.value) : parseInt(productStockInput.value, 10)) : null,
+                     minimumStock: (manageStock && productMinimumStockInput.value.trim() !== '') ? (allowDecimalStock ? parseFloat(productMinimumStockInput.value) : parseInt(productMinimumStockInput.value, 10)) : null,
+                     unitsPerContainer: isContainer ? parseInt(unitsPerContainerInput.value, 10) : null,
+                     individualUnitName: isContainer ? individualUnitNameInput.value.trim() : null,
+                 };
+
+                 if (isEditing) {
+                     // Actualizar
+                     allProducts = allProducts.map(p => p.id === productId ? productData : p);
+                 } else {
+                     // Agregar
+                     allProducts.push(productData);
+                 }
+
+                 if (saveData('productos', allProducts)) {
+                     console.log(`Producto ${isEditing ? 'actualizado' : 'agregado'}:`, productData.id);
+                     filterTable(); // Actualizar la tabla (manteniendo el filtro actual)
+                     toggleForm(false); // Ocultar formulario
+                 } else {
+                      // Si falla el guardado, revertir el cambio en la caché local
+                      allProducts = loadData('productos', []);
+                       formErrorMessage.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Error al guardar el producto. Inténtalo de nuevo.';
+                       formErrorMessage.classList.remove('d-none');
+                 }
+             }
+
+            // --- Carga de Datos Inicial y Event Listeners ---
+             function initialize() {
+                 // Cargar Proveedores para el Select
+                 allProviders = loadData('proveedores', []);
+                 productProviderSelect.innerHTML = '<option value="">Ninguno</option>'; // Limpiar y añadir opción por defecto
+                 allProviders.forEach(provider => {
+                     const option = document.createElement('option');
+                     option.value = provider.id;
+                     option.textContent = provider.name;
+                     productProviderSelect.appendChild(option);
+                 });
+
+                 // Cargar Productos y renderizar tabla
+                 allProducts = loadData('productos', []);
+                 renderTable(allProducts);
+
+                 // Listeners
+                 addProductButton.addEventListener('click', () => toggleForm(true));
+                 cancelButton.addEventListener('click', () => toggleForm(false));
+                 productForm.addEventListener('submit', handleFormSubmit);
+                 searchInput.addEventListener('input', filterTable);
+                 downloadCsvButton.addEventListener('click', generateCSV);
+                 productUnitSelect.addEventListener('change', handleUnitChange);
+                 manageStockCheckbox.addEventListener('change', handleManageStockChange);
+
+                 // Listeners para botones Editar/Eliminar (Delegación)
+                 productTableBody.addEventListener('click', (event) => {
+                    const target = event.target.closest('button'); // Busca el botón más cercano
+                    if (!target) return;
+
+                    const productId = target.dataset.id;
+                    if (target.classList.contains('edit-btn')) {
+                        toggleForm(true, productId);
+                    } else if (target.classList.contains('delete-btn')) {
+                         deleteProduct(productId);
+                    }
+                 });
+
+                 console.log('Página de Productos Inicializada.');
+             }
+
+             // --- Funcionalidad CSV ---
+             function generateCSV() {
+                 if (allProducts.length === 0) {
+                     alert("No hay productos para exportar.");
+                     return;
+                 }
+
+                 const headers = [
+                     "ID", "Nombre", "SKU", "Unidad Venta", "Unidades por Contenedor", "Nombre Unidad Individual",
+                     "Precio Venta", "Precio Costo", "ID Proveedor", "Nombre Proveedor",
+                     "Gestiona Inventario", "Stock Actual", "Stock Mínimo"
+                 ];
+                 const rows = allProducts.map(p => {
+                     const provider = allProviders.find(prov => prov.id === p.providerId);
+                     return [
+                         p.id,
+                         `"${p.name || ''}"`, // Comillas para nombres con comas
+                         p.sku || '',
+                         p.unit || '',
+                         p.unitsPerContainer ?? '', // ?? para null/undefined
+                         `"${p.individualUnitName || ''}"`,
+                         p.salePrice ?? '',
+                         p.costPrice ?? '',
+                         p.providerId || '',
+                         provider ? `"${provider.name}"` : '',
+                         p.manageStock ? 'Sí' : 'No',
+                         p.stock ?? '',
+                         p.minimumStock ?? ''
+                     ].join(',');
+                 });
+
+                 const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
+                 const encodedUri = encodeURI(csvContent);
+                 const link = document.createElement("a");
+                 link.setAttribute("href", encodedUri);
+                 link.setAttribute("download", `productos_gestiona_facil_${new Date().toISOString().slice(0,10)}.csv`);
+                 document.body.appendChild(link); // Required for FF
+                 link.click();
+                 document.body.removeChild(link);
+             }
+
+
+             // --- Iniciar la aplicación en esta página ---
+             initialize();
+        });
+    </script>
+
+</body>
+</html>

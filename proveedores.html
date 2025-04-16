@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Proveedores</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa; --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef; --sidebar-link-active-bg-light: #0d6efd; --sidebar-link-active-color-light: #ffffff;
+            --sidebar-bg-dark: #212529; --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40; --sidebar-link-active-bg-dark: #0d6efd; --sidebar-link-active-color-dark: #ffffff;
+        }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light); transition: background-color 0.3s ease, color 0.3s ease; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; border-right: 1px solid var(--bs-border-color); }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Proveedores */
+        #provider-form-container { display: none; } /* Oculto por defecto */
+        .table th, .table td { vertical-align: middle; }
+        .table .action-buttons a, .table .action-buttons button { margin-right: 5px; padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+         }
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link active" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a>
+             <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+             <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Gestión de Proveedores</h1>
+
+             <!-- Barra de Acciones -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <button id="add-provider-button" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Agregar Proveedor
+                </button>
+                <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="search-input" class="form-control" placeholder="Buscar proveedor...">
+                </div>
+                 <button id="download-csv-button" class="btn btn-outline-secondary">
+                    <i class="fas fa-download me-1"></i> Descargar CSV
+                </button>
+            </div>
+
+            <!-- Formulario Agregar/Editar Proveedor (Oculto por defecto) -->
+             <div class="card mb-3 shadow-sm" id="provider-form-container">
+                <div class="card-header">
+                    <h5 class="mb-0" id="form-title">Agregar Nuevo Proveedor</h5>
+                </div>
+                <div class="card-body">
+                    <form id="provider-form" novalidate>
+                         <input type="hidden" id="provider-id"> <!-- Para modo edición -->
+                         <div id="form-error-message" class="alert alert-danger d-none" role="alert"></div>
+
+                         <div class="row g-3">
+                             <div class="col-md-6">
+                                 <div class="mb-3">
+                                     <label for="provider-name" class="form-label">Nombre Proveedor <span class="text-danger">*</span></label>
+                                     <input type="text" class="form-control" id="provider-name" required>
+                                     <div class="invalid-feedback">El nombre es obligatorio.</div>
+                                 </div>
+                                 <div class="mb-3">
+                                     <label for="provider-contact" class="form-label">Nombre Contacto (Opcional)</label>
+                                     <input type="text" class="form-control" id="provider-contact">
+                                 </div>
+                                 <div class="mb-3">
+                                     <label for="provider-phone" class="form-label">Teléfono (Opcional)</label>
+                                     <input type="tel" class="form-control" id="provider-phone">
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                  <div class="mb-3">
+                                     <label for="provider-email" class="form-label">Email (Opcional)</label>
+                                     <input type="email" class="form-control" id="provider-email">
+                                     <div class="invalid-feedback">Por favor, introduce un email válido.</div>
+                                 </div>
+                                 <div class="mb-3">
+                                     <label for="provider-address" class="form-label">Dirección (Opcional)</label>
+                                     <textarea class="form-control" id="provider-address" rows="2"></textarea>
+                                 </div>
+                             </div>
+                              <div class="col-12">
+                                 <div class="mb-3">
+                                     <label for="provider-notes" class="form-label">Notas Adicionales (Opcional)</label>
+                                     <textarea class="form-control" id="provider-notes" rows="2"></textarea>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <hr>
+                        <div class="d-flex justify-content-end">
+                             <button type="button" id="cancel-button" class="btn btn-secondary me-2">Cancelar</button>
+                             <button type="submit" id="save-button" class="btn btn-success">
+                                 <i class="fas fa-save me-1"></i> Guardar
+                             </button>
+                        </div>
+                    </form>
+                </div>
+             </div>
+
+
+            <!-- Tabla de Proveedores -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Listado de Proveedores</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0" id="provider-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Contacto</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filas se cargarán aquí -->
+                                <tr>
+                                    <td colspan="5" class="text-center p-4">
+                                         <div id="loading-message">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            Cargando proveedores...
+                                         </div>
+                                         <div id="empty-message" class="d-none text-muted">
+                                             No hay proveedores registrados.
+                                         </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> <!-- /.table-responsive -->
+                </div>
+            </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const themeText = themeToggleButton.querySelector('span');
+            const logoutButton = document.getElementById('logout-button');
+            const sidebarBusinessName = document.getElementById('sidebar-business-name');
+            const restaurantLink = document.getElementById('restaurant-link');
+            const addProviderButton = document.getElementById('add-provider-button');
+            const providerFormContainer = document.getElementById('provider-form-container');
+            const providerForm = document.getElementById('provider-form');
+            const formTitle = document.getElementById('form-title');
+            const providerIdInput = document.getElementById('provider-id');
+            const providerNameInput = document.getElementById('provider-name');
+            const providerContactInput = document.getElementById('provider-contact');
+            const providerPhoneInput = document.getElementById('provider-phone');
+            const providerEmailInput = document.getElementById('provider-email');
+            const providerAddressInput = document.getElementById('provider-address');
+            const providerNotesInput = document.getElementById('provider-notes');
+            const cancelButton = document.getElementById('cancel-button');
+            const saveButton = document.getElementById('save-button');
+            const formErrorMessage = document.getElementById('form-error-message');
+            const providerTableBody = document.querySelector('#provider-table tbody');
+            const searchInput = document.getElementById('search-input');
+            const downloadCsvButton = document.getElementById('download-csv-button');
+            const loadingMessage = document.getElementById('loading-message');
+            const emptyMessage = document.getElementById('empty-message');
+
+            let allProviders = []; // Caché local de proveedores
+            let allProducts = []; // Necesario para validación de borrado
+            let currencyConfig = {}; // Para consistencia, aunque no se use directamente
+
+            // --- Lógica del Tema y Sidebar (Copiar/Adaptar) ---
+            const applyTheme = (theme) => { /* ... (igual que antes) ... */ htmlElement.setAttribute('data-bs-theme', theme); if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; } else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; } try { localStorage.setItem('preferredTheme', theme); } catch (e) { console.warn("LS Error (Theme):", e); } };
+            const loadTheme = () => { /* ... (igual que antes) ... */ let preferredTheme = null; try { preferredTheme = localStorage.getItem('preferredTheme'); } catch (e) { console.warn("LS Error (Theme):", e); } if (preferredTheme) { applyTheme(preferredTheme); } else { const pDark = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(pDark ? 'dark' : 'light'); } };
+            themeToggleButton.addEventListener('click', () => { const currentTheme = htmlElement.getAttribute('data-bs-theme'); applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); });
+            loadTheme();
+            logoutButton.addEventListener('click', () => { if (confirm('¿Estás seguro?')) window.location.href = 'login.html'; });
+
+            // --- Funciones Auxiliares ---
+            function loadData(key, defaultValue = null) { /* ... (igual que antes) ... */ try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : defaultValue; } catch (e) { console.error(`LS Error Load (${key}):`, e); return defaultValue; } }
+            function saveData(key, data) { /* ... (igual que antes) ... */ try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error(`LS Error Save (${key}):`, e); alert(`Error al guardar ${key}.`); return false; } }
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+            function isValidEmail(email) { const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; return re.test(String(email).toLowerCase()); }
+
+             // --- Autenticación y Configuración Inicial ---
+            const config = loadData('gestionaFacilConfig');
+            if (!config || !config.masterPassword) { window.location.href = 'login.html'; return; }
+            currencyConfig = config.currency || { code: 'USD', symbol: '$', decimals: 2 }; // Cargar por si acaso
+            if (config.businessName) sidebarBusinessName.textContent = config.businessName;
+            if (config.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+
+
+            // --- Lógica del Formulario ---
+            function resetForm() {
+                providerForm.reset();
+                providerIdInput.value = '';
+                formTitle.textContent = 'Agregar Nuevo Proveedor';
+                saveButton.textContent = 'Guardar';
+                saveButton.classList.replace('btn-warning', 'btn-success');
+                formErrorMessage.classList.add('d-none');
+                providerForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            }
+
+            function toggleForm(show = true, providerIdToEdit = null) {
+                if (show) {
+                    resetForm();
+                    if (providerIdToEdit) {
+                        const provider = allProviders.find(p => p.id === providerIdToEdit);
+                        if (provider) {
+                            formTitle.textContent = 'Editar Proveedor';
+                            saveButton.textContent = 'Actualizar';
+                            saveButton.classList.replace('btn-success', 'btn-warning');
+                            providerIdInput.value = provider.id;
+                            providerNameInput.value = provider.name || '';
+                            providerContactInput.value = provider.contact || '';
+                            providerPhoneInput.value = provider.phone || '';
+                            providerEmailInput.value = provider.email || '';
+                            providerAddressInput.value = provider.address || '';
+                            providerNotesInput.value = provider.notes || '';
+                        } else {
+                            console.error("Proveedor a editar no encontrado:", providerIdToEdit);
+                            alert("Error: No se encontró el proveedor para editar.");
+                            return;
+                        }
+                    }
+                    providerFormContainer.style.display = 'block';
+                    providerNameInput.focus();
+                } else {
+                    providerFormContainer.style.display = 'none';
+                }
+            }
+
+            // --- Lógica de la Tabla ---
+             function renderTable(providersToRender) {
+                providerTableBody.innerHTML = '';
+                loadingMessage.classList.add('d-none');
+
+                if (!providersToRender || providersToRender.length === 0) {
+                    emptyMessage.classList.remove('d-none');
+                     providerTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-4">No se encontraron proveedores.</td></tr>`;
+                    return;
+                }
+                emptyMessage.classList.add('d-none');
+
+                providersToRender.forEach(provider => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${provider.name || 'N/A'}</td>
+                        <td>${provider.contact || '-'}</td>
+                        <td>${provider.phone || '-'}</td>
+                        <td>${provider.email || '-'}</td>
+                        <td class="text-end action-buttons">
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${provider.id}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${provider.id}" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    providerTableBody.appendChild(tr);
+                });
+            }
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                if (!searchTerm) {
+                    renderTable(allProviders);
+                    return;
+                }
+                const filteredProviders = allProviders.filter(p =>
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                    (p.contact && p.contact.toLowerCase().includes(searchTerm)) ||
+                    (p.phone && p.phone.toLowerCase().includes(searchTerm)) ||
+                    (p.email && p.email.toLowerCase().includes(searchTerm))
+                );
+                renderTable(filteredProviders);
+            }
+
+             function isProviderInUse(providerId) {
+                 return allProducts.some(product => product.providerId === providerId);
+             }
+
+             function deleteProvider(providerId) {
+                 const provider = allProviders.find(p => p.id === providerId);
+                 if (!provider) return;
+
+                 // Validar si está en uso
+                 if (isProviderInUse(providerId)) {
+                     alert(`No se puede eliminar el proveedor "${provider.name}" porque está asignado a uno o más productos. Primero, desasigna el proveedor de esos productos.`);
+                     return;
+                 }
+
+                 if (confirm(`¿Estás seguro de eliminar al proveedor "${provider.name}"? Esta acción no se puede deshacer.`)) {
+                     allProviders = allProviders.filter(p => p.id !== providerId);
+                     if (saveData('proveedores', allProviders)) {
+                         console.log('Proveedor eliminado:', providerId);
+                         filterTable(); // Re-renderizar
+                     } else {
+                         // Revertir si falla guardado
+                         allProviders = loadData('proveedores', []);
+                         alert("Error al guardar la eliminación del proveedor.");
+                     }
+                 }
+             }
+
+             function validateForm() {
+                 let isValid = true;
+                 formErrorMessage.classList.add('d-none');
+                 formErrorMessage.innerHTML = '';
+                 providerForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                 // Nombre
+                 if (!providerNameInput.value.trim()) {
+                     providerNameInput.classList.add('is-invalid');
+                     isValid = false;
+                 }
+                 // Email (opcional, pero validar formato si se ingresa)
+                 const email = providerEmailInput.value.trim();
+                 if (email && !isValidEmail(email)) {
+                     providerEmailInput.classList.add('is-invalid');
+                     isValid = false;
+                 }
+
+                 if (!isValid) {
+                    formErrorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> Por favor, corrige los campos marcados.';
+                    formErrorMessage.classList.remove('d-none');
+                    const firstInvalid = providerForm.querySelector('.is-invalid');
+                    if (firstInvalid) firstInvalid.focus();
+                 }
+                 return isValid;
+             }
+
+             function handleFormSubmit(event) {
+                 event.preventDefault();
+                 event.stopPropagation();
+
+                 if (!validateForm()) {
+                     return;
+                 }
+
+                 const providerId = providerIdInput.value;
+                 const isEditing = !!providerId;
+
+                 const providerData = {
+                     id: isEditing ? providerId : generateId(),
+                     name: providerNameInput.value.trim(),
+                     contact: providerContactInput.value.trim() || null,
+                     phone: providerPhoneInput.value.trim() || null,
+                     email: providerEmailInput.value.trim() || null,
+                     address: providerAddressInput.value.trim() || null,
+                     notes: providerNotesInput.value.trim() || null,
+                 };
+
+                 if (isEditing) {
+                     allProviders = allProviders.map(p => p.id === providerId ? providerData : p);
+                 } else {
+                     allProviders.push(providerData);
+                 }
+
+                 if (saveData('proveedores', allProviders)) {
+                     console.log(`Proveedor ${isEditing ? 'actualizado' : 'agregado'}:`, providerData.id);
+                     filterTable();
+                     toggleForm(false);
+                 } else {
+                      allProviders = loadData('proveedores', []); // Revertir caché
+                      formErrorMessage.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Error al guardar el proveedor.';
+                      formErrorMessage.classList.remove('d-none');
+                 }
+             }
+
+
+             // --- Carga de Datos Inicial y Event Listeners ---
+             function initialize() {
+                 // Cargar productos (necesario para validación de borrado)
+                 allProducts = loadData('productos', []);
+                 // Cargar proveedores y renderizar tabla
+                 allProviders = loadData('proveedores', []);
+                 renderTable(allProviders);
+
+                 // Listeners
+                 addProviderButton.addEventListener('click', () => toggleForm(true));
+                 cancelButton.addEventListener('click', () => toggleForm(false));
+                 providerForm.addEventListener('submit', handleFormSubmit);
+                 searchInput.addEventListener('input', filterTable);
+                 downloadCsvButton.addEventListener('click', generateCSV);
+
+                  // Listeners para botones Editar/Eliminar (Delegación)
+                 providerTableBody.addEventListener('click', (event) => {
+                    const target = event.target.closest('button');
+                    if (!target) return;
+                    const providerId = target.dataset.id;
+                    if (target.classList.contains('edit-btn')) {
+                        toggleForm(true, providerId);
+                    } else if (target.classList.contains('delete-btn')) {
+                        deleteProvider(providerId);
+                    }
+                 });
+
+                 console.log('Página de Proveedores Inicializada.');
+             }
+
+             // --- Funcionalidad CSV ---
+             function generateCSV() {
+                 if (allProviders.length === 0) {
+                     alert("No hay proveedores para exportar.");
+                     return;
+                 }
+
+                 const headers = ["ID", "Nombre Proveedor", "Nombre Contacto", "Teléfono", "Email", "Dirección", "Notas"];
+                 const rows = allProviders.map(p => [
+                     p.id,
+                     `"${p.name || ''}"`,
+                     `"${p.contact || ''}"`,
+                     p.phone || '',
+                     p.email || '',
+                     `"${(p.address || '').replace(/"/g, '""')}"`, // Escape double quotes in address
+                     `"${(p.notes || '').replace(/"/g, '""')}"`   // Escape double quotes in notes
+                 ].join(','));
+
+                 const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
+                 const encodedUri = encodeURI(csvContent);
+                 const link = document.createElement("a");
+                 link.setAttribute("href", encodedUri);
+                 link.setAttribute("download", `proveedores_gestiona_facil_${new Date().toISOString().slice(0,10)}.csv`);
+                 document.body.appendChild(link);
+                 link.click();
+                 document.body.removeChild(link);
+             }
+
+
+            // --- Iniciar ---
+            initialize();
+        });
+    </script>
+
+</body>
+</html>

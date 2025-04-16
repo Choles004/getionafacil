@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Iniciar Sesión / Configurar</title>
+
+    <!-- Bootstrap CSS (v5.3.x via CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Font Awesome CSS (v6.x via CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa;
+            --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef;
+            --sidebar-link-active-bg-light: #0d6efd;
+            --sidebar-link-active-color-light: #ffffff;
+
+            --sidebar-bg-dark: #212529;
+            --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40;
+            --sidebar-link-active-bg-dark: #0d6efd;
+            --sidebar-link-active-color-dark: #ffffff;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background-color: var(--sidebar-bg-light);
+            color: var(--sidebar-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            border-right: 1px solid var(--bs-border-color);
+        }
+
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+
+        /* Ocultar formularios inicialmente */
+        #login-form-container, #setup-form-container { display: none; }
+
+        /* Centrar contenido en pantalla de login/setup */
+        .main-content {
+            display: flex;
+            align-items: center; /* Centrar verticalmente */
+            justify-content: center; /* Centrar horizontalmente */
+        }
+        .content-wrapper {
+            max-width: 500px; /* Ancho máximo para el formulario */
+            width: 100%;
+        }
+
+        /* Estilos para mensajes de error */
+        .form-control.is-invalid { border-color: var(--bs-danger); }
+        .invalid-feedback { display: block; /* Asegurarse que se muestre */ }
+
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span { display: none; }
+            .sidebar .nav-link i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle { text-align: center; }
+            .btn-theme-toggle i { margin-right: 0; }
+            /* En pantallas pequeñas, dejar que el contenido ocupe más espacio */
+            .main-content { align-items: flex-start; padding-top: 2rem; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+         }
+
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="index.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span class="app-brand-text fs-4 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+            <!-- Aquí irán los enlaces principales en el dashboard -->
+             <a class="nav-link disabled" href="#">
+                <i class="fas fa-sign-in-alt"></i><span>Acceso</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <!-- Contenedor Formulario Login -->
+            <div id="login-form-container">
+                <div class="card shadow">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">Iniciar Sesión</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="login-error-message" class="alert alert-danger d-none" role="alert">
+                           <i class="fas fa-times-circle me-2"></i> Contraseña incorrecta.
+                        </div>
+                        <form id="login-form" novalidate>
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">Contraseña Maestra</label>
+                                <div class="input-group">
+                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                     <input type="password" class="form-control" id="login-password" required>
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor Formulario Setup -->
+            <div id="setup-form-container">
+                 <div class="card shadow">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">Configuración Inicial</h3>
+                    </div>
+                    <div class="card-body">
+                         <div id="setup-error-message" class="alert alert-danger d-none" role="alert">
+                           <i class="fas fa-exclamation-circle me-2"></i> Por favor, corrige los errores.
+                        </div>
+                        <form id="setup-form" novalidate>
+                            <div class="mb-3">
+                                <label for="setup-business-name" class="form-label">Nombre del Negocio <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                     <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                    <input type="text" class="form-control" id="setup-business-name" required>
+                                    <div class="invalid-feedback">El nombre del negocio es obligatorio.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="setup-currency" class="form-label">Moneda Principal <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                     <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                    <select class="form-select" id="setup-currency" required>
+                                        <option value="" disabled selected>Selecciona una moneda...</option>
+                                        <!-- Los valores contienen JSON con code, symbol y decimals -->
+                                        <option value='{"code":"USD","symbol":"$","decimals":2}'>USD - Dólar Estadounidense ($)</option>
+                                        <option value='{"code":"EUR","symbol":"€","decimals":2}'>EUR - Euro (€)</option>
+                                        <option value='{"code":"COP","symbol":"$","decimals":0}'>COP - Peso Colombiano ($)</option>
+                                        <option value='{"code":"MXN","symbol":"$","decimals":2}'>MXN - Peso Mexicano ($)</option>
+                                        <option value='{"code":"ARS","symbol":"$","decimals":2}'>ARS - Peso Argentino ($)</option>
+                                        <option value='{"code":"PEN","symbol":"S/","decimals":2}'>PEN - Sol Peruano (S/)</option>
+                                        <option value='{"code":"CLP","symbol":"$","decimals":0}'>CLP - Peso Chileno ($)</option>
+                                        <option value='{"code":"GBP","symbol":"£","decimals":2}'>GBP - Libra Esterlina (£)</option>
+                                        <!-- Añadir más monedas si es necesario -->
+                                    </select>
+                                    <div class="invalid-feedback">Debes seleccionar una moneda.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="setup-password" class="form-label">Contraseña Maestra <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <input type="password" class="form-control" id="setup-password" required minlength="4">
+                                    <div class="invalid-feedback">La contraseña es obligatoria (mínimo 4 caracteres).</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="setup-confirm-password" class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                      <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                      <input type="password" class="form-control" id="setup-confirm-password" required>
+                                      <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+                                </div>
+
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                     <i class="fas fa-check-circle me-2"></i>Guardar y Comenzar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /.content-wrapper -->
+    </main>
+
+    <!-- Bootstrap JS Bundle (Popper.js incluido) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const themeText = themeToggleButton.querySelector('span');
+
+            const loginFormContainer = document.getElementById('login-form-container');
+            const setupFormContainer = document.getElementById('setup-form-container');
+            const loginForm = document.getElementById('login-form');
+            const setupForm = document.getElementById('setup-form');
+            const loginPasswordInput = document.getElementById('login-password');
+            const loginErrorMessage = document.getElementById('login-error-message');
+            const setupBusinessNameInput = document.getElementById('setup-business-name');
+            const setupCurrencySelect = document.getElementById('setup-currency');
+            const setupPasswordInput = document.getElementById('setup-password');
+            const setupConfirmPasswordInput = document.getElementById('setup-confirm-password');
+            const setupErrorMessage = document.getElementById('setup-error-message');
+
+            // --- Lógica del Tema (Copiar/Adaptar de index.html) ---
+            const applyTheme = (theme) => {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                if (theme === 'dark') {
+                    themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro';
+                    themeToggleButton.setAttribute('title', 'Cambiar a Tema Claro');
+                } else {
+                    themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro';
+                    themeToggleButton.setAttribute('title', 'Cambiar a Tema Oscuro');
+                }
+                try { localStorage.setItem('preferredTheme', theme); } catch (e) { console.warn("LS Error (Theme):", e); }
+            };
+            const loadTheme = () => {
+                let preferredTheme = null;
+                try { preferredTheme = localStorage.getItem('preferredTheme'); } catch (e) { console.warn("LS Error (Theme):", e); }
+                if (preferredTheme) { applyTheme(preferredTheme); }
+                else { const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(prefersDark ? 'dark' : 'light'); }
+            };
+            themeToggleButton.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+            loadTheme();
+
+            // --- Funciones Auxiliares ---
+            function loadData(key) {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : null;
+                } catch (e) {
+                    console.error(`Error loading data for key "${key}":`, e);
+                    // Podríamos mostrar un error al usuario aquí si es crítico
+                    return null;
+                }
+            }
+
+            function saveData(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    console.error(`Error saving data for key "${key}":`, e);
+                    // Mostrar error al usuario, quizás el localStorage está lleno
+                    alert(`Error al guardar datos (${key}). Es posible que el almacenamiento esté lleno. Intenta liberar espacio o exportar datos.`);
+                    return false;
+                }
+            }
+
+            // --- Lógica Principal: Determinar si mostrar Login o Setup ---
+            const config = loadData('gestionaFacilConfig');
+
+            if (config && config.masterPassword) {
+                // --- Flujo de Login ---
+                loginFormContainer.style.display = 'block';
+
+                loginForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    loginErrorMessage.classList.add('d-none'); // Ocultar error previo
+
+                    const enteredPassword = loginPasswordInput.value;
+
+                    if (!enteredPassword) {
+                        loginPasswordInput.classList.add('is-invalid');
+                        return;
+                    } else {
+                         loginPasswordInput.classList.remove('is-invalid');
+                    }
+
+                    // Comparación simple (en una app real, usar hashing!)
+                    if (enteredPassword === config.masterPassword) {
+                        console.log('Login exitoso');
+                        window.location.href = 'dashboard.html'; // Redirigir al panel
+                    } else {
+                        console.log('Login fallido');
+                        loginErrorMessage.classList.remove('d-none');
+                        loginPasswordInput.classList.add('is-invalid');
+                        loginPasswordInput.focus();
+                        loginPasswordInput.select();
+                    }
+                });
+
+            } else {
+                // --- Flujo de Setup ---
+                setupFormContainer.style.display = 'block';
+
+                setupForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setupErrorMessage.classList.add('d-none'); // Ocultar error general previo
+                    // Resetear validación previa
+                    setupForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                    let isValid = true;
+
+                    const businessName = setupBusinessNameInput.value.trim();
+                    const currencyValue = setupCurrencySelect.value;
+                    const password = setupPasswordInput.value;
+                    const confirmPassword = setupConfirmPasswordInput.value;
+
+                    // Validaciones
+                    if (!businessName) {
+                        setupBusinessNameInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                    if (!currencyValue) {
+                         setupCurrencySelect.classList.add('is-invalid');
+                         isValid = false;
+                    }
+                    if (!password || password.length < 4) {
+                         setupPasswordInput.classList.add('is-invalid');
+                         isValid = false;
+                    }
+                    if (!confirmPassword || password !== confirmPassword) {
+                         setupConfirmPasswordInput.classList.add('is-invalid');
+                         // Asegurarse que el mensaje de error específico para confirmación se muestre
+                         const feedback = setupConfirmPasswordInput.nextElementSibling;
+                         if (feedback && feedback.classList.contains('invalid-feedback')) {
+                            feedback.textContent = (!confirmPassword) ? 'La confirmación es obligatoria.' : 'Las contraseñas no coinciden.';
+                         }
+                         isValid = false;
+                    } else {
+                         // Resetear mensaje de error si ahora coincide
+                         const feedback = setupConfirmPasswordInput.nextElementSibling;
+                          if (feedback && feedback.classList.contains('invalid-feedback')) {
+                            feedback.textContent = 'Las contraseñas no coinciden.'; // Volver al mensaje por defecto
+                         }
+                    }
+
+
+                    if (!isValid) {
+                        console.log('Setup validation failed');
+                        setupErrorMessage.classList.remove('d-none'); // Mostrar error general
+                        // Enfocar el primer campo inválido podría ser útil
+                         const firstInvalid = setupForm.querySelector('.is-invalid');
+                         if (firstInvalid) firstInvalid.focus();
+                        return;
+                    }
+
+                    // Si la validación es correcta:
+                    console.log('Setup validation passed. Saving data...');
+
+                    try {
+                        const selectedCurrencyData = JSON.parse(currencyValue);
+
+                        // 1. Crear y guardar la configuración principal
+                        const initialConfig = {
+                            businessName: businessName,
+                            currency: selectedCurrencyData, // Guardamos el objeto {code, symbol, decimals}
+                            masterPassword: password,
+                            businessType: 'store', // Por defecto 'tienda'
+                            address: '', // Añadir campos vacíos para futura edición
+                            phone: '',
+                            taxId: '',
+                            config_banks: [] // Inicializar cuentas bancarias vacías
+                        };
+                        if (!saveData('gestionaFacilConfig', initialConfig)) {
+                            throw new Error("Failed to save initial config."); // Lanzar error si saveData falla
+                        }
+
+
+                        // 2. Inicializar otras estructuras de datos necesarias como vacías
+                        const initializations = {
+                            'productos': [],
+                            'proveedores': [],
+                            'clientes': [], // Incluirá deuda: { id, name, ..., debt: 0, debtHistory: [] }
+                            'ventas': [], // { id, date, items:[], total, paymentMethod, clientId (opcional) }
+                            'gastos': [], // { id, date, amount, type, description, category, paymentMethod, bankRef }
+                            'cashRegisterStatus': { isOpen: false, openingTime: null, openingBalance: 0, lastCloseTime: null },
+                            'cashHistory': [], // { closeTime, openingTime, openingBalance, ..., closingBalanceCalculated, closingBalanceActual, difference }
+                            'inventoryAdjustments': [], // { id, date, productId, type, quantity, notes }
+                            'restaurantTables': [], // { id, name, status: 'free' } - Solo si businessType es 'restaurant'
+                            'activeOrders': [] // { id, type: 'table'/'delivery', tableId/deliveryInfo, items: [], total, status: 'open'/'paying'/'closed' }
+                        };
+
+                        let allSaved = true;
+                        for (const key in initializations) {
+                            if (!saveData(key, initializations[key])) {
+                                allSaved = false;
+                                console.error(`Failed to initialize ${key}`);
+                                // Podríamos intentar revertir, pero con localStorage es complicado.
+                                // Mejor informar al usuario.
+                                throw new Error(`Failed to initialize storage for ${key}. Setup incomplete.`);
+                            }
+                        }
+
+                        if (allSaved) {
+                             console.log('Initial setup complete. Redirecting to dashboard...');
+                             window.location.href = 'dashboard.html';
+                        }
+
+
+                    } catch (e) {
+                         console.error('Error during setup process:', e);
+                         setupErrorMessage.textContent = `Error crítico durante la configuración: ${e.message}. Inténtalo de nuevo o revisa la consola.`;
+                         setupErrorMessage.classList.remove('d-none');
+                    }
+
+                });
+            }
+
+            console.log('Gestiona Fácil - Página de Login/Setup Cargada');
+        });
+    </script>
+
+</body>
+</html>

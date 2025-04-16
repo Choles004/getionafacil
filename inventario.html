@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Gestión de Inventario</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa; --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef; --sidebar-link-active-bg-light: #0d6efd; --sidebar-link-active-color-light: #ffffff;
+            --sidebar-bg-dark: #212529; --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40; --sidebar-link-active-bg-dark: #0d6efd; --sidebar-link-active-color-dark: #ffffff;
+        }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light); transition: background-color 0.3s ease, color 0.3s ease; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; border-right: 1px solid var(--bs-border-color); }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Inventario */
+        #inventory-table th, #inventory-table td { vertical-align: middle; padding: 0.5rem; font-size: 0.9rem;}
+        #inventory-table .action-buttons button { padding: 0.2rem 0.4rem; font-size: 0.8rem; }
+        .stock-ok { color: var(--bs-success); }
+        .stock-low { color: var(--bs-warning); font-weight: bold; }
+        .stock-out { color: var(--bs-danger); font-weight: bold; }
+
+        /* Estilo Modal Ajuste */
+        #adjustment-product-display { font-weight: bold; }
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+             #inventory-table th, #inventory-table td { font-size: 0.85rem; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+              .inventory-filters .col-md-auto { width: 50%; } /* Ajustar filtros */
+              .inventory-filters .input-group { width: 100%; }
+         }
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a>
+             <a class="nav-link active" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+            <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Gestión de Inventario</h1>
+
+            <!-- Filtros y Acciones -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 inventory-filters">
+                 <div class="col-md-auto btn-group" role="group" aria-label="Filtros de stock">
+                     <input type="radio" class="btn-check" name="stockFilter" id="filter-all" value="all" autocomplete="off" checked>
+                     <label class="btn btn-outline-secondary btn-sm" for="filter-all">Todos</label>
+
+                     <input type="radio" class="btn-check" name="stockFilter" id="filter-managed" value="managed" autocomplete="off">
+                     <label class="btn btn-outline-secondary btn-sm" for="filter-managed">Gestionados</label>
+
+                     <input type="radio" class="btn-check" name="stockFilter" id="filter-low" value="low" autocomplete="off">
+                     <label class="btn btn-outline-secondary btn-sm" for="filter-low">Bajo Stock</label>
+
+                     <input type="radio" class="btn-check" name="stockFilter" id="filter-out" value="out" autocomplete="off">
+                     <label class="btn btn-outline-secondary btn-sm" for="filter-out">Sin Stock</label>
+                </div>
+                <div class="col-md-auto input-group input-group-sm" style="max-width: 300px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="search-input" class="form-control" placeholder="Buscar producto...">
+                </div>
+                <div class="col-md-auto">
+                    <button id="download-csv-button" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-download me-1"></i> Descargar Estado Actual (CSV)
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Tabla de Inventario -->
+             <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Estado del Inventario</h5>
+                </div>
+                 <div class="card-body p-0">
+                     <div class="table-responsive">
+                         <table class="table table-striped table-hover table-sm mb-0" id="inventory-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>SKU</th>
+                                    <th>Stock Actual</th>
+                                    <th>Stock Mínimo</th>
+                                    <th>Unidad</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filas aquí -->
+                                <tr>
+                                    <td colspan="8" class="text-center p-4">
+                                        <div id="loading-message"><div class="spinner-border spinner-border-sm"></div> Cargando inventario...</div>
+                                        <div id="empty-message" class="d-none text-muted">No hay productos con inventario gestionado o que coincidan con los filtros.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                         </table>
+                     </div>
+                 </div>
+             </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+    <!-- Modal Ajuste de Inventario -->
+    <div class="modal fade" id="adjustmentModal" tabindex="-1" aria-labelledby="adjustmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adjustmentModalLabel">Ajuste Manual de Inventario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <form id="adjustment-form" novalidate>
+                         <input type="hidden" id="adjustment-product-id">
+                         <div class="mb-3">
+                             <label class="form-label">Producto:</label>
+                             <p id="adjustment-product-display" class="form-control-plaintext ps-2">--</p>
+                         </div>
+                         <div class="mb-3">
+                             <label class="form-label">Stock Actual:</label>
+                              <p id="adjustment-current-stock" class="form-control-plaintext ps-2">--</p>
+                         </div>
+                         <div class="mb-3">
+                             <label for="adjustment-type" class="form-label">Tipo de Ajuste <span class="text-danger">*</span></label>
+                             <select class="form-select" id="adjustment-type" required>
+                                 <option value="" disabled selected>Seleccionar tipo...</option>
+                                 <option value="addition">Entrada / Adición (+)</option>
+                                 <option value="subtraction">Salida / Sustracción (-)</option>
+                                 <option value="inventory_count">Conteo / Inventario Físico (=)</option>
+                                 <option value="damage">Daño / Merma (-)</option>
+                                 <option value="loss">Pérdida / Robo (-)</option>
+                                 <option value="return">Devolución Cliente (+)</option>
+                                 <option value="other_in">Otra Entrada (+)</option>
+                                 <option value="other_out">Otra Salida (-)</option>
+                             </select>
+                             <div class="invalid-feedback">Selecciona un tipo de ajuste.</div>
+                         </div>
+                         <div class="mb-3">
+                             <label for="adjustment-quantity" class="form-label">Cantidad <span class="text-danger">*</span></label>
+                             <input type="number" step="any" class="form-control" id="adjustment-quantity" required>
+                             <div class="form-text">Para Conteo, introduce la cantidad total contada. Para otros, la cantidad a sumar/restar.</div>
+                              <div class="invalid-feedback">La cantidad es obligatoria y debe ser numérica.</div>
+                         </div>
+                         <div class="mb-3">
+                            <label for="adjustment-notes" class="form-label">Notas / Razón <span class="text-danger">*</span></label>
+                             <textarea class="form-control" id="adjustment-notes" rows="3" required></textarea>
+                             <div class="invalid-feedback">Las notas son obligatorias para registrar el motivo del ajuste.</div>
+                         </div>
+                         <div id="adjustment-error-message" class="alert alert-danger d-none mt-3"></div>
+                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="save-adjustment-button" class="btn btn-primary">Guardar Ajuste</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const themeToggleButton = document.getElementById('theme-toggle'); /* ... */ const htmlElement = document.documentElement; const themeIcon = themeToggleButton.querySelector('i'); const themeText = themeToggleButton.querySelector('span'); const logoutButton = document.getElementById('logout-button'); const sidebarBusinessName = document.getElementById('sidebar-business-name'); const restaurantLink = document.getElementById('restaurant-link');
+            const filterRadios = document.querySelectorAll('input[name="stockFilter"]');
+            const searchInput = document.getElementById('search-input');
+            const downloadCsvButton = document.getElementById('download-csv-button');
+            const inventoryTableBody = document.querySelector('#inventory-table tbody');
+            const loadingMessage = document.getElementById('loading-message');
+            const emptyMessage = document.getElementById('empty-message');
+            // Modal
+            const adjustmentModalEl = document.getElementById('adjustmentModal');
+            const adjustmentModal = new bootstrap.Modal(adjustmentModalEl);
+            const adjustmentForm = document.getElementById('adjustment-form');
+            const adjustmentProductIdInput = document.getElementById('adjustment-product-id');
+            const adjustmentProductDisplay = document.getElementById('adjustment-product-display');
+            const adjustmentCurrentStockDisplay = document.getElementById('adjustment-current-stock');
+            const adjustmentTypeSelect = document.getElementById('adjustment-type');
+            const adjustmentQuantityInput = document.getElementById('adjustment-quantity');
+            const adjustmentNotesInput = document.getElementById('adjustment-notes');
+            const saveAdjustmentButton = document.getElementById('save-adjustment-button');
+             const adjustmentErrorMessage = document.getElementById('adjustment-error-message');
+
+            let allProducts = []; // Caché local de productos
+            let allProviders = []; // Caché local de proveedores
+            let currencyConfig = {};
+            let currentFilter = 'all'; // Filtro de stock activo
+            let currentSearchTerm = ''; // Término de búsqueda activo
+
+             // --- Lógica Tema, Sidebar, Auxiliares (Igual que antes) ---
+            const applyTheme = (theme) => { /* ... */ htmlElement.setAttribute('data-bs-theme', theme); if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; } else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; } try { localStorage.setItem('preferredTheme', theme); } catch (e) {} };
+            const loadTheme = () => { /* ... */ let pT = null; try { pT = localStorage.getItem('preferredTheme'); } catch (e) {} if (pT) { applyTheme(pT); } else { const pD = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(pD ? 'dark' : 'light'); } };
+            themeToggleButton.addEventListener('click', () => { const cT = htmlElement.getAttribute('data-bs-theme'); applyTheme(cT === 'dark' ? 'light' : 'dark'); }); loadTheme();
+            logoutButton.addEventListener('click', () => { if (confirm('¿Seguro?')) window.location.href = 'login.html'; });
+            function loadData(key, defaultValue = null) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : defaultValue; } catch (e) { console.error(`LS Load (${key}):`, e); return defaultValue; } }
+            function saveData(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error(`LS Save (${key}):`, e); alert(`Error al guardar ${key}.`); return false; } }
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+             function getLocaleForCurrency(code) { const map = { /*...*/ }; return map[code]; }
+             function formatCurrency(amount, config) { /*...*/ return "..."; } // Podría necesitarse si mostramos valor inventario
+
+            // --- Autenticación y Configuración Inicial ---
+            const config = loadData('gestionaFacilConfig');
+            if (!config || !config.masterPassword) { window.location.href = 'login.html'; return; }
+            currencyConfig = config.currency || { code: 'USD', symbol: '$', decimals: 2 };
+            if (config.businessName) sidebarBusinessName.textContent = config.businessName;
+            if (config.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+
+            // --- Lógica Tabla y Filtros ---
+            function renderInventoryTable() {
+                loadingMessage.style.display = 'inline-block';
+                emptyMessage.classList.add('d-none');
+                inventoryTableBody.innerHTML = '';
+
+                 // Filtrar productos
+                let filteredProducts = allProducts.filter(p => {
+                    // Filtrar por gestión de inventario si es necesario
+                    if (currentFilter === 'managed' && !p.manageStock) return false;
+                    if (currentFilter === 'low' && (!p.manageStock || typeof p.stock !== 'number' || typeof p.minimumStock !== 'number' || p.stock >= p.minimumStock)) return false;
+                     if (currentFilter === 'out' && (!p.manageStock || typeof p.stock !== 'number' || p.stock > 0)) return false;
+
+                    // Filtrar por término de búsqueda
+                    if (currentSearchTerm) {
+                        const provider = allProviders.find(prov => prov.id === p.providerId);
+                        const nameMatch = p.name && p.name.toLowerCase().includes(currentSearchTerm);
+                        const skuMatch = p.sku && p.sku.toLowerCase().includes(currentSearchTerm);
+                        const providerMatch = provider && provider.name.toLowerCase().includes(currentSearchTerm);
+                        if (!nameMatch && !skuMatch && !providerMatch) return false;
+                    }
+                    return true; // Pasa todos los filtros
+                });
+
+                 // Ordenar (ej. por nombre)
+                 filteredProducts.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+                 loadingMessage.style.display = 'none';
+
+                 if (filteredProducts.length === 0) {
+                     emptyMessage.classList.remove('d-none');
+                     inventoryTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-3">No hay productos que coincidan con los filtros.</td></tr>`;
+                     return;
+                 }
+
+                 filteredProducts.forEach(product => {
+                    const provider = allProviders.find(p => p.id === product.providerId);
+                    const stock = product.manageStock ? (product.stock ?? 'N/A') : 'No gestionado';
+                    const minStock = product.manageStock ? (product.minimumStock ?? '-') : '-';
+                    let stockStatus = { text: 'N/A', class: '' };
+
+                    if (product.manageStock && typeof product.stock === 'number') {
+                         if (product.stock <= 0) {
+                             stockStatus = { text: 'Sin Stock', class: 'stock-out' };
+                         } else if (typeof product.minimumStock === 'number' && product.stock < product.minimumStock) {
+                             stockStatus = { text: 'Bajo', class: 'stock-low' };
+                         } else {
+                              stockStatus = { text: 'OK', class: 'stock-ok' };
+                         }
+                    } else if (!product.manageStock) {
+                         stockStatus = { text: 'No gestionado', class: 'text-muted' };
+                    }
+
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${product.name || 'N/A'}</td>
+                        <td>${product.sku || '-'}</td>
+                        <td class="text-end">${stock}</td>
+                        <td class="text-end">${minStock}</td>
+                        <td>${product.unit || '-'}</td>
+                        <td>${provider ? provider.name : '-'}</td>
+                        <td><span class="${stockStatus.class}">${stockStatus.text}</span></td>
+                        <td class="text-center action-buttons">
+                            ${product.manageStock ? `<button class="btn btn-outline-warning adjust-stock-btn" data-id="${product.id}" title="Ajustar Stock">
+                                <i class="fas fa-edit"></i>
+                            </button>` : ''}
+                        </td>
+                    `;
+                     inventoryTableBody.appendChild(tr);
+                 });
+            }
+
+             function applyFilters() {
+                 const selectedRadio = document.querySelector('input[name="stockFilter"]:checked');
+                 currentFilter = selectedRadio ? selectedRadio.value : 'all';
+                 currentSearchTerm = searchInput.value.toLowerCase().trim();
+                 renderInventoryTable();
+             }
+
+             // --- Lógica Modal Ajuste ---
+             function openAdjustmentModal(productId) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product || !product.manageStock) {
+                     alert("Error: Producto no encontrado o no gestiona inventario.");
+                     return;
+                 }
+
+                 // Resetear formulario
+                 adjustmentForm.reset();
+                 adjustmentForm.classList.remove('was-validated');
+                 adjustmentErrorMessage.classList.add('d-none');
+
+                 adjustmentProductIdInput.value = product.id;
+                 adjustmentProductDisplay.textContent = `${product.name} (${product.sku || 'Sin SKU'})`;
+                 const currentStock = product.stock ?? 0; // Usar 0 si es null/undefined
+                 adjustmentCurrentStockDisplay.textContent = `${currentStock} ${product.unit || ''}`;
+
+                 // Ajustar step del input de cantidad según unidad
+                  const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(product.unit);
+                  adjustmentQuantityInput.step = allowDecimalStock ? 'any' : '1';
+                  adjustmentQuantityInput.min = allowDecimalStock ? '0.000001' : '1'; // Min positivo
+
+                 adjustmentModal.show();
+             }
+
+             function validateAdjustmentForm() {
+                 adjustmentErrorMessage.classList.add('d-none');
+                 if (!adjustmentForm.checkValidity()) {
+                     adjustmentForm.classList.add('was-validated');
+                     return false;
+                 }
+                 // Validación numérica de cantidad
+                 const quantity = parseFloat(adjustmentQuantityInput.value);
+                 if (isNaN(quantity)) {
+                     adjustmentQuantityInput.classList.add('is-invalid');
+                     adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'La cantidad debe ser numérica.'; // Mostrar error específico
+                      adjustmentForm.classList.add('was-validated');
+                     return false;
+                 } else {
+                     adjustmentQuantityInput.classList.remove('is-invalid');
+                      adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'La cantidad es obligatoria.'; // Reset error
+                 }
+
+                 // Validar entero si es necesario
+                 const product = allProducts.find(p => p.id === adjustmentProductIdInput.value);
+                 const allowDecimalStock = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm'].includes(product?.unit);
+                 if (!allowDecimalStock && !Number.isInteger(quantity) && adjustmentTypeSelect.value === 'inventory_count') {
+                      adjustmentQuantityInput.classList.add('is-invalid');
+                      adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'El conteo debe ser un número entero para esta unidad.';
+                      adjustmentForm.classList.add('was-validated');
+                     return false;
+                 } else if (!allowDecimalStock && quantity <= 0 && adjustmentTypeSelect.value !== 'inventory_count') {
+                      adjustmentQuantityInput.classList.add('is-invalid');
+                      adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'La cantidad a sumar/restar debe ser > 0.';
+                       adjustmentForm.classList.add('was-validated');
+                       return false;
+                 } else if (allowDecimalStock && quantity <= 0 && adjustmentTypeSelect.value !== 'inventory_count') {
+                      adjustmentQuantityInput.classList.add('is-invalid');
+                      adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'La cantidad a sumar/restar debe ser > 0.';
+                       adjustmentForm.classList.add('was-validated');
+                       return false;
+                 } else {
+                      // Resetear mensaje de error si pasa validación específica
+                      adjustmentQuantityInput.nextElementSibling.nextElementSibling.textContent = 'La cantidad es obligatoria y debe ser numérica.';
+                 }
+
+
+                 return true;
+             }
+
+             function handleSaveAdjustment() {
+                if (!validateAdjustmentForm()) return;
+
+                const productId = adjustmentProductIdInput.value;
+                const productIndex = allProducts.findIndex(p => p.id === productId);
+                if (productIndex === -1) {
+                     adjustmentErrorMessage.textContent = "Error: Producto no encontrado.";
+                     adjustmentErrorMessage.classList.remove('d-none');
+                     return;
+                 }
+
+                const adjustmentType = adjustmentTypeSelect.value;
+                const quantity = parseFloat(adjustmentQuantityInput.value);
+                const notes = adjustmentNotesInput.value.trim();
+                const currentStock = allProducts[productIndex].stock ?? 0;
+                let newStock = currentStock; // Valor por defecto
+
+                 // Calcular nuevo stock
+                 switch (adjustmentType) {
+                    case 'addition':
+                    case 'return':
+                    case 'other_in':
+                         newStock = currentStock + quantity;
+                         break;
+                    case 'subtraction':
+                    case 'damage':
+                    case 'loss':
+                    case 'other_out':
+                         newStock = currentStock - quantity;
+                         if (newStock < 0) { // No permitir stock negativo con ajustes manuales (decisión de diseño)
+                            adjustmentErrorMessage.textContent = `Error: El ajuste resultaría en stock negativo (${newStock}). Stock actual: ${currentStock}.`;
+                            adjustmentErrorMessage.classList.remove('d-none');
+                            return; // Detener guardado
+                         }
+                         break;
+                    case 'inventory_count':
+                         newStock = quantity; // Establecer stock al valor contado
+                         break;
+                    default:
+                         adjustmentErrorMessage.textContent = "Error: Tipo de ajuste inválido.";
+                         adjustmentErrorMessage.classList.remove('d-none');
+                         return;
+                 }
+
+                 // Crear registro de ajuste
+                 const adjustmentRecord = {
+                     id: generateId(),
+                     date: new Date().toISOString(),
+                     productId: productId,
+                     productName: allProducts[productIndex].name, // Guardar nombre por conveniencia
+                     type: adjustmentType,
+                     quantity: adjustmentType === 'inventory_count' ? quantity : (['addition', 'return', 'other_in'].includes(adjustmentType) ? quantity : -quantity), // Guardar diferencia para +/-
+                     notes: notes,
+                     stockBefore: currentStock,
+                     stockAfter: newStock
+                 };
+
+                 // Actualizar stock del producto
+                 allProducts[productIndex].stock = newStock;
+
+                 // Guardar registro y productos actualizados
+                 let adjustments = loadData('inventoryAdjustments', []);
+                 adjustments.push(adjustmentRecord);
+
+                 if (saveData('productos', allProducts) && saveData('inventoryAdjustments', adjustments)) {
+                     console.log('Ajuste de inventario guardado:', adjustmentRecord);
+                     renderInventoryTable(); // Actualizar tabla principal
+                     adjustmentModal.hide(); // Cerrar modal
+                 } else {
+                      // Revertir cambios si falla el guardado
+                      allProducts = loadData('productos', []);
+                      adjustments = loadData('inventoryAdjustments', []);
+                      adjustmentErrorMessage.textContent = "Error al guardar el ajuste. Inténtalo de nuevo.";
+                      adjustmentErrorMessage.classList.remove('d-none');
+                 }
+             }
+
+             // --- CSV ---
+             function generateCSV() {
+                 // Usar los productos actualmente filtrados
+                 const productsToExport = allProducts.filter(p => {
+                      if (currentFilter === 'managed' && !p.manageStock) return false;
+                      if (currentFilter === 'low' && (!p.manageStock || typeof p.stock !== 'number' || typeof p.minimumStock !== 'number' || p.stock >= p.minimumStock)) return false;
+                      if (currentFilter === 'out' && (!p.manageStock || typeof p.stock !== 'number' || p.stock > 0)) return false;
+                      if (currentSearchTerm) { const provider = allProviders.find(prov => prov.id === p.providerId); const nameMatch = p.name && p.name.toLowerCase().includes(currentSearchTerm); const skuMatch = p.sku && p.sku.toLowerCase().includes(currentSearchTerm); const providerMatch = provider && provider.name.toLowerCase().includes(currentSearchTerm); if (!nameMatch && !skuMatch && !providerMatch) return false; }
+                      return true;
+                 });
+
+                 if (productsToExport.length === 0) { alert("No hay productos que coincidan con los filtros para exportar."); return; }
+
+                 const headers = ["ID Producto", "Nombre", "SKU", "Stock Actual", "Stock Mínimo", "Unidad", "ID Proveedor", "Nombre Proveedor", "Gestiona Stock"];
+                 const rows = productsToExport.map(p => {
+                     const provider = allProviders.find(prov => prov.id === p.providerId);
+                     return [
+                         p.id, `"${p.name || ''}"`, p.sku || '',
+                         p.manageStock ? (p.stock ?? '') : '', // Vacío si no se gestiona
+                         p.manageStock ? (p.minimumStock ?? '') : '',
+                         p.unit || '', p.providerId || '', provider ? `"${provider.name}"` : '',
+                         p.manageStock ? 'Sí' : 'No'
+                     ].join(',');
+                 });
+
+                 const csv = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
+                 const link = document.createElement("a");
+                 link.setAttribute("href", encodeURI(csv));
+                 link.setAttribute("download", `inventario_actual_${new Date().toISOString().slice(0,10)}.csv`);
+                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
+             }
+
+
+            // --- Carga Inicial y Listeners ---
+            function initialize() {
+                 allProducts = loadData('productos', []);
+                 allProviders = loadData('proveedores', []);
+                 renderInventoryTable(); // Render inicial
+
+                 // Listeners filtros y búsqueda
+                 filterRadios.forEach(radio => radio.addEventListener('change', applyFilters));
+                 searchInput.addEventListener('input', applyFilters);
+                 downloadCsvButton.addEventListener('click', generateCSV);
+
+                 // Listener delegado para botón de ajuste
+                 inventoryTableBody.addEventListener('click', (event) => {
+                     const adjustButton = event.target.closest('.adjust-stock-btn');
+                     if (adjustButton) {
+                         openAdjustmentModal(adjustButton.dataset.id);
+                     }
+                 });
+
+                 // Listener botón guardar modal
+                 saveAdjustmentButton.addEventListener('click', handleSaveAdjustment);
+
+                 console.log('Página de Inventario Inicializada.');
+            }
+
+            // --- Iniciar ---
+            initialize();
+        });
+    </script>
+
+</body>
+</html>

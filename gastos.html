@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Registro de Gastos</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa; --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef; --sidebar-link-active-bg-light: #0d6efd; --sidebar-link-active-color-light: #ffffff;
+            --sidebar-bg-dark: #212529; --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40; --sidebar-link-active-bg-dark: #0d6efd; --sidebar-link-active-color-dark: #ffffff;
+        }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light); transition: background-color 0.3s ease, color 0.3s ease; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; border-right: 1px solid var(--bs-border-color); }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Gastos */
+        #expense-history-table th, #expense-history-table td { vertical-align: middle; padding: 0.5rem; font-size: 0.9rem;}
+        #expense-history-table .action-buttons button { padding: 0.2rem 0.4rem; font-size: 0.8rem; }
+        #bank-ref-group { display: none; } /* Oculto por defecto */
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+            #expense-history-table th, #expense-history-table td { font-size: 0.85rem; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+              .filter-form .col-md-3, .filter-form .col-md-2 { width: 50%; } /* Ajustar filtros en móvil */
+              .filter-form button { width: 100%; margin-top: 0.5rem; }
+         }
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link active" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a>
+             <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+            <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Registro de Gastos</h1>
+
+            <!-- Formulario de Registro de Gasto -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i> Registrar Nuevo Gasto</h5>
+                </div>
+                <div class="card-body">
+                    <form id="expense-form" novalidate>
+                        <div id="form-error-message" class="alert alert-danger d-none" role="alert"></div>
+                        <div class="row g-3">
+                            <div class="col-md-4 col-lg-2">
+                                <label for="expense-date" class="form-label">Fecha <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="expense-date" required>
+                                <div class="invalid-feedback">Fecha obligatoria.</div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <label for="expense-amount" class="form-label">Monto <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text" id="currency-symbol">$</span>
+                                    <input type="number" step="any" min="0.01" class="form-control" id="expense-amount" required>
+                                    <div class="invalid-feedback">Monto > 0 obligatorio.</div>
+                                </div>
+                            </div>
+                             <div class="col-md-4 col-lg-2">
+                                <label for="expense-type" class="form-label">Tipo <span class="text-danger">*</span></label>
+                                <select class="form-select" id="expense-type" required>
+                                    <option value="" disabled selected>Seleccionar...</option>
+                                    <option value="Gasto Fijo">Gasto Fijo</option>
+                                    <option value="Gasto Variable">Gasto Variable</option>
+                                    <option value="Compra Inventario">Compra Inventario</option>
+                                    <option value="Retiro Personal">Retiro Personal</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                 <div class="invalid-feedback">Selecciona un tipo.</div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <label for="expense-description" class="form-label">Beneficiario / Desc. <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="expense-description" required>
+                                <div class="invalid-feedback">Descripción obligatoria.</div>
+                            </div>
+                             <div class="col-md-6 col-lg-3">
+                                <label for="expense-category" class="form-label">Categoría <span class="text-danger">*</span></label>
+                                <select class="form-select" id="expense-category" required>
+                                    <option value="" disabled selected>Seleccionar...</option>
+                                    <option value="Alquiler/Renta">Alquiler/Renta</option>
+                                    <option value="Nómina/Salarios">Nómina/Salarios</option>
+                                    <option value="Servicios Públicos">Servicios Públicos (Luz, Agua, Gas, Internet)</option>
+                                    <option value="Marketing/Publicidad">Marketing/Publicidad</option>
+                                    <option value="Suministros Oficina">Suministros de Oficina</option>
+                                    <option value="Compras Inventario">Compras de Inventario</option>
+                                    <option value="Impuestos/Tasas">Impuestos/Tasas</option>
+                                    <option value="Transporte/Envío">Transporte/Envío</option>
+                                    <option value="Reparaciones/Mantenimiento">Reparaciones/Mantenimiento</option>
+                                     <option value="Comisiones Bancarias">Comisiones Bancarias</option>
+                                    <option value="Retiro Socio/Dueño">Retiro Socio/Dueño</option>
+                                    <option value="Otros Gastos">Otros Gastos</option>
+                                </select>
+                                 <div class="invalid-feedback">Selecciona una categoría.</div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <label for="expense-payment-method" class="form-label">Método Pago <span class="text-danger">*</span></label>
+                                <select class="form-select" id="expense-payment-method" required>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Tarjeta">Tarjeta</option>
+                                    <!-- Bancos se cargarán aquí -->
+                                </select>
+                                 <div class="invalid-feedback">Selecciona un método.</div>
+                            </div>
+                            <div class="col-md-4 col-lg-3" id="bank-ref-group">
+                                <label for="expense-bank-ref" class="form-label">Referencia Banco (Opcional)</label>
+                                <input type="text" class="form-control" id="expense-bank-ref">
+                            </div>
+                            <div class="col-md-4 col-lg-7">
+                                <label for="expense-notes" class="form-label">Notas Adicionales (Opcional)</label>
+                                <input type="text" class="form-control" id="expense-notes">
+                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="submit" class="btn btn-success"><i class="fas fa-plus me-1"></i> Registrar Gasto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Historial de Gastos -->
+            <div class="card shadow-sm">
+                 <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i> Historial de Gastos</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form id="filter-form" class="row g-3 align-items-end mb-3 filter-form">
+                        <div class="col-md-3">
+                             <label for="filter-date-start" class="form-label form-label-sm">Desde</label>
+                             <input type="date" id="filter-date-start" class="form-control form-control-sm">
+                        </div>
+                         <div class="col-md-3">
+                             <label for="filter-date-end" class="form-label form-label-sm">Hasta</label>
+                             <input type="date" id="filter-date-end" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filter-category" class="form-label form-label-sm">Categoría</label>
+                            <select id="filter-category" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <!-- Categorías cargadas aquí -->
+                            </select>
+                        </div>
+                        <div class="col-md-auto">
+                             <button type="button" id="filter-button" class="btn btn-primary btn-sm w-100">
+                                 <i class="fas fa-filter me-1"></i> Filtrar
+                             </button>
+                        </div>
+                        <div class="col-md-auto">
+                            <button type="button" id="download-csv-button" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-download me-1"></i> Descargar CSV
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Tabla Historial -->
+                    <div class="table-responsive">
+                         <table class="table table-striped table-hover table-sm" id="expense-history-table">
+                             <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Tipo</th>
+                                    <th>Beneficiario / Desc.</th>
+                                    <th>Categoría</th>
+                                    <th>Método Pago</th>
+                                    <th>Acciones</th>
+                                </tr>
+                             </thead>
+                             <tbody>
+                                <!-- Filas aquí -->
+                                 <tr>
+                                     <td colspan="7" class="text-center p-4">
+                                         <div id="loading-message"><div class="spinner-border spinner-border-sm"></div> Cargando historial...</div>
+                                         <div id="empty-message" class="d-none text-muted">No hay gastos registrados o que coincidan con los filtros.</div>
+                                     </td>
+                                 </tr>
+                             </tbody>
+                             <tfoot class="table-group-divider fw-bold">
+                                 <tr>
+                                     <td colspan="6" class="text-end">Total Gastos Filtrados:</td>
+                                     <td id="total-filtered-expenses" class="text-danger">--</td>
+                                      <td></td> <!-- Celda vacía para columna acciones -->
+                                 </tr>
+                             </tfoot>
+                         </table>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const themeToggleButton = document.getElementById('theme-toggle'); const htmlElement = document.documentElement; const themeIcon = themeToggleButton.querySelector('i'); const themeText = themeToggleButton.querySelector('span'); const logoutButton = document.getElementById('logout-button'); const sidebarBusinessName = document.getElementById('sidebar-business-name'); const restaurantLink = document.getElementById('restaurant-link');
+            const expenseForm = document.getElementById('expense-form');
+            const formErrorMessage = document.getElementById('form-error-message');
+            const expenseDateInput = document.getElementById('expense-date');
+            const expenseAmountInput = document.getElementById('expense-amount');
+            const expenseTypeSelect = document.getElementById('expense-type');
+            const expenseDescriptionInput = document.getElementById('expense-description');
+            const expenseCategorySelect = document.getElementById('expense-category');
+            const expensePaymentMethodSelect = document.getElementById('expense-payment-method');
+            const bankRefGroup = document.getElementById('bank-ref-group');
+            const expenseBankRefInput = document.getElementById('expense-bank-ref');
+            const expenseNotesInput = document.getElementById('expense-notes');
+            const currencySymbol = document.getElementById('currency-symbol');
+            const filterDateStartInput = document.getElementById('filter-date-start');
+            const filterDateEndInput = document.getElementById('filter-date-end');
+            const filterCategorySelect = document.getElementById('filter-category');
+            const filterButton = document.getElementById('filter-button');
+            const downloadCsvButton = document.getElementById('download-csv-button');
+            const expenseHistoryTableBody = document.querySelector('#expense-history-table tbody');
+            const totalFilteredExpensesTd = document.getElementById('total-filtered-expenses');
+            const loadingMessage = document.getElementById('loading-message');
+            const emptyMessage = document.getElementById('empty-message');
+
+            let allExpenses = []; // Caché local
+            let filteredExpenses = []; // Para CSV y total
+            let currencyConfig = {};
+            let bankAccounts = []; // Lista de cuentas bancarias
+
+            // Categorías (hardcoded por ahora)
+            const expenseCategories = [ "Alquiler/Renta", "Nómina/Salarios", "Servicios Públicos", "Marketing/Publicidad", "Suministros Oficina", "Compras Inventario", "Impuestos/Tasas", "Transporte/Envío", "Reparaciones/Mantenimiento", "Comisiones Bancarias", "Retiro Socio/Dueño", "Otros Gastos" ];
+
+             // --- Lógica Tema, Sidebar, Auxiliares (Igual que antes) ---
+            const applyTheme = (theme) => { /* ... */ htmlElement.setAttribute('data-bs-theme', theme); if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; } else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; } try { localStorage.setItem('preferredTheme', theme); } catch (e) {} };
+            const loadTheme = () => { /* ... */ let pT = null; try { pT = localStorage.getItem('preferredTheme'); } catch (e) {} if (pT) { applyTheme(pT); } else { const pD = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(pD ? 'dark' : 'light'); } };
+            themeToggleButton.addEventListener('click', () => { const cT = htmlElement.getAttribute('data-bs-theme'); applyTheme(cT === 'dark' ? 'light' : 'dark'); }); loadTheme();
+            logoutButton.addEventListener('click', () => { if (confirm('¿Seguro?')) window.location.href = 'login.html'; });
+            function loadData(key, defaultValue = null) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : defaultValue; } catch (e) { console.error(`LS Load (${key}):`, e); return defaultValue; } }
+            function saveData(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error(`LS Save (${key}):`, e); alert(`Error al guardar ${key}.`); return false; } }
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+            function getLocaleForCurrency(code) { const map = { 'USD': 'en-US', /*...*/ 'COP': 'es-CO', 'MXN': 'es-MX', /*...*/ }; return map[code]; }
+            function formatCurrency(amount, config) { /* ... (igual que antes) ... */
+                if (amount === null || amount === undefined || isNaN(Number(amount))) { amount = 0; }
+                if (!config || !config.code || config.decimals === undefined) { return Number(amount).toLocaleString('es-ES'); }
+                try {
+                    const formatter = new Intl.NumberFormat(getLocaleForCurrency(config.code) || 'es-ES', { style: 'decimal', minimumFractionDigits: config.decimals, maximumFractionDigits: config.decimals });
+                    const formatted = formatter.format(amount); const symbol = config.symbol || config.code;
+                    if (['USD','EUR','GBP','MXN','ARS','COP','CLP','PEN'].includes(config.code)) return `${symbol}${formatted}`; else return `${formatted} ${symbol}`;
+                } catch (e) { return `${config.symbol || ''}${Number(amount).toFixed(config.decimals || 2)}`; }
+            }
+             function formatDateTimeForDisplay(isoString) {
+                 if (!isoString) return '--';
+                 try { return new Date(isoString).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }); }
+                 catch (e) { return 'Inválido'; }
+             }
+             function getCurrentDateTimeLocalString() { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); return now.toISOString().slice(0, 16); }
+
+            // --- Autenticación y Configuración Inicial ---
+            const config = loadData('gestionaFacilConfig');
+            if (!config || !config.masterPassword) { window.location.href = 'login.html'; return; }
+            currencyConfig = config.currency || { code: 'USD', symbol: '$', decimals: 2 };
+            currencySymbol.textContent = currencyConfig.symbol || '$';
+             bankAccounts = loadData('config_banks', []); // Cargar cuentas bancarias
+            if (config.businessName) sidebarBusinessName.textContent = config.businessName;
+            if (config.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+
+
+            // --- Llenar Selects Dinámicos ---
+            function populateSelects() {
+                // Categorías (en ambos formularios)
+                expenseCategorySelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                filterCategorySelect.innerHTML = '<option value="">Todas</option>';
+                expenseCategories.forEach(cat => {
+                    expenseCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+
+                // Métodos de pago (incluyendo bancos)
+                expensePaymentMethodSelect.innerHTML = `
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Transferencia">Transferencia</option>
+                `; // Base methods
+                bankAccounts.forEach(bank => {
+                    // Usar JSON stringify para guardar más info si es necesario, o solo el nombre/ID
+                    // Por simplicidad, usaremos "Banco: NombreBanco" como valor
+                    const bankValue = `Banco: ${bank.name}`;
+                    expensePaymentMethodSelect.innerHTML += `<option value="${bankValue}">${bank.name} (Banco)</option>`;
+                });
+                 expensePaymentMethodSelect.innerHTML += `<option value="Otro">Otro</option>`;
+            }
+
+            // --- Lógica Formulario Registro Gasto ---
+            function resetExpenseForm() {
+                 expenseForm.reset();
+                 expenseDateInput.value = getCurrentDateTimeLocalString(); // Fecha actual por defecto
+                 formErrorMessage.classList.add('d-none');
+                 expenseForm.classList.remove('was-validated');
+                 handlePaymentMethodChange(); // Ocultar ref banco
+            }
+
+            function validateExpenseForm() {
+                formErrorMessage.classList.add('d-none');
+                if (!expenseForm.checkValidity()) {
+                     expenseForm.classList.add('was-validated');
+                     formErrorMessage.textContent = 'Por favor, completa todos los campos obligatorios.';
+                     formErrorMessage.classList.remove('d-none');
+                     // Enfocar el primer inválido
+                     const firstInvalid = expenseForm.querySelector(':invalid');
+                     if(firstInvalid) firstInvalid.focus();
+                     return false;
+                 }
+                 // Validación extra para monto > 0
+                 const amount = parseFloat(expenseAmountInput.value);
+                 if (isNaN(amount) || amount <= 0) {
+                      expenseAmountInput.classList.add('is-invalid');
+                      expenseForm.classList.add('was-validated'); // Marcar como validado para mostrar mensaje
+                      formErrorMessage.textContent = 'El monto debe ser mayor que cero.';
+                      formErrorMessage.classList.remove('d-none');
+                      expenseAmountInput.focus();
+                      return false;
+                 } else {
+                     expenseAmountInput.classList.remove('is-invalid');
+                 }
+                 return true;
+             }
+
+            function handlePaymentMethodChange() {
+                const selectedMethod = expensePaymentMethodSelect.value;
+                // Mostrar referencia si empieza con "Banco:"
+                if (selectedMethod && selectedMethod.startsWith('Banco:')) {
+                    bankRefGroup.style.display = 'block';
+                } else {
+                    bankRefGroup.style.display = 'none';
+                    expenseBankRefInput.value = ''; // Limpiar si se oculta
+                }
+            }
+
+            function handleExpenseFormSubmit(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (!validateExpenseForm()) return;
+
+                const expenseData = {
+                    id: generateId(),
+                    date: new Date(expenseDateInput.value).toISOString(),
+                    amount: parseFloat(expenseAmountInput.value),
+                    type: expenseTypeSelect.value,
+                    description: expenseDescriptionInput.value.trim(),
+                    category: expenseCategorySelect.value,
+                    paymentMethod: expensePaymentMethodSelect.value,
+                    bankRef: expensePaymentMethodSelect.value.startsWith('Banco:') ? expenseBankRefInput.value.trim() || null : null,
+                    notes: expenseNotesInput.value.trim() || null
+                };
+
+                 allExpenses.push(expenseData);
+
+                 if (saveData('gastos', allExpenses)) {
+                     console.log('Gasto registrado:', expenseData.id);
+                     resetExpenseForm();
+                     renderExpenseHistory(); // Actualizar historial
+                 } else {
+                     // Revertir si falla
+                     allExpenses = loadData('gastos', []);
+                     alert("Error al guardar el gasto.");
+                 }
+            }
+
+
+            // --- Lógica Historial y Filtros ---
+            function renderExpenseHistory() {
+                 loadingMessage.style.display = 'inline-block'; // Mostrar carga
+                 emptyMessage.classList.add('d-none');
+                 expenseHistoryTableBody.innerHTML = ''; // Limpiar tabla
+
+                 const dateStartFilter = filterDateStartInput.value ? new Date(filterDateStartInput.value + "T00:00:00") : null;
+                 const dateEndFilter = filterDateEndInput.value ? new Date(filterDateEndInput.value + "T23:59:59") : null;
+                 const categoryFilter = filterCategorySelect.value;
+
+                 filteredExpenses = allExpenses.filter(expense => {
+                     const expenseDate = new Date(expense.date);
+                     const dateMatch = (!dateStartFilter || expenseDate >= dateStartFilter) &&
+                                       (!dateEndFilter || expenseDate <= dateEndFilter);
+                     const categoryMatch = !categoryFilter || expense.category === categoryFilter;
+                     return dateMatch && categoryMatch;
+                 });
+
+                  // Ordenar por fecha descendente
+                 filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+
+                 loadingMessage.style.display = 'none'; // Ocultar carga
+
+                 if (filteredExpenses.length === 0) {
+                     emptyMessage.classList.remove('d-none');
+                     expenseHistoryTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted p-3">No hay gastos que coincidan.</td></tr>`;
+                     totalFilteredExpensesTd.textContent = formatCurrency(0, currencyConfig);
+                     return;
+                 }
+
+                 let totalAmount = 0;
+                 filteredExpenses.forEach(expense => {
+                     totalAmount += expense.amount;
+                     const tr = document.createElement('tr');
+                     tr.innerHTML = `
+                        <td>${formatDateTimeForDisplay(expense.date)}</td>
+                        <td class="text-end text-danger">${formatCurrency(expense.amount, currencyConfig)}</td>
+                        <td>${expense.type || '-'}</td>
+                        <td>${expense.description || '-'}</td>
+                        <td>${expense.category || '-'}</td>
+                        <td>${expense.paymentMethod || '-'}${expense.bankRef ? ` (${expense.bankRef})` : ''}</td>
+                        <td class="text-center action-buttons">
+                            <button class="btn btn-outline-danger delete-btn" data-id="${expense.id}" title="Eliminar Gasto">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    expenseHistoryTableBody.appendChild(tr);
+                 });
+
+                 totalFilteredExpensesTd.textContent = formatCurrency(totalAmount, currencyConfig);
+            }
+
+            function deleteExpense(expenseId) {
+                const expense = allExpenses.find(e => e.id === expenseId);
+                 if (!expense) return;
+
+                 if (confirm(`¿Seguro de eliminar el gasto "${expense.description}" por ${formatCurrency(expense.amount, currencyConfig)}?`)) {
+                     allExpenses = allExpenses.filter(e => e.id !== expenseId);
+                     if (saveData('gastos', allExpenses)) {
+                         console.log('Gasto eliminado:', expenseId);
+                         renderExpenseHistory(); // Re-renderizar con filtros actuales
+                     } else {
+                         allExpenses = loadData('gastos', []); // Revertir
+                         alert("Error al guardar la eliminación.");
+                     }
+                 }
+            }
+
+             // --- CSV ---
+             function generateCSV() {
+                 if (filteredExpenses.length === 0) {
+                     alert("No hay gastos filtrados para exportar.");
+                     return;
+                 }
+                 const headers = ["ID", "Fecha", "Monto", "Tipo", "Descripción", "Categoría", "Método Pago", "Ref. Banco", "Notas"];
+                 const rows = filteredExpenses.map(e => [
+                     e.id,
+                     new Date(e.date).toISOString(), // Formato ISO para consistencia
+                     e.amount,
+                     `"${e.type || ''}"`,
+                     `"${(e.description || '').replace(/"/g, '""')}"`,
+                     `"${e.category || ''}"`,
+                     `"${e.paymentMethod || ''}"`,
+                     `"${e.bankRef || ''}"`,
+                     `"${(e.notes || '').replace(/"/g, '""')}"`,
+                 ].join(','));
+
+                 const csv = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
+                 const link = document.createElement("a");
+                 link.setAttribute("href", encodeURI(csv));
+                 link.setAttribute("download", `gastos_filtrados_${new Date().toISOString().slice(0,10)}.csv`);
+                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
+             }
+
+            // --- Carga Inicial y Listeners ---
+            function initialize() {
+                 populateSelects(); // Llenar selects primero
+                 allExpenses = loadData('gastos', []);
+                 renderExpenseHistory(); // Render inicial (sin filtros)
+
+                 // Listeners
+                 expenseForm.addEventListener('submit', handleExpenseFormSubmit);
+                 expensePaymentMethodSelect.addEventListener('change', handlePaymentMethodChange);
+                 filterButton.addEventListener('click', renderExpenseHistory);
+                 downloadCsvButton.addEventListener('click', generateCSV);
+
+                  // Listener delegado para eliminar
+                 expenseHistoryTableBody.addEventListener('click', (event) => {
+                    const deleteButton = event.target.closest('.delete-btn');
+                    if (deleteButton) {
+                         deleteExpense(deleteButton.dataset.id);
+                    }
+                 });
+
+                 resetExpenseForm(); // Establecer fecha actual en form
+
+                 console.log('Página de Gastos Inicializada.');
+            }
+
+            // --- Iniciar ---
+            initialize();
+        });
+    </script>
+
+</body>
+</html>

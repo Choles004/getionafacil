@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Nueva Venta (POS)</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        /* ... (Estilos :root, body, sidebar, main-content, responsividad sidebar igual que antes) ... */
+        :root {
+            --sidebar-width: 260px;
+             --sidebar-bg-light: #f8f9fa; --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef; --sidebar-link-active-bg-light: #0d6efd; --sidebar-link-active-color-light: #ffffff;
+            --sidebar-bg-dark: #212529; --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40; --sidebar-link-active-bg-dark: #0d6efd; --sidebar-link-active-color-dark: #ffffff;
+        }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light); transition: background-color 0.3s ease, color 0.3s ease; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; border-right: 1px solid var(--bs-border-color); }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1rem; overflow-y: hidden; display: flex; flex-direction: column; height: 100vh; }
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos POS */
+        .pos-container { display: flex; flex-grow: 1; gap: 1rem; overflow: hidden; }
+        .product-search-section { flex: 1 1 55%; display: flex; flex-direction: column; overflow: hidden; }
+        .cart-section { flex: 1 1 45%; display: flex; flex-direction: column; overflow: hidden; background-color: var(--bs-tertiary-bg); border-radius: var(--bs-border-radius); padding: 1rem; }
+        #product-search-results { flex-grow: 1; overflow-y: auto; margin-top: 1rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); }
+        .product-result-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid var(--bs-border-color-translucent); cursor: pointer; }
+        .product-result-item:last-child { border-bottom: none; }
+        .product-result-item:hover { background-color: var(--bs-secondary-bg); }
+        .product-result-item .stock-info { font-size: 0.8rem; color: var(--bs-secondary-color); }
+        #cart-items-container { flex-grow: 1; overflow-y: auto; margin-bottom: 1rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background-color: var(--bs-body-bg);}
+        .cart-item { display: flex; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--bs-border-color-translucent); font-size: 0.9rem; }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-details { flex-grow: 1; margin-left: 0.5rem; margin-right: 0.5rem; }
+        .cart-item-actions { display: flex; align-items: center; }
+        .cart-item-actions button { width: 28px; height: 28px; padding: 0; line-height: 1; font-size: 1rem; }
+        /* Input de cantidad en lugar de span para unidades no discretas */
+        .cart-item-quantity-input { width: 60px; text-align: center; margin: 0 0.5rem; font-weight: bold; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius-sm); padding: 0.1rem 0.2rem; background-color: var(--bs-body-bg); color: var(--bs-body-color);}
+        .cart-item-quantity-text { margin: 0 0.5rem; min-width: 30px; text-align: center; font-weight: bold;} /* Para unidades discretas */
+        .cart-item-price { font-weight: bold; min-width: 80px; text-align: right;}
+        .totals-section { margin-top: auto; padding-top: 1rem; border-top: 2px solid var(--bs-primary); }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .total-row span:first-child { font-weight: 500; }
+        .grand-total { font-size: 1.4rem; font-weight: bold; }
+        #cash-payment-fields { display: none; }
+
+        /* Modal Cantidad Decimal */
+        #quantityModal .modal-dialog { max-width: 400px; }
+
+        /* Modal de Factura (Igual que antes) */
+        #invoice-modal .modal-dialog { max-width: 800px; }
+        #invoice-content-editor { font-family: monospace; font-size: 0.9rem; min-height: 400px; white-space: pre; }
+        @media print { /* ... (igual que antes) ... */
+            body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            #print-area pre { font-family: monospace; font-size: 10pt; white-space: pre-wrap; word-wrap: break-word; }
+            .no-print { display: none; }
+        }
+         /* Responsividad (Igual que antes) */
+        @media (max-width: 992px) {
+             body { display: block; } .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items: center; padding: 0.5rem 1rem; }
+             .sidebar .app-logo { margin-bottom: 0; margin-right: auto;} .sidebar .nav { flex-direction: row; } .sidebar .nav-link span { display: none; }
+             .sidebar .nav-link i { margin: 0 5px; } .sidebar .sidebar-footer { margin-top: 0; padding: 0; border-top: none; display: flex; }
+             .sidebar .btn-theme-toggle, .sidebar #logout-button { width: auto; margin-left: 10px;} .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+             .main-content { height: auto; padding: 1rem;} .pos-container { flex-direction: column; height: auto; overflow: visible;}
+             .product-search-section, .cart-section { overflow: visible; flex: 1 1 auto; }
+             #product-search-results { max-height: 200px; } #cart-items-container { max-height: 250px; }
+        }
+
+    </style>
+</head>
+<body>
+     <!-- Barra Lateral Fija (se adapta en móvil) -->
+     <aside class="sidebar p-3 d-flex flex-column sticky-top no-print">
+        <!-- ... (Contenido de la barra lateral igual que antes) ... -->
+         <div class="app-logo text-center mb-4"> <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center"> <i class="fas fa-store fa-lg me-2"></i> <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span> </a> </div>
+        <nav class="nav flex-column nav-pills flex-grow-1"> <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a> <a class="nav-link active" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a> <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a> <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a> <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a> <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a> <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a> <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a> <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a> <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a> <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a> <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a> </nav>
+        <div class="sidebar-footer mt-auto"> <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema"> <i class="fas fa-sun"></i> <span></span> </button> <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir"> <i class="fas fa-sign-out-alt"></i> <span>Salir</span> </button> </div>
+    </aside>
+
+    <!-- Contenido Principal POS -->
+    <main class="main-content">
+        <!-- ... (Alertas de caja cerrada, error, éxito igual que antes) ... -->
+        <div id="cash-register-closed-alert" class="alert alert-danger text-center fw-bold no-print" style="display: none;"> <i class="fas fa-exclamation-triangle me-2"></i>LA CAJA ESTÁ CERRADA. No se pueden registrar ventas. <a href="caja.html">Abrir Caja</a>. </div>
+        <div id="pos-error-alert" class="alert alert-danger d-none no-print"></div>
+        <div id="pos-success-alert" class="alert alert-success d-none no-print"></div>
+
+        <div class="pos-container">
+            <!-- Sección Búsqueda Productos (Igual que antes) -->
+            <div class="product-search-section card shadow-sm no-print">
+                 <div class="card-body d-flex flex-column">
+                    <div class="input-group mb-3"> <span class="input-group-text"><i class="fas fa-search"></i></span> <input type="text" id="product-search-input" class="form-control" placeholder="Buscar producto por nombre o SKU..."> </div>
+                    <div id="product-search-results" class="list-group list-group-flush"> <div class="list-group-item text-muted text-center">Empieza a buscar...</div> </div>
+                 </div>
+            </div>
+
+            <!-- Sección Carrito y Pago (Modificada) -->
+            <div class="cart-section card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="mb-3 no-print">Carrito de Compra</h5>
+                    <div id="cart-items-container">
+                        <div id="empty-cart-message" class="text-center text-muted p-4">El carrito está vacío.</div>
+                        <!-- Items del carrito aquí -->
+                    </div>
+
+                    <div class="totals-section no-print">
+                        <!-- ... (Subtotal, Grand Total, Cliente, Método Pago, Efectivo - Igual que antes) ... -->
+                         <div class="total-row"> <span>Subtotal:</span> <span id="subtotal">--</span> </div>
+                         <div class="total-row grand-total"> <span>TOTAL:</span> <span id="grand-total">--</span> </div> <hr>
+                         <div class="mb-3"> <label for="client-select" class="form-label">Cliente (Opcional)</label> <select id="client-select" class="form-select form-select-sm"> <option value="">Consumidor Final</option> </select> </div>
+                         <div class="mb-3"> <label for="payment-method-select" class="form-label">Método de Pago <span class="text-danger">*</span></label> <select id="payment-method-select" class="form-select form-select-sm" required> <option value="" disabled selected>Seleccionar...</option> <option value="Efectivo">Efectivo</option> <option value="Tarjeta">Tarjeta</option> <option value="Transferencia">Transferencia</option> <option value="Deuda Cliente" disabled>Agregar a Deuda Cliente</option> </select> </div>
+                         <div id="cash-payment-fields" class="row g-2 mb-3"> <div class="col"> <label for="cash-received" class="form-label form-label-sm">Efectivo Recibido</label> <div class="input-group input-group-sm"> <span class="input-group-text" id="currency-symbol-received">$</span> <input type="number" step="any" min="0" class="form-control" id="cash-received"> </div> </div> <div class="col"> <label for="cash-change" class="form-label form-label-sm">Cambio</label> <div class="input-group input-group-sm"> <span class="input-group-text" id="currency-symbol-change">$</span> <input type="text" class="form-control" id="cash-change" readonly disabled> </div> </div> </div>
+                         <div class="d-grid gap-2"> <button id="finalize-sale-button" class="btn btn-success btn-lg" disabled> <i class="fas fa-check-circle me-1"></i> Finalizar Venta </button> <button id="print-last-invoice-button" class="btn btn-outline-secondary btn-sm" style="display: none;"> <i class="fas fa-print me-1"></i> Imprimir Última Factura </button> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+     <!-- Modal Editar Cantidad (para productos no discretos) -->
+    <div class="modal fade no-print" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quantityModalLabel">Ingresar Cantidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="quantityModalProductId">
+                     <div class="mb-3">
+                         <label id="quantityModalProductName" class="form-label fw-bold">Nombre Producto</label>
+                     </div>
+                     <div class="mb-3">
+                        <label for="quantityModalInput" class="form-label">Cantidad (<span id="quantityModalUnit"></span>)</label>
+                        <input type="number" step="any" min="0" class="form-control" id="quantityModalInput" required>
+                         <div class="invalid-feedback">Ingresa una cantidad válida.</div>
+                         <div id="quantityModalStockInfo" class="form-text text-muted"></div>
+                    </div>
+                    <div id="quantityModalError" class="alert alert-danger d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="quantityModalSaveButton" class="btn btn-primary">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Previsualizar/Editar Factura (Igual que antes) -->
+    <div class="modal fade no-print" id="invoice-modal" tabindex="-1"> <!-- ... (Contenido del modal igual) ... -->
+        <div class="modal-dialog modal-lg"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="invoiceModalLabel">Factura / Recibo (Editable)</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> </div> <div class="modal-body"> <p class="text-muted small">Puedes editar el contenido a continuación antes de imprimir.</p> <textarea id="invoice-content-editor" class="form-control"></textarea> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> <button type="button" id="print-button" class="btn btn-primary"><i class="fas fa-print me-1"></i> Imprimir</button> </div> </div> </div>
+    </div>
+    <!-- Área oculta para la impresión (Igual que antes) -->
+    <div id="print-area" style="display: none;"> <pre id="print-content"></pre> </div>
+
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements (Add quantity modal elements) ---
+             const themeToggleButton = document.getElementById('theme-toggle'); const htmlElement = document.documentElement; const themeIcon = themeToggleButton.querySelector('i'); const themeText = themeToggleButton.querySelector('span'); const logoutButton = document.getElementById('logout-button'); const sidebarBusinessName = document.getElementById('sidebar-business-name'); const restaurantLink = document.getElementById('restaurant-link');
+             const cashRegisterClosedAlert = document.getElementById('cash-register-closed-alert'); const posErrorAlert = document.getElementById('pos-error-alert'); const posSuccessAlert = document.getElementById('pos-success-alert');
+             const productSearchInput = document.getElementById('product-search-input'); const productSearchResultsDiv = document.getElementById('product-search-results');
+             const cartItemsContainer = document.getElementById('cart-items-container'); const emptyCartMessage = document.getElementById('empty-cart-message');
+             const subtotalEl = document.getElementById('subtotal'); const grandTotalEl = document.getElementById('grand-total');
+             const clientSelect = document.getElementById('client-select'); const paymentMethodSelect = document.getElementById('payment-method-select');
+             const cashPaymentFieldsDiv = document.getElementById('cash-payment-fields'); const cashReceivedInput = document.getElementById('cash-received'); const cashChangeInput = document.getElementById('cash-change');
+             const finalizeSaleButton = document.getElementById('finalize-sale-button'); const printLastInvoiceButton = document.getElementById('print-last-invoice-button');
+             const currencySymbolReceived = document.getElementById('currency-symbol-received'); const currencySymbolChange = document.getElementById('currency-symbol-change');
+             // Invoice Modal
+             const invoiceModalEl = document.getElementById('invoice-modal'); const invoiceModal = new bootstrap.Modal(invoiceModalEl); const invoiceContentEditor = document.getElementById('invoice-content-editor'); const printButton = document.getElementById('print-button'); const printContentPre = document.getElementById('print-content');
+             // Quantity Modal
+             const quantityModalEl = document.getElementById('quantityModal'); const quantityModal = new bootstrap.Modal(quantityModalEl);
+             const quantityModalProductId = document.getElementById('quantityModalProductId');
+             const quantityModalProductName = document.getElementById('quantityModalProductName');
+             const quantityModalUnit = document.getElementById('quantityModalUnit');
+             const quantityModalInput = document.getElementById('quantityModalInput');
+             const quantityModalStockInfo = document.getElementById('quantityModalStockInfo');
+             const quantityModalSaveButton = document.getElementById('quantityModalSaveButton');
+              const quantityModalError = document.getElementById('quantityModalError');
+
+             // --- State Variables (Igual que antes) ---
+             let appConfig = {}; let currencyConfig = {}; let cashRegisterStatus = {}; let allProducts = []; let allClients = []; let cartItems = []; let lastSaleId = null; let lastSaleData = null;
+
+             // Units that allow decimal quantities
+             const decimalUnits = ['Kg', 'Gr', 'Litro', 'Ml', 'Metro', 'Cm']; // Add others if needed
+
+             // --- Lógica Tema, Sidebar, Auxiliares (Igual que antes) ---
+             const applyTheme = (theme) => { /* ... */ htmlElement.setAttribute('data-bs-theme', theme); if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; } else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; } try { localStorage.setItem('preferredTheme', theme); } catch (e) {} };
+             const loadTheme = () => { /* ... */ let pT = null; try { pT = localStorage.getItem('preferredTheme'); } catch (e) {} if (pT) { applyTheme(pT); } else { const pD = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(pD ? 'dark' : 'light'); } };
+             themeToggleButton.addEventListener('click', () => { const cT = htmlElement.getAttribute('data-bs-theme'); applyTheme(cT === 'dark' ? 'light' : 'dark'); }); loadTheme();
+             logoutButton.addEventListener('click', () => { if (confirm('¿Seguro?')) window.location.href = 'login.html'; });
+             function loadData(key, defaultValue = null) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : defaultValue; } catch (e) { console.error(`LS Load (${key}):`, e); return defaultValue; } }
+             function saveData(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error(`LS Save (${key}):`, e); showError(`Error al guardar ${key}.`); return false; } }
+             function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+             function getLocaleForCurrency(code) { const map = { /*...*/ }; return map[code]; }
+             function formatCurrency(amount, config) { /* ... (igual que antes) ... */
+                 if (amount === null || amount === undefined || isNaN(Number(amount))) { amount = 0; }
+                 if (!config || !config.code || config.decimals === undefined) { return Number(amount).toLocaleString('es-ES'); }
+                 try { const f = new Intl.NumberFormat(getLocaleForCurrency(config.code) || 'es-ES', { style: 'decimal', minimumFractionDigits: config.decimals, maximumFractionDigits: config.decimals }); const fm = f.format(amount); const s = config.symbol || config.code; if (['USD','EUR','GBP','MXN','ARS','COP','CLP','PEN'].includes(config.code)) return `${s}${fm}`; else return `${fm} ${s}`; }
+                 catch (e) { return `${config.symbol || ''}${Number(amount).toFixed(config.decimals || 2)}`; }
+            }
+             function showError(message) { /* ... */ posErrorAlert.textContent = message; posErrorAlert.classList.remove('d-none'); setTimeout(() => posErrorAlert.classList.add('d-none'), 5000); }
+             function showSuccess(message) { /* ... */ posSuccessAlert.textContent = message; posSuccessAlert.classList.remove('d-none'); setTimeout(() => posSuccessAlert.classList.add('d-none'), 3000); }
+             function isDecimalUnit(unit) { return decimalUnits.includes(unit); }
+
+            // --- Autenticación y Carga Inicial (Igual que antes) ---
+            function initializePOS() { /* ... (Igual que antes, carga config, caja, productos, clientes, verifica caja, carga clientes select) ... */
+                 appConfig = loadData('gestionaFacilConfig');
+                 if (!appConfig || !appConfig.masterPassword) { window.location.href = 'login.html'; return; }
+                 currencyConfig = appConfig.currency || { code: 'USD', symbol: '$', decimals: 2 };
+                 currencySymbolReceived.textContent = currencyConfig.symbol || '$'; currencySymbolChange.textContent = currencyConfig.symbol || '$';
+                 cashRegisterStatus = loadData('cashRegisterStatus', { isOpen: false });
+                 allProducts = loadData('productos', []); allClients = loadData('clientes', []);
+                 if (appConfig.businessName) sidebarBusinessName.textContent = appConfig.businessName;
+                 if (appConfig.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+                 if (!cashRegisterStatus.isOpen) { cashRegisterClosedAlert.style.display = 'block'; finalizeSaleButton.disabled = true; }
+                 else { cashRegisterClosedAlert.style.display = 'none'; finalizeSaleButton.disabled = cartItems.length === 0; }
+                 clientSelect.innerHTML = '<option value="">Consumidor Final</option>';
+                 allClients.sort((a,b) => a.name.localeCompare(b.name)).forEach(client => { clientSelect.innerHTML += `<option value="${client.id}">${client.name}</option>`; });
+                 resetPOS();
+                 console.log('Página POS Inicializada.');
+            }
+
+             // --- Lógica Búsqueda Producto (Igual que antes) ---
+             function renderSearchResults(results) { /* ... (Igual que antes) ... */
+                  productSearchResultsDiv.innerHTML = '';
+                 if (results.length === 0) { productSearchResultsDiv.innerHTML = '<div class="list-group-item text-muted text-center">No se encontraron productos.</div>'; return; }
+                 results.slice(0, 15).forEach(product => { const div = document.createElement('div'); div.className = 'list-group-item list-group-item-action product-result-item'; div.dataset.productId = product.id; const stockInfo = product.manageStock ? `Stock: ${product.stock ?? 'N/A'} ${product.unit || ''}` : 'No gestionado'; const priceFormatted = formatCurrency(product.salePrice, currencyConfig); div.innerHTML = `<div> <strong>${product.name}</strong> <small class="text-muted">(${product.sku || 'Sin SKU'})</small> <div class="stock-info">${stockInfo}</div> </div> <span class="fw-bold">${priceFormatted}</span>`; div.addEventListener('click', () => handleProductClick(product.id)); /* <--- CAMBIO AQUÍ */ productSearchResultsDiv.appendChild(div); });
+             }
+              productSearchInput.addEventListener('input', () => { /* ... (Igual que antes) ... */
+                 const searchTerm = productSearchInput.value.toLowerCase().trim();
+                 if (searchTerm.length < 2) { productSearchResultsDiv.innerHTML = '<div class="list-group-item text-muted text-center">Escribe al menos 2 caracteres...</div>'; return; }
+                 const results = allProducts.filter(p => (p.name && p.name.toLowerCase().includes(searchTerm)) || (p.sku && p.sku.toLowerCase().includes(searchTerm)));
+                 renderSearchResults(results);
+             });
+
+
+            // --- Lógica Carrito (Modificada) ---
+            function findCartItemIndex(productId) { return cartItems.findIndex(item => item.productId === productId); }
+
+             // NUEVO: Decide si abrir modal o añadir directamente
+             function handleProductClick(productId) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product) return;
+
+                 if (isDecimalUnit(product.unit)) {
+                     openQuantityModal(productId);
+                 } else {
+                     addToCartDiscrete(productId, 1); // Añade 1 unidad por defecto
+                 }
+             }
+
+            // NUEVO: Abrir modal para cantidad decimal/discreta
+            function openQuantityModal(productId, isEditing = false) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product) return;
+
+                 const cartItem = cartItems.find(item => item.productId === productId);
+                 const currentQuantity = isEditing && cartItem ? cartItem.quantity : '';
+
+                 quantityModalProductId.value = productId;
+                 quantityModalProductName.textContent = product.name;
+                 quantityModalUnit.textContent = product.unit || 'Und';
+                 quantityModalInput.value = currentQuantity;
+                 quantityModalInput.step = isDecimalUnit(product.unit) ? 'any' : '1';
+                 quantityModalInput.min = isDecimalUnit(product.unit) ? '0.001' : '1'; // Mínimo pequeño para decimales
+                 quantityModalError.classList.add('d-none');
+                 quantityModalInput.classList.remove('is-invalid');
+
+                  if (product.manageStock) {
+                     quantityModalStockInfo.textContent = `Stock disponible: ${product.stock ?? 'N/A'} ${product.unit || ''}`;
+                 } else {
+                     quantityModalStockInfo.textContent = "Inventario no gestionado.";
+                 }
+
+                 quantityModal.show();
+                 // Enfocar input después de que el modal sea visible
+                 quantityModalEl.addEventListener('shown.bs.modal', () => {
+                    quantityModalInput.focus();
+                    quantityModalInput.select();
+                 }, { once: true });
+            }
+
+             // NUEVO: Guardar desde modal
+             quantityModalSaveButton.addEventListener('click', () => {
+                 const productId = quantityModalProductId.value;
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product) return;
+
+                 const quantityStr = quantityModalInput.value;
+                 const quantity = parseFloat(quantityStr);
+                 const isDecimal = isDecimalUnit(product.unit);
+
+                 quantityModalInput.classList.remove('is-invalid');
+                 quantityModalError.classList.add('d-none');
+
+                 if (isNaN(quantity) || quantity <= 0) {
+                     quantityModalInput.classList.add('is-invalid');
+                     quantityModalError.textContent = "La cantidad debe ser un número positivo.";
+                     quantityModalError.classList.remove('d-none');
+                     return;
+                 }
+                  if (!isDecimal && !Number.isInteger(quantity)) {
+                     quantityModalInput.classList.add('is-invalid');
+                     quantityModalError.textContent = "La cantidad debe ser un número entero para esta unidad.";
+                     quantityModalError.classList.remove('d-none');
+                     return;
+                 }
+
+                  // Validar stock
+                 if (product.manageStock) {
+                     const availableStock = product.stock ?? 0;
+                     if (quantity > availableStock) {
+                         quantityModalInput.classList.add('is-invalid');
+                         quantityModalError.textContent = `Stock insuficiente. Disponible: ${availableStock}`;
+                         quantityModalError.classList.remove('d-none');
+                         return;
+                     }
+                 }
+
+                 // Añadir o actualizar carrito
+                 const cartIndex = findCartItemIndex(productId);
+                 if (cartIndex > -1) {
+                    cartItems[cartIndex].quantity = quantity;
+                 } else {
+                     cartItems.push({
+                         productId: product.id, name: product.name, quantity: quantity,
+                         price: product.salePrice, stock: product.stock, manageStock: product.manageStock, unit: product.unit
+                     });
+                 }
+                 renderCart();
+                 quantityModal.hide();
+                  productSearchInput.value = ''; // Limpiar búsqueda
+                  productSearchResultsDiv.innerHTML = '<div class="list-group-item text-muted text-center">Empieza a buscar...</div>';
+             });
+
+
+             // Modificado: Añadir/Incrementar para unidades discretas
+             function addToCartDiscrete(productId, quantityChange) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product || isDecimalUnit(product.unit)) return; // Solo para discretos
+
+                 const cartIndex = findCartItemIndex(productId);
+                 let currentQuantityInCart = cartIndex > -1 ? cartItems[cartIndex].quantity : 0;
+                 let newQuantity = currentQuantityInCart + quantityChange;
+
+                 if (newQuantity <= 0) { // Eliminar si es cero o menos
+                     if (cartIndex > -1) cartItems.splice(cartIndex, 1);
+                 } else {
+                     // Validar stock ANTES de añadir/incrementar
+                     if (product.manageStock) {
+                         const availableStock = product.stock ?? 0;
+                         if (newQuantity > availableStock) {
+                             showError(`Stock insuficiente para "${product.name}". Disponible: ${availableStock}`);
+                             return; // No permitir
+                         }
+                     }
+                     if (cartIndex > -1) {
+                         cartItems[cartIndex].quantity = newQuantity;
+                     } else {
+                         cartItems.push({
+                             productId: product.id, name: product.name, quantity: newQuantity,
+                             price: product.salePrice, stock: product.stock, manageStock: product.manageStock, unit: product.unit
+                         });
+                     }
+                 }
+                 renderCart();
+             }
+
+
+             // Modificado: Renderizar carrito con input o texto para cantidad
+             function renderCart() {
+                 cartItemsContainer.innerHTML = '';
+                 if (cartItems.length === 0) { /* ... (igual que antes, mensaje vacío, resetear totales/botones) ... */
+                     emptyCartMessage.style.display = 'block'; subtotalEl.textContent = formatCurrency(0, currencyConfig); grandTotalEl.textContent = formatCurrency(0, currencyConfig); finalizeSaleButton.disabled = true; paymentMethodSelect.value = ''; handlePaymentMethodChange();
+                     return;
+                 }
+                 emptyCartMessage.style.display = 'none';
+                 let currentSubtotal = 0;
+
+                 cartItems.forEach(item => {
+                     const itemTotal = item.quantity * item.price;
+                     currentSubtotal += itemTotal;
+                     const div = document.createElement('div');
+                     div.className = 'cart-item';
+                     const isDecimal = isDecimalUnit(item.unit);
+                     const quantityDisplay = isDecimal
+                         ? `<input type="number" value="${item.quantity}" step="any" min="0.001" class="cart-item-quantity-input" data-id="${item.productId}">`
+                         : `<span class="cart-item-quantity-text">${item.quantity}</span>`;
+
+                     div.innerHTML = `
+                         <div class="cart-item-details">
+                            <div><strong>${item.name}</strong></div>
+                            <small class="text-muted">${formatCurrency(item.price, currencyConfig)} / ${item.unit || 'Und'}</small>
+                         </div>
+                         <div class="cart-item-actions">
+                             <button class="btn btn-sm btn-outline-secondary decrease-qty-btn" data-id="${item.productId}" ${isDecimal ? 'disabled title="Editar cantidad directamente"' : ''}>-</button>
+                             ${quantityDisplay}
+                             <button class="btn btn-sm btn-outline-secondary increase-qty-btn" data-id="${item.productId}" ${isDecimal ? 'disabled title="Editar cantidad directamente"' : ''}>+</button>
+                         </div>
+                         <span class="cart-item-price">${formatCurrency(itemTotal, currencyConfig)}</span>
+                         <button class="btn btn-sm btn-outline-danger remove-item-btn ms-2" data-id="${item.productId}" title="Quitar">
+                              <i class="fas fa-times"></i>
+                         </button>
+                     `;
+                     cartItemsContainer.appendChild(div);
+
+                     // Añadir listener para input de cantidad si es decimal
+                     if (isDecimal) {
+                         const input = div.querySelector('.cart-item-quantity-input');
+                         input.addEventListener('change', (e) => handleQuantityInputChange(e.target.dataset.id, e.target.value));
+                         input.addEventListener('focus', (e) => e.target.select()); // Seleccionar al enfocar
+                     }
+                 });
+
+                 // Listeners botones + / - / X (delegación)
+                 cartItemsContainer.querySelectorAll('.decrease-qty-btn:not([disabled])').forEach(btn => btn.onclick = () => addToCartDiscrete(btn.dataset.id, -1));
+                 cartItemsContainer.querySelectorAll('.increase-qty-btn:not([disabled])').forEach(btn => btn.onclick = () => addToCartDiscrete(btn.dataset.id, 1));
+                 cartItemsContainer.querySelectorAll('.remove-item-btn').forEach(btn => btn.onclick = () => { const indexToRemove = findCartItemIndex(btn.dataset.id); if (indexToRemove > -1) cartItems.splice(indexToRemove, 1); renderCart(); });
+
+                 // Calcular Totales (igual que antes)
+                 const grandTotal = currentSubtotal;
+                 subtotalEl.textContent = formatCurrency(currentSubtotal, currencyConfig);
+                 grandTotalEl.textContent = formatCurrency(grandTotal, currencyConfig);
+                 finalizeSaleButton.disabled = !cashRegisterStatus.isOpen || cartItems.length === 0;
+                 handlePaymentMethodChange();
+             }
+
+             // NUEVO: Manejar cambio en input de cantidad decimal
+             function handleQuantityInputChange(productId, newValueStr) {
+                 const product = allProducts.find(p => p.id === productId);
+                 if (!product) return;
+
+                 const newValue = parseFloat(newValueStr);
+                 const cartIndex = findCartItemIndex(productId);
+
+                 if (cartIndex === -1) return;
+
+                 if (isNaN(newValue) || newValue <= 0) {
+                     // Si es inválido o cero, eliminar del carrito? O revertir? Por ahora, eliminar.
+                     cartItems.splice(cartIndex, 1);
+                     renderCart();
+                     showError("Cantidad inválida. Item eliminado.");
+                     return;
+                 }
+
+                  // Validar stock
+                 if (product.manageStock) {
+                     const availableStock = product.stock ?? 0;
+                     if (newValue > availableStock) {
+                         showError(`Stock insuficiente para "${product.name}". Disponible: ${availableStock}. Cantidad no actualizada.`);
+                         // Revertir el valor en el input
+                          renderCart(); // Re-renderizar para mostrar valor anterior
+                         return;
+                     }
+                 }
+
+                 // Actualizar cantidad en el carrito
+                 cartItems[cartIndex].quantity = newValue;
+                 renderCart(); // Re-renderizar para actualizar totales y formato
+             }
+
+
+            // --- Lógica Pago (Igual que antes) ---
+            clientSelect.addEventListener('change', () => { /* ... */ const debtOption = paymentMethodSelect.querySelector('option[value="Deuda Cliente"]'); if (clientSelect.value) { debtOption.disabled = false; } else { debtOption.disabled = true; if (paymentMethodSelect.value === 'Deuda Cliente') paymentMethodSelect.value = ''; } handlePaymentMethodChange(); });
+            paymentMethodSelect.addEventListener('change', handlePaymentMethodChange);
+            function handlePaymentMethodChange() { /* ... */ const selectedMethod = paymentMethodSelect.value; cashPaymentFieldsDiv.style.display = selectedMethod === 'Efectivo' ? 'flex' : 'none'; if (selectedMethod !== 'Efectivo') { cashReceivedInput.value = ''; cashChangeInput.value = ''; } finalizeSaleButton.disabled = !cashRegisterStatus.isOpen || cartItems.length === 0 || !selectedMethod || (selectedMethod === 'Deuda Cliente' && !clientSelect.value); }
+            cashReceivedInput.addEventListener('input', () => { /* ... */ const total = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0); const received = parseFloat(cashReceivedInput.value); if (!isNaN(received) && received >= total) { cashChangeInput.value = formatCurrency(received - total, currencyConfig); } else { cashChangeInput.value = ''; } });
+
+
+            // --- Finalizar Venta (Igual que antes) ---
+            finalizeSaleButton.addEventListener('click', () => { /* ... (La lógica interna no cambia significativamente) ... */
+                 if (!cashRegisterStatus.isOpen) { showError("La caja está cerrada."); return; }
+                 if (cartItems.length === 0) { showError("El carrito está vacío."); return; }
+                 const paymentMethod = paymentMethodSelect.value; const clientId = clientSelect.value || null; const total = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                 if (!paymentMethod) { showError("Selecciona un método de pago."); return; }
+                 if (paymentMethod === 'Deuda Cliente' && !clientId) { showError("Selecciona un cliente para agregar a deuda."); return; }
+                 if (paymentMethod === 'Efectivo') { const received = parseFloat(cashReceivedInput.value); if (isNaN(received) || received < total) { showError("El efectivo recibido es insuficiente."); cashReceivedInput.focus(); return; } }
+
+                 const saleData = { id: generateId(), date: new Date().toISOString(), items: cartItems.map(item => ({ productId: item.productId, name: item.name, unit: item.unit, quantity: item.quantity, price: item.price, total: item.quantity * item.price })), subtotal: cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0), total: total, paymentMethod: paymentMethod, clientId: clientId, cashReceived: paymentMethod === 'Efectivo' ? parseFloat(cashReceivedInput.value) : null, cashChange: paymentMethod === 'Efectivo' ? (parseFloat(cashReceivedInput.value) - total) : null };
+                 let clientUpdateSuccess = true; let stockUpdateSuccess = true;
+
+                 if (paymentMethod === 'Deuda Cliente') { /* ... (actualizar deuda cliente) ... */
+                    const clientIndex = allClients.findIndex(c => c.id === clientId);
+                    if (clientIndex > -1) { allClients[clientIndex].debt = (allClients[clientIndex].debt || 0) + total; if (!allClients[clientIndex].debtHistory) { allClients[clientIndex].debtHistory = []; } allClients[clientIndex].debtHistory.push({ id: generateId(), date: saleData.date, type: 'sale', amount: total, description: `Venta #${saleData.id}`, balanceAfter: allClients[clientIndex].debt }); clientUpdateSuccess = saveData('clientes', allClients); }
+                    else { showError("Error: Cliente seleccionado para deuda no encontrado."); return; }
+                 }
+                 if (clientUpdateSuccess) { /* ... (actualizar stock) ... */
+                     const updatedProducts = [...allProducts];
+                     cartItems.forEach(item => { if (item.manageStock) { const productIndex = updatedProducts.findIndex(p => p.id === item.productId); if (productIndex > -1) { updatedProducts[productIndex].stock = (updatedProducts[productIndex].stock ?? 0) - item.quantity; } else { console.warn(`Producto ${item.productId} no encontrado para actualizar stock.`); } } });
+                     if (saveData('productos', updatedProducts)) { allProducts = updatedProducts; } else { stockUpdateSuccess = false; showError("¡Error CRÍTICO al actualizar el stock!"); }
+                 }
+                 if (clientUpdateSuccess && stockUpdateSuccess) { /* ... (guardar venta) ... */
+                     allSales = loadData('ventas', []); allSales.push(saleData);
+                     if (saveData('ventas', allSales)) { showSuccess(`Venta #${saleData.id} finalizada.`); lastSaleId = saleData.id; lastSaleData = saleData; printLastInvoiceButton.style.display = 'inline-block'; resetPOS(); }
+                     else { showError("¡Error CRÍTICO al guardar la venta!"); }
+                 } else { console.error("No se guardó la venta por errores previos."); }
+            });
+
+            // --- Lógica Impresión (Igual que antes) ---
+            function generateInvoiceContent(sale) { /* ... (Igual que antes) ... */
+                 if (!sale) return "Error: No hay datos de venta."; let content = ` ${appConfig.businessName || 'Gestiona Fácil'}\n`; if (appConfig.address) content += `Dirección: ${appConfig.address}\n`; if (appConfig.phone) content += `Teléfono: ${appConfig.phone}\n`; if (appConfig.taxId) content += `ID Fiscal: ${appConfig.taxId}\n`; content += `--------------------------------------------------\n`; content += `RECIBO DE VENTA #${sale.id}\n`; content += `Fecha: ${new Date(sale.date).toLocaleString('es-ES')}\n`; if (sale.clientId) { const client = allClients.find(c => c.id === sale.clientId); content += `Cliente: ${client ? client.name : sale.clientId}\n`; } else { content += `Cliente: Consumidor Final\n`; } content += `--------------------------------------------------\n`; content += `Cant. Descripción              P. Unit.   Total\n`; content += `--------------------------------------------------\n`; sale.items.forEach(item => { const name = item.name.padEnd(25).substring(0, 25); const qty = item.quantity.toString().padStart(4); const unitPrice = formatCurrency(item.price, currencyConfig).padStart(10); const lineTotal = formatCurrency(item.total, currencyConfig).padStart(10); content += `${qty} ${name} ${unitPrice} ${lineTotal}\n`; }); content += `--------------------------------------------------\n`; content += `SUBTOTAL: ${formatCurrency(sale.subtotal, currencyConfig).padStart(38)}\n`; content += `TOTAL: ${formatCurrency(sale.total, currencyConfig).padStart(38)}\n`; content += `--------------------------------------------------\n`; content += `Método Pago: ${sale.paymentMethod}\n`; if (sale.paymentMethod === 'Efectivo') { content += `Recibido: ${formatCurrency(sale.cashReceived, currencyConfig)}\n`; content += `Cambio: ${formatCurrency(sale.cashChange, currencyConfig)}\n`; } content += `\n ¡Gracias por su compra!\n`; return content;
+            }
+            function showInvoiceModal(saleId) { /* ... */ let saleToPrint = null; if (saleId === lastSaleId && lastSaleData) { saleToPrint = lastSaleData; } else { const sales = loadData('ventas', []); saleToPrint = sales.find(s => s.id === saleId); } if (!saleToPrint) { showError("No se encontraron datos de venta."); return; } const invoiceText = generateInvoiceContent(saleToPrint); invoiceContentEditor.value = invoiceText; invoiceModal.show(); }
+            printLastInvoiceButton.addEventListener('click', () => { if (lastSaleId) showInvoiceModal(lastSaleId); else showError("No hay última venta registrada."); });
+            printButton.addEventListener('click', () => { const contentToPrint = invoiceContentEditor.value; printContentPre.textContent = contentToPrint; setTimeout(() => window.print(), 250); });
+
+            // --- Resetear POS (Igual que antes) ---
+            function resetPOS() { /* ... */ cartItems = []; renderCart(); productSearchInput.value = ''; productSearchResultsDiv.innerHTML = '<div class="list-group-item text-muted text-center">Empieza a buscar...</div>'; clientSelect.value = ''; paymentMethodSelect.value = ''; paymentMethodSelect.querySelector('option[value="Deuda Cliente"]').disabled = true; cashPaymentFieldsDiv.style.display = 'none'; cashReceivedInput.value = ''; cashChangeInput.value = ''; finalizeSaleButton.disabled = true; }
+
+            // --- Inicializar ---
+            initializePOS();
+        });
+    </script>
+
+</body>
+</html>

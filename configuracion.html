@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Configuración</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa; --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef; --sidebar-link-active-bg-light: #0d6efd; --sidebar-link-active-color-light: #ffffff;
+            --sidebar-bg-dark: #212529; --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40; --sidebar-link-active-bg-dark: #0d6efd; --sidebar-link-active-color-dark: #ffffff;
+        }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light); transition: background-color 0.3s ease, color 0.3s ease; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; border-right: 1px solid var(--bs-border-color); }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Configuración */
+        .form-section { margin-bottom: 2rem; }
+        #bank-list .list-group-item { display: flex; justify-content: space-between; align-items: center;}
+         #import-confirmation-text { font-weight: bold; color: var(--bs-danger);}
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+         }
+    </style>
+</head>
+<body>
+     <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-calculator"></i><span>Caja</span></a>
+             <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link active" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+            <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+             <h1 class="mb-4">Configuración General</h1>
+
+             <!-- Sección Información del Negocio -->
+             <div class="card form-section shadow-sm">
+                 <div class="card-header">
+                     <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i> Información del Negocio</h5>
+                 </div>
+                 <div class="card-body">
+                     <form id="business-info-form" novalidate>
+                         <div class="row g-3">
+                             <div class="col-md-6">
+                                 <label for="business-name" class="form-label">Nombre del Negocio</label>
+                                 <input type="text" id="business-name" class="form-control">
+                             </div>
+                              <div class="col-md-6">
+                                 <label for="business-tax-id" class="form-label">ID Fiscal / NIT / RUC</label>
+                                 <input type="text" id="business-tax-id" class="form-control">
+                             </div>
+                             <div class="col-md-6">
+                                 <label for="business-phone" class="form-label">Teléfono</label>
+                                 <input type="tel" id="business-phone" class="form-control">
+                             </div>
+                              <div class="col-md-6">
+                                 <label for="business-address" class="form-label">Dirección</label>
+                                 <input type="text" id="business-address" class="form-control">
+                             </div>
+                         </div>
+                         <div class="text-end mt-3">
+                             <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Guardar Información</button>
+                         </div>
+                           <div id="business-info-feedback" class="mt-2"></div>
+                     </form>
+                 </div>
+             </div>
+
+            <!-- Sección Ajustes de la App -->
+            <div class="card form-section shadow-sm">
+                 <div class="card-header">
+                     <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> Ajustes de la Aplicación</h5>
+                 </div>
+                 <div class="card-body">
+                     <form id="app-settings-form" novalidate>
+                         <div class="row g-3">
+                            <div class="col-md-6">
+                                 <label for="app-currency" class="form-label">Moneda Principal</label>
+                                 <input type="text" id="app-currency" class="form-control" readonly disabled>
+                                 <div class="form-text">La moneda se define en la configuración inicial.</div>
+                             </div>
+                              <div class="col-md-6">
+                                 <label for="app-business-type" class="form-label">Tipo de Negocio</label>
+                                 <select id="app-business-type" class="form-select">
+                                     <option value="store">Tienda / Comercio General</option>
+                                     <option value="restaurant">Restaurante / Cafetería</option>
+                                 </select>
+                                  <div class="form-text text-warning">Cambiar el tipo de negocio recargará la aplicación.</div>
+                             </div>
+                         </div>
+                         <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Guardar Ajustes</button>
+                         </div>
+                         <div id="app-settings-feedback" class="mt-2"></div>
+                     </form>
+                 </div>
+            </div>
+
+            <!-- Sección Seguridad -->
+            <div class="card form-section shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i> Seguridad</h5>
+                </div>
+                 <div class="card-body">
+                     <form id="security-form" novalidate>
+                         <h6>Cambiar Contraseña Maestra</h6>
+                         <div class="mb-3">
+                             <label for="current-password" class="form-label">Contraseña Actual <span class="text-danger">*</span></label>
+                             <input type="password" id="current-password" class="form-control" required>
+                              <div class="invalid-feedback">Ingresa tu contraseña actual.</div>
+                         </div>
+                         <div class="mb-3">
+                             <label for="new-password" class="form-label">Nueva Contraseña (mín. 4 caracteres) <span class="text-danger">*</span></label>
+                             <input type="password" id="new-password" class="form-control" required minlength="4">
+                             <div class="invalid-feedback">La nueva contraseña debe tener al menos 4 caracteres.</div>
+                         </div>
+                          <div class="mb-3">
+                             <label for="confirm-new-password" class="form-label">Confirmar Nueva Contraseña <span class="text-danger">*</span></label>
+                             <input type="password" id="confirm-new-password" class="form-control" required>
+                              <div class="invalid-feedback">Las nuevas contraseñas no coinciden.</div>
+                         </div>
+                         <div class="text-end">
+                              <button type="submit" class="btn btn-warning"><i class="fas fa-key me-1"></i> Cambiar Contraseña</button>
+                         </div>
+                           <div id="security-feedback" class="mt-2"></div>
+                     </form>
+                 </div>
+            </div>
+
+             <!-- Sección Cuentas Bancarias -->
+             <div class="card form-section shadow-sm">
+                 <div class="card-header">
+                     <h5 class="mb-0"><i class="fas fa-university me-2"></i> Cuentas Bancarias (Para Gastos)</h5>
+                 </div>
+                 <div class="card-body">
+                      <form id="add-bank-form" class="row g-3 align-items-end mb-3">
+                          <div class="col">
+                              <label for="bank-name" class="form-label form-label-sm">Nombre / Alias Banco <span class="text-danger">*</span></label>
+                              <input type="text" id="bank-name" class="form-control form-control-sm" required>
+                              <div class="invalid-feedback">El nombre es obligatorio.</div>
+                          </div>
+                          <div class="col">
+                              <label for="bank-info" class="form-label form-label-sm">Info Adicional (Nº Cuenta, etc.)</label>
+                              <input type="text" id="bank-info" class="form-control form-control-sm">
+                          </div>
+                          <div class="col-auto">
+                              <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i> Añadir</button>
+                          </div>
+                           <div id="bank-feedback" class="col-12 mt-2"></div>
+                      </form>
+                      <ul id="bank-list" class="list-group">
+                          <!-- Bancos se listarán aquí -->
+                          <li class="list-group-item text-muted">No hay cuentas bancarias registradas.</li>
+                      </ul>
+                 </div>
+             </div>
+
+             <!-- Sección Gestión de Datos -->
+            <div class="card form-section shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                     <h5 class="mb-0"><i class="fas fa-database me-2"></i> Gestión de Datos (Backups)</h5>
+                 </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h6>Exportar Datos (Backup)</h6>
+                            <p class="text-muted">Guarda una copia de seguridad de TODOS tus datos (configuración, productos, ventas, etc.) en un archivo JSON.</p>
+                             <p class="text-danger"><strong>¡IMPORTANTE!</strong> Guarda este archivo en un lugar seguro (Nube, USB externo).</p>
+                            <button id="export-data-button" class="btn btn-primary"><i class="fas fa-file-export me-1"></i> Exportar Todo (JSON)</button>
+                             <div id="export-feedback" class="mt-2"></div>
+                        </div>
+                        <div class="col-md-6 border-start">
+                             <h6>Importar Datos (Restaurar Backup)</h6>
+                             <div class="alert alert-danger">
+                                 <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>¡ADVERTENCIA EXTREMA!</h4>
+                                 <p>Importar un archivo de backup <strong>BORRARÁ PERMANENTEMENTE TODOS LOS DATOS ACTUALES</strong> en la aplicación (productos, ventas, clientes, configuración, TODO) y los reemplazará con los datos del archivo.</p>
+                                 <hr>
+                                 <p class="mb-0">Esta acción <strong>NO SE PUEDE DESHACER</strong>. Asegúrate de que realmente quieres reemplazar todo y que has seleccionado el archivo correcto.</p>
+                             </div>
+                              <form id="import-form">
+                                 <div class="mb-3">
+                                     <label for="import-file" class="form-label">Selecciona el archivo JSON de backup:</label>
+                                     <input type="file" id="import-file" class="form-control" accept=".json" required>
+                                     <div class="invalid-feedback">Selecciona un archivo .json</div>
+                                 </div>
+                                  <div class="mb-3 form-check">
+                                     <input type="checkbox" class="form-check-input" id="import-confirmation-checkbox" required>
+                                     <label class="form-check-label" for="import-confirmation-checkbox" id="import-confirmation-text">
+                                        Entiendo que TODOS los datos actuales se borrarán y serán reemplazados.
+                                     </label>
+                                      <div class="invalid-feedback">Debes confirmar para poder importar.</div>
+                                  </div>
+                                 <button type="submit" id="import-data-button" class="btn btn-danger" disabled>
+                                     <i class="fas fa-file-import me-1"></i> Importar y Reemplazar TODO
+                                 </button>
+                                   <div id="import-feedback" class="mt-2"></div>
+                              </form>
+                         </div>
+                    </div>
+                 </div>
+            </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Elementos del DOM ---
+             const themeToggleButton = document.getElementById('theme-toggle'); const htmlElement = document.documentElement; const themeIcon = themeToggleButton.querySelector('i'); const themeText = themeToggleButton.querySelector('span'); const logoutButton = document.getElementById('logout-button'); const sidebarBusinessName = document.getElementById('sidebar-business-name'); const restaurantLink = document.getElementById('restaurant-link');
+            // Forms & Feedback
+            const businessInfoForm = document.getElementById('business-info-form');
+            const businessInfoFeedback = document.getElementById('business-info-feedback');
+            const appSettingsForm = document.getElementById('app-settings-form');
+            const appSettingsFeedback = document.getElementById('app-settings-feedback');
+            const securityForm = document.getElementById('security-form');
+            const securityFeedback = document.getElementById('security-feedback');
+            const addBankForm = document.getElementById('add-bank-form');
+            const bankFeedback = document.getElementById('bank-feedback');
+            const importForm = document.getElementById('import-form');
+            const importFeedback = document.getElementById('import-feedback');
+            const exportFeedback = document.getElementById('export-feedback');
+            // Business Info Inputs
+            const businessNameInput = document.getElementById('business-name');
+            const businessTaxIdInput = document.getElementById('business-tax-id');
+            const businessPhoneInput = document.getElementById('business-phone');
+            const businessAddressInput = document.getElementById('business-address');
+            // App Settings Inputs
+            const appCurrencyDisplay = document.getElementById('app-currency');
+            const appBusinessTypeSelect = document.getElementById('app-business-type');
+            // Security Inputs
+            const currentPasswordInput = document.getElementById('current-password');
+            const newPasswordInput = document.getElementById('new-password');
+            const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+            // Bank Inputs & List
+            const bankNameInput = document.getElementById('bank-name');
+            const bankInfoInput = document.getElementById('bank-info');
+            const bankListUl = document.getElementById('bank-list');
+            // Data Management Inputs & Buttons
+            const exportDataButton = document.getElementById('export-data-button');
+            const importFileInput = document.getElementById('import-file');
+            const importConfirmationCheckbox = document.getElementById('import-confirmation-checkbox');
+            const importDataButton = document.getElementById('import-data-button');
+
+            let appConfig = {}; // Caché de la configuración principal
+            let bankAccounts = []; // Caché de cuentas bancarias
+
+             // --- Lógica Tema, Sidebar, Auxiliares (Igual que antes) ---
+            const applyTheme = (theme) => { /* ... */ htmlElement.setAttribute('data-bs-theme', theme); if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; } else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; } try { localStorage.setItem('preferredTheme', theme); } catch (e) {} };
+            const loadTheme = () => { /* ... */ let pT = null; try { pT = localStorage.getItem('preferredTheme'); } catch (e) {} if (pT) { applyTheme(pT); } else { const pD = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(pD ? 'dark' : 'light'); } };
+            themeToggleButton.addEventListener('click', () => { const cT = htmlElement.getAttribute('data-bs-theme'); applyTheme(cT === 'dark' ? 'light' : 'dark'); }); loadTheme();
+            logoutButton.addEventListener('click', () => { if (confirm('¿Seguro?')) window.location.href = 'login.html'; });
+            function loadData(key, defaultValue = null) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : defaultValue; } catch (e) { console.error(`LS Load (${key}):`, e); return defaultValue; } }
+            function saveData(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { console.error(`LS Save (${key}):`, e); alert(`Error al guardar ${key}.`); return false; } }
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+             function showFeedback(element, message, isSuccess = true) {
+                 element.textContent = message;
+                 element.className = `mt-2 alert alert-${isSuccess ? 'success' : 'danger'}`;
+                  // Ocultar después de unos segundos
+                 setTimeout(() => { element.textContent = ''; element.className = 'mt-2'; }, 5000);
+             }
+
+             // --- Autenticación y Carga Inicial ---
+             appConfig = loadData('gestionaFacilConfig');
+             if (!appConfig || !appConfig.masterPassword) { window.location.href = 'login.html'; return; }
+             if (appConfig.businessName) sidebarBusinessName.textContent = appConfig.businessName;
+             if (appConfig.businessType === 'restaurant') restaurantLink.classList.remove('d-none');
+             bankAccounts = appConfig.config_banks || []; // Usar directamente desde la config principal
+
+            // --- Cargar Datos en Formularios ---
+            function loadFormData() {
+                // Business Info
+                businessNameInput.value = appConfig.businessName || '';
+                businessTaxIdInput.value = appConfig.taxId || '';
+                businessPhoneInput.value = appConfig.phone || '';
+                businessAddressInput.value = appConfig.address || '';
+                // App Settings
+                appCurrencyDisplay.value = `${appConfig.currency?.code || 'N/A'} (${appConfig.currency?.symbol || '?'})`;
+                appBusinessTypeSelect.value = appConfig.businessType || 'store';
+                // Bank List
+                renderBankList();
+            }
+
+            // --- Lógica Secciones ---
+
+            // 1. Información del Negocio
+            businessInfoForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 appConfig.businessName = businessNameInput.value.trim();
+                 appConfig.taxId = businessTaxIdInput.value.trim();
+                 appConfig.phone = businessPhoneInput.value.trim();
+                 appConfig.address = businessAddressInput.value.trim();
+
+                 if (saveData('gestionaFacilConfig', appConfig)) {
+                     sidebarBusinessName.textContent = appConfig.businessName; // Actualizar sidebar
+                     showFeedback(businessInfoFeedback, 'Información del negocio guardada con éxito.', true);
+                 } else {
+                     showFeedback(businessInfoFeedback, 'Error al guardar la información.', false);
+                 }
+             });
+
+            // 2. Ajustes de la App
+            appSettingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newBusinessType = appBusinessTypeSelect.value;
+                const currentType = appConfig.businessType;
+
+                appConfig.businessType = newBusinessType;
+
+                 if (saveData('gestionaFacilConfig', appConfig)) {
+                     showFeedback(appSettingsFeedback, 'Ajustes guardados con éxito.', true);
+                      if (newBusinessType !== currentType) {
+                          alert("El tipo de negocio ha cambiado. La aplicación se recargará para aplicar los cambios.");
+                          setTimeout(() => window.location.reload(), 1000); // Recargar después de 1 seg
+                      }
+                 } else {
+                      showFeedback(appSettingsFeedback, 'Error al guardar los ajustes.', false);
+                       // Revertir cambio en memoria si falla
+                       appConfig.businessType = currentType;
+                       appBusinessTypeSelect.value = currentType;
+                 }
+             });
+
+
+            // 3. Seguridad
+            securityForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 securityFeedback.textContent = ''; securityFeedback.className = 'mt-2';
+                 securityForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                 const currentPass = currentPasswordInput.value;
+                 const newPass = newPasswordInput.value;
+                 const confirmPass = confirmNewPasswordInput.value;
+
+                 let isValid = true;
+
+                 // Validar contraseña actual
+                 if (!currentPass) {
+                      currentPasswordInput.classList.add('is-invalid'); isValid = false;
+                 } else if (currentPass !== appConfig.masterPassword) {
+                      currentPasswordInput.classList.add('is-invalid');
+                      currentPasswordInput.nextElementSibling.textContent = 'La contraseña actual es incorrecta.';
+                      isValid = false;
+                 } else {
+                      currentPasswordInput.nextElementSibling.textContent = 'Ingresa tu contraseña actual.'; // Reset message
+                 }
+
+                 // Validar nueva contraseña
+                 if (!newPass || newPass.length < 4) {
+                      newPasswordInput.classList.add('is-invalid'); isValid = false;
+                 }
+                  if (!confirmPass) {
+                       confirmNewPasswordInput.classList.add('is-invalid');
+                       confirmNewPasswordInput.nextElementSibling.textContent = 'Confirma la nueva contraseña.';
+                       isValid = false;
+                  } else if (newPass && newPass !== confirmPass) {
+                      confirmNewPasswordInput.classList.add('is-invalid');
+                      confirmNewPasswordInput.nextElementSibling.textContent = 'Las nuevas contraseñas no coinciden.';
+                      isValid = false;
+                  } else {
+                       confirmNewPasswordInput.nextElementSibling.textContent = 'Las nuevas contraseñas no coinciden.'; // Reset message
+                  }
+
+
+                 if (!isValid) {
+                     const firstInvalid = securityForm.querySelector('.is-invalid');
+                     if(firstInvalid) firstInvalid.focus();
+                     return;
+                 }
+
+                 // Si todo es válido
+                 appConfig.masterPassword = newPass;
+                  if (saveData('gestionaFacilConfig', appConfig)) {
+                     showFeedback(securityFeedback, 'Contraseña actualizada con éxito.', true);
+                     securityForm.reset(); // Limpiar formulario
+                 } else {
+                      showFeedback(securityFeedback, 'Error al actualizar la contraseña.', false);
+                       // Revertir contraseña en memoria si falla (recargar config?)
+                       appConfig = loadData('gestionaFacilConfig');
+                 }
+
+            });
+
+
+            // 4. Cuentas Bancarias
+            function renderBankList() {
+                bankListUl.innerHTML = '';
+                if (bankAccounts.length === 0) {
+                    bankListUl.innerHTML = '<li class="list-group-item text-muted">No hay cuentas bancarias registradas.</li>';
+                    return;
+                }
+                bankAccounts.forEach(bank => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.innerHTML = `
+                        <span>
+                            <strong>${bank.name || 'N/A'}</strong>
+                            ${bank.info ? `<small class="d-block text-muted">${bank.info}</small>` : ''}
+                        </span>
+                        <button class="btn btn-sm btn-outline-danger delete-bank-btn" data-id="${bank.id}" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    bankListUl.appendChild(li);
+                });
+            }
+
+            addBankForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 addBankForm.classList.remove('was-validated');
+                 bankFeedback.textContent = ''; bankFeedback.className = 'col-12 mt-2';
+
+                 const name = bankNameInput.value.trim();
+                 const info = bankInfoInput.value.trim();
+
+                 if (!name) {
+                     addBankForm.classList.add('was-validated');
+                     return;
+                 }
+
+                 const newBank = {
+                     id: generateId(),
+                     name: name,
+                     info: info || null
+                 };
+                 bankAccounts.push(newBank);
+                 appConfig.config_banks = bankAccounts; // Asegurar que esté en el objeto config principal
+
+                 if (saveData('gestionaFacilConfig', appConfig)) {
+                     showFeedback(bankFeedback, `Banco "${name}" añadido.`, true);
+                     renderBankList();
+                     addBankForm.reset();
+                 } else {
+                     showFeedback(bankFeedback, 'Error al añadir banco.', false);
+                      // Revertir
+                      bankAccounts = loadData('gestionaFacilConfig')?.config_banks || [];
+                      appConfig.config_banks = bankAccounts;
+                      renderBankList();
+                 }
+            });
+
+            bankListUl.addEventListener('click', (e) => {
+                 const deleteButton = e.target.closest('.delete-bank-btn');
+                 if (deleteButton) {
+                     const bankId = deleteButton.dataset.id;
+                     const bank = bankAccounts.find(b => b.id === bankId);
+                      if (bank && confirm(`¿Seguro de eliminar la cuenta "${bank.name}"?`)) {
+                         bankAccounts = bankAccounts.filter(b => b.id !== bankId);
+                         appConfig.config_banks = bankAccounts;
+                          if (saveData('gestionaFacilConfig', appConfig)) {
+                             showFeedback(bankFeedback, `Banco "${bank.name}" eliminado.`, true);
+                             renderBankList();
+                         } else {
+                              showFeedback(bankFeedback, 'Error al eliminar banco.', false);
+                              bankAccounts = loadData('gestionaFacilConfig')?.config_banks || [];
+                              appConfig.config_banks = bankAccounts;
+                              renderBankList();
+                         }
+                     }
+                 }
+            });
+
+
+            // 5. Gestión de Datos (Export/Import)
+             const relevantKeys = [ // Claves a incluir en el backup
+                 'gestionaFacilConfig', 'productos', 'proveedores', 'clientes',
+                 'ventas', 'gastos', 'cashRegisterStatus', 'cashHistory',
+                 'inventoryAdjustments', 'restaurantTables', 'activeOrders'
+                 // 'config_banks' ya está dentro de 'gestionaFacilConfig'
+             ];
+
+            exportDataButton.addEventListener('click', () => {
+                exportFeedback.textContent = ''; exportFeedback.className = 'mt-2';
+                try {
+                    const backupData = {};
+                    relevantKeys.forEach(key => {
+                        backupData[key] = loadData(key, null); // Cargar cada clave
+                    });
+
+                    const jsonString = JSON.stringify(backupData, null, 2); // Pretty print JSON
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    link.download = `gestiona_facil_backup_${timestamp}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    showFeedback(exportFeedback, 'Datos exportados con éxito.', true);
+                } catch (error) {
+                    console.error("Error al exportar datos:", error);
+                    showFeedback(exportFeedback, `Error al exportar: ${error.message}`, false);
+                }
+            });
+
+             importConfirmationCheckbox.addEventListener('change', () => {
+                 importDataButton.disabled = !importConfirmationCheckbox.checked;
+             });
+
+             importForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 importFeedback.textContent = ''; importFeedback.className = 'mt-2';
+                  importForm.classList.remove('was-validated');
+
+                 const file = importFileInput.files[0];
+
+                 if (!file) {
+                      importFileInput.classList.add('is-invalid');
+                      importForm.classList.add('was-validated');
+                      return;
+                 }
+                 if (!importConfirmationCheckbox.checked) {
+                      importConfirmationCheckbox.classList.add('is-invalid');
+                      importForm.classList.add('was-validated');
+                      return;
+                 }
+
+                 const reader = new FileReader();
+                 reader.onload = (event) => {
+                     try {
+                         const importedData = JSON.parse(event.target.result);
+
+                         // Validación Mínima (Verificar si tiene al menos la clave de config)
+                         if (!importedData || !importedData.gestionaFacilConfig) {
+                             throw new Error("Archivo JSON inválido o no contiene datos de configuración.");
+                         }
+
+                         // *** ADVERTENCIA FINAL ANTES DE BORRAR ***
+                         if (!confirm("¡ÚLTIMA ADVERTENCIA!\n\nEstás a punto de REEMPLAZAR TODOS TUS DATOS ACTUALES con el contenido de este archivo.\n\n¿Estás ABSOLUTAMENTE SEGURO de continuar?")) {
+                             showFeedback(importFeedback, 'Importación cancelada por el usuario.', false);
+                             return;
+                         }
+
+                         // *** BORRADO Y REEMPLAZO ***
+                         console.warn("Procediendo a borrar datos actuales y reemplazarlos...");
+
+                         // 1. Borrar todas las claves relevantes actuales
+                         relevantKeys.forEach(key => {
+                             try { localStorage.removeItem(key); } catch (err) { console.warn(`Error al borrar ${key}:`, err); }
+                         });
+
+                         // 2. Guardar los datos importados
+                         let allSaved = true;
+                         for (const key in importedData) {
+                             // Solo importar claves conocidas para evitar basura
+                             if (relevantKeys.includes(key) && importedData[key] !== null) {
+                                 if (!saveData(key, importedData[key])) {
+                                     console.error(`Error al guardar la clave importada: ${key}`);
+                                     allSaved = false;
+                                     // Intentar seguir guardando el resto? O detener? Detener es más seguro.
+                                     throw new Error(`Error crítico al guardar la clave '${key}' durante la importación. Proceso incompleto.`);
+                                 }
+                             } else if (!relevantKeys.includes(key)) {
+                                  console.warn(`Clave desconocida encontrada en el backup y omitida: ${key}`);
+                             }
+                         }
+
+                         if (allSaved) {
+                              showFeedback(importFeedback, 'Datos importados y reemplazados con éxito. La página se recargará.', true);
+                              alert("Importación completada. La aplicación se recargará ahora.");
+                              setTimeout(() => window.location.href = 'login.html', 1500); // Ir a login tras recarga
+                         } else {
+                              // Esto no debería ocurrir si lanzamos error antes
+                              showFeedback(importFeedback, 'Ocurrieron errores durante el guardado de datos importados. Revisar consola.', false);
+                         }
+
+                     } catch (error) {
+                         console.error("Error al importar datos:", error);
+                         showFeedback(importFeedback, `Error al importar: ${error.message}`, false);
+                          // Limpiar campos por seguridad
+                          importForm.reset();
+                          importDataButton.disabled = true;
+                     }
+                 };
+                 reader.onerror = (event) => {
+                     showFeedback(importFeedback, 'Error al leer el archivo.', false);
+                 };
+                 reader.readAsText(file);
+             });
+
+
+            // --- Carga Inicial de Datos en Formularios ---
+            loadFormData();
+
+            console.log('Página de Configuración Inicializada.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiona Fácil - Panel Principal</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos Personalizados Embebidos -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg-light: #f8f9fa;
+            --sidebar-text-light: #212529;
+            --sidebar-link-hover-bg-light: #e9ecef;
+            --sidebar-link-active-bg-light: #0d6efd;
+            --sidebar-link-active-color-light: #ffffff;
+
+            --sidebar-bg-dark: #212529;
+            --sidebar-text-dark: #adb5bd;
+            --sidebar-link-hover-bg-dark: #343a40;
+            --sidebar-link-active-bg-dark: #0d6efd;
+            --sidebar-link-active-color-dark: #ffffff;
+        }
+
+        body { display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        .sidebar {
+            width: var(--sidebar-width); flex-shrink: 0;
+            background-color: var(--sidebar-bg-light); color: var(--sidebar-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex; flex-direction: column; height: 100vh;
+            position: sticky; top: 0; border-right: 1px solid var(--bs-border-color);
+        }
+        .sidebar .nav-link { color: var(--sidebar-text-light); }
+        .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-light); }
+        .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-light); color: var(--sidebar-link-active-color-light); font-weight: 500; }
+        .sidebar .nav-link i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+
+        [data-bs-theme="dark"] .sidebar { background-color: var(--sidebar-bg-dark); color: var(--sidebar-text-dark); border-right: 1px solid var(--bs-border-color); }
+        [data-bs-theme="dark"] .sidebar .nav-link { color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .nav-link:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+        [data-bs-theme="dark"] .sidebar .nav-link.active { background-color: var(--sidebar-link-active-bg-dark); color: var(--sidebar-link-active-color-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle { border-color: var(--sidebar-text-dark); color: var(--sidebar-text-dark); }
+        [data-bs-theme="dark"] .sidebar .btn-theme-toggle:hover { background-color: var(--sidebar-link-hover-bg-dark); color: #fff; }
+
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--bs-border-color); }
+        .btn-theme-toggle { width: 100%; text-align: left; }
+        .btn-theme-toggle i { margin-right: 0.5rem; width: 15px; }
+        #logout-button { width: 100%; text-align: left; margin-top: 0.5rem; }
+        #logout-button i { margin-right: 0.5rem; width: 15px;}
+
+        /* Estilos Dashboard */
+        .summary-card .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .summary-card .card-icon {
+            font-size: 2.5rem;
+            opacity: 0.6;
+        }
+        .summary-card .card-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+        .summary-card .card-label {
+            font-size: 0.9rem;
+            color: var(--bs-secondary-color);
+            margin-bottom: 0;
+        }
+         .list-group-item {
+             padding: 0.5rem 1rem; /* Más compacto para listas */
+             font-size: 0.9rem;
+         }
+          .quick-access-btn {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             height: 100px; /* Altura fija */
+             font-size: 1rem;
+             text-align: center;
+         }
+         .quick-access-btn i {
+             font-size: 1.8rem;
+             margin-bottom: 0.5rem;
+         }
+
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 70px; }
+            .sidebar .nav-link span, .sidebar .app-brand-text, .sidebar .btn-theme-toggle span, .sidebar #logout-button span { display: none; }
+            .sidebar .nav-link i, .sidebar #logout-button i { margin-right: 0; }
+            .sidebar .app-logo { padding: 0.5rem; font-size: 1.5rem; }
+            .sidebar .sidebar-footer { padding: 0.5rem; }
+            .btn-theme-toggle, #logout-button { text-align: center; }
+            .btn-theme-toggle i, #logout-button i { margin-right: 0; }
+
+            .summary-card .card-value { font-size: 1.5rem; }
+            .summary-card .card-icon { font-size: 2rem; }
+            .quick-access-btn { height: 80px; font-size: 0.9rem; }
+            .quick-access-btn i { font-size: 1.5rem; }
+        }
+         @media (max-width: 576px) {
+              .main-content { padding: 1rem; }
+              .quick-access-btn { height: 70px; font-size: 0.8rem;}
+              .quick-access-btn i { font-size: 1.3rem; }
+         }
+    </style>
+</head>
+<body>
+    <!-- Barra Lateral Fija -->
+    <aside class="sidebar p-3 d-flex flex-column vh-100 sticky-top">
+        <div class="app-logo text-center mb-4">
+             <a href="dashboard.html" class="text-decoration-none d-flex align-items-center justify-content-center">
+                 <i class="fas fa-store fa-lg me-2"></i>
+                 <span id="sidebar-business-name" class="app-brand-text fs-5 fw-bold">Gestiona Fácil</span>
+             </a>
+        </div>
+        <nav class="nav flex-column nav-pills flex-grow-1">
+             <a class="nav-link active" href="dashboard.html"><i class="fas fa-tachometer-alt"></i><span>Panel Principal</span></a>
+             <a class="nav-link" href="nueva_venta.html"><i class="fas fa-cash-register"></i><span>Nueva Venta</span></a>
+             <a class="nav-link" href="productos.html"><i class="fas fa-boxes"></i><span>Productos</span></a>
+             <a class="nav-link" href="clientes.html"><i class="fas fa-users"></i><span>Clientes</span></a>
+             <a class="nav-link" href="proveedores.html"><i class="fas fa-truck-loading"></i><span>Proveedores</span></a>
+             <a class="nav-link" href="gastos.html"><i class="fas fa-receipt"></i><span>Gastos</span></a>
+             <a class="nav-link" href="caja.html"><i class="fas fa-cash-register"></i><span>Caja</span></a> <!-- Icono repetido? Cambiar por fa-calculator? -->
+             <a class="nav-link" href="inventario.html"><i class="fas fa-clipboard-list"></i><span>Inventario</span></a>
+             <a class="nav-link" href="reportes.html"><i class="fas fa-chart-line"></i><span>Reportes</span></a>
+             <a class="nav-link" href="configuracion.html"><i class="fas fa-cog"></i><span>Configuración</span></a>
+             <!-- Enlace Restaurante Condicional -->
+             <a class="nav-link d-none" id="restaurant-link" href="restaurante.html"><i class="fas fa-utensils"></i><span>Restaurante</span></a>
+             <a class="nav-link" href="ayuda.html"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
+        </nav>
+        <div class="sidebar-footer mt-auto">
+            <button id="theme-toggle" class="btn btn-outline-secondary btn-theme-toggle" title="Cambiar Tema">
+                 <i class="fas fa-sun"></i> <span></span>
+            </button>
+            <button id="logout-button" class="btn btn-outline-danger btn-sm" title="Salir">
+                 <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Panel Principal</h1>
+
+            <!-- Fila de Tarjetas de Resumen -->
+            <div class="row mb-4 gy-4">
+                <!-- Ventas del Día -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card text-bg-primary shadow-sm summary-card h-100">
+                        <div class="card-body">
+                            <div>
+                                <div id="daily-sales-amount" class="card-value">--</div>
+                                <p class="card-label">Ventas del Día (<span id="daily-sales-count">0</span> tx)</p>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                         <a href="reportes.html" class="card-footer text-white text-decoration-none small">
+                            Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                         </a>
+                    </div>
+                </div>
+
+                <!-- Estado de Caja -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card text-bg-info shadow-sm summary-card h-100">
+                        <div class="card-body">
+                            <div>
+                                <div id="cash-register-status" class="card-value">--</div>
+                                <p id="cash-register-time" class="card-label">--</p>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                        </div>
+                         <a href="caja.html" class="card-footer text-white text-decoration-none small">
+                            Gestionar Caja <i class="fas fa-arrow-circle-right"></i>
+                         </a>
+                    </div>
+                </div>
+
+                <!-- Stock Crítico -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card text-bg-warning shadow-sm h-100"> <!-- Sin clase summary-card para estilo lista -->
+                         <div class="card-header fw-bold">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Stock Crítico
+                         </div>
+                        <div class="card-body p-0"> <!-- Sin padding para que la lista ocupe todo -->
+                             <ul id="low-stock-list" class="list-group list-group-flush">
+                                <li class="list-group-item text-center text-muted p-3">Cargando...</li>
+                             </ul>
+                        </div>
+                         <a href="inventario.html" class="card-footer text-dark text-decoration-none small">
+                            Ver Inventario <i class="fas fa-arrow-circle-right"></i>
+                         </a>
+                    </div>
+                </div>
+
+                <!-- Clientes con Deuda -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card text-bg-danger shadow-sm summary-card h-100">
+                        <div class="card-body">
+                             <div>
+                                <div id="debtors-count" class="card-value">--</div>
+                                <p id="debtors-label" class="card-label">Clientes con Deuda</p>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                        </div>
+                         <a href="clientes.html" class="card-footer text-white text-decoration-none small">
+                            Gestionar Clientes <i class="fas fa-arrow-circle-right"></i>
+                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila de Accesos Rápidos -->
+            <div class="row gy-3">
+                 <h2 class="mb-3 h4">Accesos Rápidos</h2>
+                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                     <a href="nueva_venta.html" class="btn btn-outline-primary w-100 quick-access-btn">
+                         <i class="fas fa-cash-register"></i>
+                         <span>Nueva Venta</span>
+                     </a>
+                 </div>
+                  <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                     <a href="caja.html" class="btn btn-outline-info w-100 quick-access-btn">
+                         <i class="fas fa-calculator"></i> <!-- Icono diferente para Caja -->
+                         <span>Caja</span>
+                     </a>
+                 </div>
+                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                     <a href="productos.html" class="btn btn-outline-success w-100 quick-access-btn">
+                         <i class="fas fa-boxes"></i>
+                         <span>Productos</span>
+                     </a>
+                 </div>
+                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                     <a href="gastos.html" class="btn btn-outline-warning w-100 quick-access-btn">
+                         <i class="fas fa-receipt"></i>
+                         <span>Gastos</span>
+                     </a>
+                 </div>
+                 <!-- Botón Restaurante Condicional -->
+                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-none" id="quick-access-restaurant">
+                     <a href="restaurante.html" class="btn btn-outline-secondary w-100 quick-access-btn">
+                         <i class="fas fa-utensils"></i>
+                         <span>Restaurante</span>
+                     </a>
+                 </div>
+                 <!-- Añadir más si se necesitan -->
+            </div>
+
+        </div> <!-- /.container-fluid -->
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Personalizado Embebido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            const themeIcon = themeToggleButton.querySelector('i');
+            const themeText = themeToggleButton.querySelector('span');
+            const logoutButton = document.getElementById('logout-button');
+            const sidebarBusinessName = document.getElementById('sidebar-business-name');
+            const restaurantLink = document.getElementById('restaurant-link');
+            const quickAccessRestaurant = document.getElementById('quick-access-restaurant');
+
+            // Elementos del Dashboard
+            const dailySalesAmountEl = document.getElementById('daily-sales-amount');
+            const dailySalesCountEl = document.getElementById('daily-sales-count');
+            const cashRegisterStatusEl = document.getElementById('cash-register-status');
+            const cashRegisterTimeEl = document.getElementById('cash-register-time');
+            const lowStockListEl = document.getElementById('low-stock-list');
+            const debtorsCountEl = document.getElementById('debtors-count');
+            const debtorsLabelEl = document.getElementById('debtors-label');
+
+            // --- Lógica del Tema (Copiar/Adaptar) ---
+            const applyTheme = (theme) => {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                if (theme === 'dark') { themeIcon.className = 'fas fa-sun'; themeText.textContent = ' Tema Claro'; themeToggleButton.setAttribute('title', 'Cambiar a Tema Claro'); }
+                else { themeIcon.className = 'fas fa-moon'; themeText.textContent = ' Tema Oscuro'; themeToggleButton.setAttribute('title', 'Cambiar a Tema Oscuro'); }
+                try { localStorage.setItem('preferredTheme', theme); } catch (e) { console.warn("LS Error (Theme):", e); }
+            };
+            const loadTheme = () => {
+                let preferredTheme = null;
+                try { preferredTheme = localStorage.getItem('preferredTheme'); } catch (e) { console.warn("LS Error (Theme):", e); }
+                if (preferredTheme) { applyTheme(preferredTheme); }
+                else { const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(prefersDark ? 'dark' : 'light'); }
+            };
+            themeToggleButton.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+            loadTheme();
+
+             // --- Funciones Auxiliares ---
+            function loadData(key, defaultValue = null) {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : defaultValue;
+                } catch (e) {
+                    console.error(`Error loading data for key "${key}":`, e);
+                    alert(`Error al cargar datos (${key}). Los datos podrían estar corruptos.`);
+                    return defaultValue;
+                }
+            }
+
+            function getLocaleForCurrency(currencyCode) {
+                const map = { 'USD': 'en-US', 'EUR': 'de-DE', 'COP': 'es-CO', 'MXN': 'es-MX', 'ARS': 'es-AR', 'PEN': 'es-PE', 'CLP': 'es-CL', 'GBP': 'en-GB' };
+                return map[currencyCode];
+            }
+
+            function formatCurrency(amount, currencyConfig) {
+                 if (amount === null || amount === undefined || isNaN(Number(amount))) { amount = 0; }
+                 if (!currencyConfig || !currencyConfig.code || currencyConfig.decimals === undefined) {
+                     console.error("Invalid currencyConfig:", currencyConfig);
+                     return Number(amount).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); // Fallback genérico español
+                 }
+                try {
+                    const numberFormatter = new Intl.NumberFormat(getLocaleForCurrency(currencyConfig.code) || 'es-ES', {
+                        style: 'decimal',
+                        minimumFractionDigits: currencyConfig.decimals,
+                        maximumFractionDigits: currencyConfig.decimals,
+                    });
+                    const formattedNumber = numberFormatter.format(amount);
+                    const symbol = currencyConfig.symbol || currencyConfig.code;
+                    // Simple symbol placement
+                     if (['USD', 'EUR', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'PEN'].includes(currencyConfig.code)) {
+                         return `${symbol}${formattedNumber}`;
+                     } else { return `${formattedNumber} ${symbol}`; }
+                } catch (e) {
+                    console.error("Error formatting currency:", e);
+                    const fixedAmount = Number(amount).toFixed(currencyConfig.decimals || 2);
+                    return `${currencyConfig.symbol || ''}${fixedAmount}`;
+                }
+            }
+
+            function formatTime(isoString) {
+                 if (!isoString) return '--';
+                 try {
+                    const date = new Date(isoString);
+                    return date.toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true });
+                 } catch (e) { return 'Inválido'; }
+            }
+
+            function isToday(dateString) {
+                if (!dateString) return false;
+                try {
+                    const date = new Date(dateString);
+                    const today = new Date();
+                    // Compare year, month, and day in the current timezone
+                    return date.toDateString() === today.toDateString();
+                } catch (e) { return false; }
+            }
+
+            // --- Autenticación ---
+            const config = loadData('gestionaFacilConfig');
+            if (!config || !config.masterPassword) {
+                console.log('No config found, redirecting to login.');
+                window.location.href = 'login.html';
+                return; // Detener ejecución si no está autenticado
+            }
+
+            // --- Carga y Muestra de Datos del Dashboard ---
+            function updateDashboard() {
+                console.log('Updating dashboard data...');
+                // Cargar todos los datos necesarios una vez
+                const sales = loadData('ventas', []);
+                const cashStatus = loadData('cashRegisterStatus', { isOpen: false, openingTime: null, lastCloseTime: null });
+                const products = loadData('productos', []);
+                const clients = loadData('clientes', []);
+
+                // 1. Ventas del Día
+                const todaySales = sales.filter(sale => isToday(sale.date));
+                const totalDailySales = todaySales.reduce((sum, sale) => sum + (sale.total || 0), 0);
+                dailySalesAmountEl.textContent = formatCurrency(totalDailySales, config.currency);
+                dailySalesCountEl.textContent = todaySales.length;
+
+                // 2. Estado de Caja
+                if (cashStatus.isOpen) {
+                    cashRegisterStatusEl.textContent = 'Abierta';
+                    cashRegisterStatusEl.classList.remove('text-danger'); // Asegurar que no esté rojo
+                    cashRegisterStatusEl.classList.add('text-success'); // Bootstrap class for success/open might not exist, using text color
+                    cashRegisterTimeEl.textContent = `Desde: ${formatTime(cashStatus.openingTime)}`;
+                } else {
+                    cashRegisterStatusEl.textContent = 'Cerrada';
+                     cashRegisterStatusEl.classList.remove('text-success');
+                     cashRegisterStatusEl.classList.add('text-danger'); // Text color red
+                    cashRegisterTimeEl.textContent = cashStatus.lastCloseTime ? `Último cierre: ${formatTime(cashStatus.lastCloseTime)}` : 'Nunca abierta';
+                }
+
+                // 3. Stock Crítico
+                const lowStockProducts = products.filter(p => p.manageStock && typeof p.stock === 'number' && typeof p.minimumStock === 'number' && p.stock < p.minimumStock);
+                lowStockListEl.innerHTML = ''; // Limpiar lista
+                if (lowStockProducts.length > 0) {
+                    // Limitar a mostrar N productos (e.g., 5)
+                    const productsToShow = lowStockProducts.slice(0, 5);
+                    productsToShow.forEach(p => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        li.innerHTML = `
+                            <span>${p.name}</span>
+                            <span class="badge bg-danger rounded-pill">${p.stock} / ${p.minimumStock || 0} ${p.unit || ''}</span>
+                        `;
+                        lowStockListEl.appendChild(li);
+                    });
+                     if (lowStockProducts.length > 5) {
+                         const liMore = document.createElement('li');
+                         liMore.className = 'list-group-item text-center text-muted small';
+                         liMore.textContent = `... y ${lowStockProducts.length - 5} más`;
+                          lowStockListEl.appendChild(liMore);
+                     }
+
+                } else {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item text-center text-muted p-3';
+                    li.textContent = 'No hay productos bajos de stock.';
+                    lowStockListEl.appendChild(li);
+                }
+
+                // 4. Clientes con Deuda
+                const debtors = clients.filter(c => c.debt && c.debt > 0);
+                debtorsCountEl.textContent = debtors.length;
+                 if (debtors.length > 0) {
+                     const totalDebt = debtors.reduce((sum, c) => sum + c.debt, 0);
+                     debtorsLabelEl.textContent = `Clientes (${formatCurrency(totalDebt, config.currency)})`;
+                 } else {
+                     debtorsLabelEl.textContent = `Clientes con Deuda`;
+                 }
+            }
+
+
+            // --- Inicialización ---
+            // Mostrar nombre del negocio en sidebar
+            if (config.businessName) {
+                sidebarBusinessName.textContent = config.businessName;
+            }
+
+            // Mostrar/ocultar enlace/botón de Restaurante
+            if (config.businessType === 'restaurant') {
+                restaurantLink.classList.remove('d-none');
+                quickAccessRestaurant.classList.remove('d-none');
+            }
+
+            // Llenar el dashboard con datos
+            updateDashboard();
+
+             // Actualizar dashboard periódicamente? (Opcional, puede ser costoso)
+            // setInterval(updateDashboard, 60000); // Cada minuto
+
+            // --- Logout ---
+             logoutButton.addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que deseas salir?')) {
+                    // Aquí podríamos limpiar algún estado de "sesión" si lo hubiera.
+                    // Por ahora, solo redirigimos.
+                    console.log('Logging out...');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            console.log('Gestiona Fácil - Dashboard Cargado');
+        });
+    </script>
+
+</body>
+</html>
